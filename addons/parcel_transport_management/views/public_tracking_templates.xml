@@ -1,0 +1,1244 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <template id="public_tracking_status_label" name="Public parcel status label">
+        <t t-if="status_code == 'draft'">Draft</t>
+        <t t-elif="status_code == 'assigned'">Assigned</t>
+        <t t-elif="status_code == 'partially_picked_up'">Partially picked up</t>
+        <t t-elif="status_code == 'picked_up'">Picked up</t>
+        <t t-elif="status_code == 'in_transit'">In transit</t>
+        <t t-elif="status_code == 'partially_delivered'">Partially delivered</t>
+        <t t-elif="status_code == 'delivered'">Delivered</t>
+        <t t-elif="status_code == 'cancelled'">Cancelled</t>
+        <t t-else="">Status update</t>
+    </template>
+
+    <template id="public_tracking_page" name="Public parcel tracking">
+        <html t-att-lang="html_lang">
+            <head>
+                <meta charset="utf-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <meta name="robots" content="noindex,nofollow" />
+                <title>Track your parcel</title>
+                <style>
+                    .o_ptm_public_tracking {
+                        --ptm-color-canvas: #ecebe6;
+                        --ptm-color-surface: #f7f6f1;
+                        --ptm-color-surface-raised: #fbfaf6;
+                        --ptm-color-surface-contrast: #f0eee8;
+                        --ptm-color-ink: #171b20;
+                        --ptm-color-ink-soft: #30383e;
+                        --ptm-color-muted: #586268;
+                        --ptm-color-subtle: #626d74;
+                        --ptm-color-line: #c3c9ca;
+                        --ptm-color-line-strong: #7d898e;
+                        --ptm-color-red: #c92338;
+                        --ptm-color-red-dark: #8f1728;
+                        --ptm-color-red-soft: #f4dde1;
+                        --ptm-color-cyan: #176e80;
+                        --ptm-color-cyan-dark: #0b5666;
+                        --ptm-color-cyan-soft: #d8ecef;
+                        --ptm-color-night: #1d2429;
+                        --ptm-color-night-soft: #293238;
+                        --ptm-color-night-muted: #c5cdcf;
+                        --ptm-color-grid: rgba(73, 84, 89, 0.12);
+                        --ptm-color-shadow: rgba(23, 27, 32, 0.13);
+                        --ptm-color-focus-gap: #fbfaf6;
+                        --ptm-color-forced-canvas: Canvas;
+                        --ptm-color-forced-text: CanvasText;
+
+                        --ptm-space-1: 0.25rem;
+                        --ptm-space-2: 0.5rem;
+                        --ptm-space-3: 0.75rem;
+                        --ptm-space-4: 1rem;
+                        --ptm-space-5: 1.25rem;
+                        --ptm-space-6: 1.5rem;
+                        --ptm-space-8: 2rem;
+                        --ptm-space-10: 2.5rem;
+                        --ptm-space-12: 3rem;
+                        --ptm-space-16: 4rem;
+
+                        --ptm-font-display: "Arial Narrow", "Liberation Sans Narrow", "Nimbus Sans Narrow", sans-serif;
+                        --ptm-font-body: "Noto Sans", "DejaVu Sans", sans-serif;
+                        --ptm-font-mono: "Liberation Mono", "DejaVu Sans Mono", monospace;
+                        --ptm-text-2xs: 0.625rem;
+                        --ptm-text-xs: 0.6875rem;
+                        --ptm-text-sm: 0.8125rem;
+                        --ptm-text-base: 0.9375rem;
+                        --ptm-text-lg: 1.125rem;
+                        --ptm-text-xl: 1.5rem;
+                        --ptm-text-2xl: 2rem;
+                        --ptm-text-display: clamp(3.5rem, 7vw, 6.5rem);
+                        --ptm-tracking-tight: 0.025em;
+                        --ptm-tracking-wide: 0.08em;
+
+                        --ptm-border-thin: 0.0625rem;
+                        --ptm-border-medium: 0.125rem;
+                        --ptm-border-accent: 0.25rem;
+                        --ptm-radius-control: 0.125rem;
+                        --ptm-control-size: 2.75rem;
+                        --ptm-content-max: 72rem;
+                        --ptm-grid-size: 4rem;
+                        --ptm-diagonal: 0.75rem;
+                        --ptm-skew: -28deg;
+                        --ptm-shadow-panel: 0 var(--ptm-space-3) var(--ptm-space-10) var(--ptm-color-shadow);
+                        --ptm-ease: cubic-bezier(0.22, 1, 0.36, 1);
+                        --ptm-transition: 160ms var(--ptm-ease);
+
+                        position: relative;
+                        display: flex;
+                        min-width: 0;
+                        min-height: 100vh;
+                        min-height: 100svh;
+                        margin: 0;
+                        color: var(--ptm-color-ink);
+                        background-color: var(--ptm-color-canvas);
+                        font-family: var(--ptm-font-body);
+                        font-size: var(--ptm-text-base);
+                        line-height: 1.6;
+                        color-scheme: light;
+                        isolation: isolate;
+                        overflow-x: hidden;
+                        overflow-x: clip;
+                        flex-direction: column;
+                    }
+
+                    .o_ptm_public_tracking *,
+                    .o_ptm_public_tracking *::before,
+                    .o_ptm_public_tracking *::after {
+                        box-sizing: border-box;
+                    }
+
+                    .o_ptm_public_tracking h1,
+                    .o_ptm_public_tracking h2,
+                    .o_ptm_public_tracking h3,
+                    .o_ptm_public_tracking p {
+                        margin-top: 0;
+                    }
+
+                    .o_ptm_public_tracking button,
+                    .o_ptm_public_tracking input {
+                        color: inherit;
+                        font: inherit;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_shell {
+                        width: min(
+                            calc(100% - (var(--ptm-space-4) * 2)),
+                            var(--ptm-content-max)
+                        );
+                        min-width: 0;
+                        margin-inline: auto;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_atmosphere {
+                        position: absolute;
+                        inset: 0;
+                        z-index: -1;
+                        pointer-events: none;
+                        overflow: hidden;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_grid {
+                        position: absolute;
+                        inset: 0;
+                        background-image:
+                            linear-gradient(
+                                var(--ptm-color-grid) var(--ptm-border-thin),
+                                transparent var(--ptm-border-thin)
+                            ),
+                            linear-gradient(
+                                90deg,
+                                var(--ptm-color-grid) var(--ptm-border-thin),
+                                transparent var(--ptm-border-thin)
+                            );
+                        background-size: var(--ptm-grid-size) var(--ptm-grid-size);
+                        mask-image: linear-gradient(
+                            to bottom,
+                            var(--ptm-color-ink),
+                            transparent
+                        );
+                        opacity: 0.58;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_slash {
+                        position: absolute;
+                        top: var(--ptm-space-16);
+                        right: calc(var(--ptm-space-16) * -2);
+                        width: calc(var(--ptm-grid-size) * 5);
+                        height: var(--ptm-space-6);
+                        background: var(--ptm-color-red);
+                        opacity: 0.08;
+                        transform: rotate(-8deg) skewX(var(--ptm-skew));
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_slash--cyan {
+                        top: auto;
+                        right: auto;
+                        bottom: calc(var(--ptm-space-16) * 2);
+                        left: calc(var(--ptm-space-16) * -2);
+                        background: var(--ptm-color-cyan);
+                        transform: rotate(-8deg) skewX(calc(var(--ptm-skew) * -1));
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_header {
+                        color: var(--ptm-color-surface-raised);
+                        background: var(--ptm-color-night);
+                        border-bottom: var(--ptm-border-accent) solid var(--ptm-color-red);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_header_inner {
+                        display: flex;
+                        min-height: calc(var(--ptm-control-size) + var(--ptm-space-8));
+                        gap: var(--ptm-space-6);
+                        align-items: center;
+                        justify-content: space-between;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_brand {
+                        display: flex;
+                        min-width: 0;
+                        gap: var(--ptm-space-3);
+                        align-items: center;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_brand_glyph {
+                        display: grid;
+                        width: var(--ptm-control-size);
+                        height: var(--ptm-control-size);
+                        flex: 0 0 var(--ptm-control-size);
+                        gap: var(--ptm-space-1);
+                        background: var(--ptm-color-red);
+                        clip-path: polygon(
+                            0 0,
+                            calc(100% - var(--ptm-diagonal)) 0,
+                            100% var(--ptm-diagonal),
+                            100% 100%,
+                            0 100%
+                        );
+                        place-content: center;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_brand_glyph i {
+                        display: block;
+                        width: var(--ptm-space-6);
+                        height: var(--ptm-border-medium);
+                        background: var(--ptm-color-surface-raised);
+                        transform: skewX(var(--ptm-skew));
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_brand_glyph i:last-child {
+                        width: var(--ptm-space-4);
+                        margin-left: var(--ptm-space-2);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_brand_copy {
+                        display: grid;
+                        min-width: 0;
+                        font-family: var(--ptm-font-display);
+                        line-height: 1;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_brand_copy strong {
+                        font-size: var(--ptm-text-xl);
+                        font-weight: 900;
+                        letter-spacing: var(--ptm-tracking-wide);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_brand_copy small {
+                        margin-top: var(--ptm-space-1);
+                        color: var(--ptm-color-night-muted);
+                        font-family: var(--ptm-font-mono);
+                        font-size: var(--ptm-text-2xs);
+                        letter-spacing: var(--ptm-tracking-wide);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_mode {
+                        display: grid;
+                        min-width: 0;
+                        padding-left: var(--ptm-space-6);
+                        border-left: var(--ptm-border-thin) solid var(--ptm-color-line-strong);
+                        font-family: var(--ptm-font-display);
+                        line-height: 1.15;
+                        text-align: right;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_mode span {
+                        color: var(--ptm-color-night-muted);
+                        font-size: var(--ptm-text-2xs);
+                        font-weight: 800;
+                        letter-spacing: var(--ptm-tracking-wide);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_mode strong {
+                        margin-top: var(--ptm-space-1);
+                        color: var(--ptm-color-surface-raised);
+                        font-size: var(--ptm-text-sm);
+                        font-weight: 900;
+                        letter-spacing: var(--ptm-tracking-wide);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_main {
+                        padding-block: var(--ptm-space-12) var(--ptm-space-16);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_hero {
+                        display: grid;
+                        grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+                        gap: var(--ptm-space-10);
+                        align-items: center;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_hero_copy {
+                        min-width: 0;
+                        padding-left: var(--ptm-space-6);
+                        border-left: var(--ptm-border-accent) solid var(--ptm-color-red);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_kicker,
+                    .o_ptm_public_tracking .o_ptm_tracking_section_index {
+                        display: flex;
+                        gap: var(--ptm-space-2);
+                        align-items: center;
+                        color: var(--ptm-color-cyan-dark);
+                        font-family: var(--ptm-font-display);
+                        font-size: var(--ptm-text-xs);
+                        font-weight: 900;
+                        letter-spacing: var(--ptm-tracking-wide);
+                        text-transform: uppercase;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_kicker i {
+                        display: inline-block;
+                        width: var(--ptm-space-3);
+                        height: var(--ptm-space-3);
+                        background: var(--ptm-color-cyan);
+                        clip-path: polygon(
+                            0 0,
+                            calc(100% - var(--ptm-space-1)) 0,
+                            100% var(--ptm-space-1),
+                            100% 100%,
+                            0 100%
+                        );
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_hero h1 {
+                        margin: var(--ptm-space-3) 0 var(--ptm-space-5);
+                        font-family: var(--ptm-font-display);
+                        font-size: var(--ptm-text-display);
+                        font-weight: 900;
+                        letter-spacing: var(--ptm-tracking-tight);
+                        line-height: 0.83;
+                        text-transform: uppercase;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_hero h1 span,
+                    .o_ptm_public_tracking .o_ptm_tracking_hero h1 em {
+                        display: block;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_hero h1 em {
+                        color: var(--ptm-color-red);
+                        font-style: normal;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_hero_copy p {
+                        max-width: 34rem;
+                        margin-bottom: 0;
+                        color: var(--ptm-color-ink-soft);
+                        font-size: var(--ptm-text-lg);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_search_panel {
+                        position: relative;
+                        min-width: 0;
+                        background: var(--ptm-color-surface-raised);
+                        border: var(--ptm-border-thin) solid var(--ptm-color-line-strong);
+                        border-top: var(--ptm-border-accent) solid var(--ptm-color-red);
+                        box-shadow: var(--ptm-shadow-panel);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_search_panel::before {
+                        position: absolute;
+                        top: calc(var(--ptm-border-accent) * -1);
+                        right: var(--ptm-space-8);
+                        width: var(--ptm-grid-size);
+                        height: var(--ptm-border-accent);
+                        content: "";
+                        background: var(--ptm-color-cyan);
+                        transform: skewX(var(--ptm-skew));
+                        transform-origin: right;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_search_header {
+                        display: flex;
+                        min-width: 0;
+                        padding: var(--ptm-space-4) var(--ptm-space-5);
+                        gap: var(--ptm-space-4);
+                        align-items: center;
+                        justify-content: space-between;
+                        background: var(--ptm-color-surface-contrast);
+                        border-bottom: var(--ptm-border-thin) solid var(--ptm-color-line);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_search_header h2 {
+                        margin-bottom: 0;
+                        font-family: var(--ptm-font-display);
+                        font-size: var(--ptm-text-lg);
+                        font-weight: 900;
+                        letter-spacing: var(--ptm-tracking-wide);
+                        line-height: 1.15;
+                        text-transform: uppercase;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_search_header span {
+                        color: var(--ptm-color-red-dark);
+                        font-family: var(--ptm-font-mono);
+                        font-size: var(--ptm-text-xs);
+                        font-weight: 700;
+                        white-space: nowrap;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_form {
+                        padding: var(--ptm-space-6);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_label {
+                        display: grid;
+                        margin-bottom: var(--ptm-space-2);
+                        font-family: var(--ptm-font-display);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_label span {
+                        font-size: var(--ptm-text-sm);
+                        font-weight: 900;
+                        letter-spacing: var(--ptm-tracking-wide);
+                        text-transform: uppercase;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_label small {
+                        margin-top: var(--ptm-space-1);
+                        color: var(--ptm-color-muted);
+                        font-family: var(--ptm-font-body);
+                        font-size: var(--ptm-text-xs);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_controls {
+                        display: grid;
+                        min-width: 0;
+                        grid-template-columns: minmax(0, 1fr) auto;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_input {
+                        width: 100%;
+                        min-width: 0;
+                        min-height: var(--ptm-control-size);
+                        padding: var(--ptm-space-3) var(--ptm-space-4);
+                        color: var(--ptm-color-ink);
+                        background: var(--ptm-color-surface-raised);
+                        border: var(--ptm-border-medium) solid var(--ptm-color-ink);
+                        border-right: 0;
+                        border-radius: var(--ptm-radius-control) 0 0 var(--ptm-radius-control);
+                        font-family: var(--ptm-font-mono);
+                        font-size: var(--ptm-text-sm);
+                        letter-spacing: var(--ptm-tracking-tight);
+                        outline: 0;
+                        transition:
+                            border-color var(--ptm-transition),
+                            background-color var(--ptm-transition);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_input::placeholder {
+                        color: var(--ptm-color-subtle);
+                        opacity: 1;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_input:hover {
+                        background: var(--ptm-color-surface);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_input:focus {
+                        border-color: var(--ptm-color-cyan-dark);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_button {
+                        display: inline-flex;
+                        min-width: calc(var(--ptm-control-size) * 2.5);
+                        min-height: var(--ptm-control-size);
+                        padding: var(--ptm-space-3) var(--ptm-space-5);
+                        gap: var(--ptm-space-3);
+                        align-items: center;
+                        justify-content: center;
+                        color: var(--ptm-color-surface-raised);
+                        background: var(--ptm-color-red);
+                        border: var(--ptm-border-medium) solid var(--ptm-color-red);
+                        border-radius: 0 var(--ptm-radius-control) var(--ptm-radius-control) 0;
+                        clip-path: polygon(
+                            0 0,
+                            calc(100% - var(--ptm-diagonal)) 0,
+                            100% var(--ptm-diagonal),
+                            100% 100%,
+                            0 100%
+                        );
+                        cursor: pointer;
+                        font-family: var(--ptm-font-display);
+                        font-size: var(--ptm-text-sm);
+                        font-weight: 900;
+                        letter-spacing: var(--ptm-tracking-wide);
+                        text-transform: uppercase;
+                        transition:
+                            background-color var(--ptm-transition),
+                            border-color var(--ptm-transition);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_button:hover {
+                        background: var(--ptm-color-red-dark);
+                        border-color: var(--ptm-color-red-dark);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_button:active {
+                        background: var(--ptm-color-ink);
+                        border-color: var(--ptm-color-ink);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_button:disabled {
+                        cursor: not-allowed;
+                        opacity: 0.62;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_input:focus-visible,
+                    .o_ptm_public_tracking .o_ptm_tracking_button:focus-visible {
+                        outline: var(--ptm-border-accent) solid var(--ptm-color-cyan-dark);
+                        outline-offset: var(--ptm-space-1);
+                        box-shadow: 0 0 0 var(--ptm-space-1) var(--ptm-color-focus-gap);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_hint {
+                        margin: var(--ptm-space-3) 0 0;
+                        color: var(--ptm-color-muted);
+                        font-size: var(--ptm-text-xs);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_state_area {
+                        margin-top: var(--ptm-space-10);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_idle,
+                    .o_ptm_public_tracking .o_ptm_tracking_not_found {
+                        position: relative;
+                        display: grid;
+                        min-width: 0;
+                        padding: var(--ptm-space-6);
+                        grid-template-columns: auto minmax(0, 1fr);
+                        gap: var(--ptm-space-5);
+                        align-items: center;
+                        overflow: hidden;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_idle {
+                        color: var(--ptm-color-surface-raised);
+                        background: var(--ptm-color-night);
+                        border-left: var(--ptm-border-accent) solid var(--ptm-color-cyan);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_idle::after {
+                        position: absolute;
+                        right: calc(var(--ptm-space-8) * -1);
+                        bottom: var(--ptm-space-4);
+                        width: calc(var(--ptm-grid-size) * 2);
+                        height: var(--ptm-space-2);
+                        content: "";
+                        background: var(--ptm-color-red);
+                        transform: skewX(var(--ptm-skew));
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_state_mark {
+                        display: grid;
+                        width: var(--ptm-control-size);
+                        height: var(--ptm-control-size);
+                        color: var(--ptm-color-cyan-soft);
+                        border: var(--ptm-border-medium) solid var(--ptm-color-cyan);
+                        font-family: var(--ptm-font-mono);
+                        font-size: var(--ptm-text-sm);
+                        font-weight: 700;
+                        place-items: center;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_idle .o_ptm_tracking_section_index {
+                        color: var(--ptm-color-night-muted);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_state_copy {
+                        min-width: 0;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_state_copy h2 {
+                        margin: var(--ptm-space-1) 0 var(--ptm-space-1);
+                        font-family: var(--ptm-font-display);
+                        font-size: var(--ptm-text-xl);
+                        font-weight: 900;
+                        letter-spacing: var(--ptm-tracking-tight);
+                        line-height: 1.15;
+                        text-transform: uppercase;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_state_copy p {
+                        margin-bottom: 0;
+                        color: var(--ptm-color-night-muted);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_not_found {
+                        color: var(--ptm-color-red-dark);
+                        background: var(--ptm-color-red-soft);
+                        border: var(--ptm-border-thin) solid var(--ptm-color-red);
+                        border-left-width: var(--ptm-border-accent);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_not_found .o_ptm_tracking_state_mark {
+                        color: var(--ptm-color-surface-raised);
+                        background: var(--ptm-color-red);
+                        border-color: var(--ptm-color-red);
+                        font-family: var(--ptm-font-display);
+                        font-size: var(--ptm-text-xl);
+                        font-weight: 900;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_not_found .o_ptm_tracking_section_index {
+                        color: var(--ptm-color-red-dark);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_not_found .o_ptm_tracking_state_copy p {
+                        color: var(--ptm-color-ink-soft);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_not_found .o_ptm_tracking_state_help {
+                        margin-top: var(--ptm-space-2);
+                        font-size: var(--ptm-text-sm);
+                        font-weight: 700;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_result {
+                        min-width: 0;
+                        background: var(--ptm-color-surface-raised);
+                        border: var(--ptm-border-thin) solid var(--ptm-color-line-strong);
+                        border-top: var(--ptm-border-accent) solid var(--ptm-color-cyan);
+                        box-shadow: var(--ptm-shadow-panel);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_result_header {
+                        display: flex;
+                        min-width: 0;
+                        padding: var(--ptm-space-6);
+                        gap: var(--ptm-space-6);
+                        align-items: center;
+                        justify-content: space-between;
+                        color: var(--ptm-color-surface-raised);
+                        background: var(--ptm-color-night);
+                        border-bottom: var(--ptm-border-accent) solid var(--ptm-color-red);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_result_header .o_ptm_tracking_section_index {
+                        color: var(--ptm-color-night-muted);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_result_header h2 {
+                        margin: var(--ptm-space-1) 0 0;
+                        font-family: var(--ptm-font-display);
+                        font-size: var(--ptm-text-2xl);
+                        font-weight: 900;
+                        letter-spacing: var(--ptm-tracking-tight);
+                        line-height: 1;
+                        text-transform: uppercase;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_current_status {
+                        display: grid;
+                        min-width: min(100%, 14rem);
+                        padding: var(--ptm-space-3) var(--ptm-space-4);
+                        color: var(--ptm-color-surface-raised);
+                        background: var(--ptm-color-night-soft);
+                        border-left: var(--ptm-border-accent) solid var(--ptm-color-cyan);
+                        font-family: var(--ptm-font-display);
+                        text-align: right;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_current_status span {
+                        color: var(--ptm-color-night-muted);
+                        font-size: var(--ptm-text-2xs);
+                        font-weight: 800;
+                        letter-spacing: var(--ptm-tracking-wide);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_current_status strong {
+                        margin-top: var(--ptm-space-1);
+                        overflow-wrap: anywhere;
+                        font-size: var(--ptm-text-xl);
+                        font-weight: 900;
+                        letter-spacing: var(--ptm-tracking-tight);
+                        line-height: 1.1;
+                        text-transform: uppercase;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_details {
+                        display: grid;
+                        min-width: 0;
+                        grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr));
+                        border-bottom: var(--ptm-border-thin) solid var(--ptm-color-line);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_detail {
+                        min-width: 0;
+                        margin: 0;
+                        padding: var(--ptm-space-5) var(--ptm-space-6);
+                        border-right: var(--ptm-border-thin) solid var(--ptm-color-line);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_detail:last-child {
+                        border-right: 0;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_detail span {
+                        display: block;
+                        margin-bottom: var(--ptm-space-1);
+                        color: var(--ptm-color-muted);
+                        font-family: var(--ptm-font-display);
+                        font-size: var(--ptm-text-2xs);
+                        font-weight: 900;
+                        letter-spacing: var(--ptm-tracking-wide);
+                        text-transform: uppercase;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_detail strong,
+                    .o_ptm_public_tracking .o_ptm_tracking_detail time {
+                        display: block;
+                        min-width: 0;
+                        color: var(--ptm-color-ink);
+                        font-family: var(--ptm-font-mono);
+                        font-size: var(--ptm-text-sm);
+                        font-weight: 700;
+                        line-height: 1.4;
+                        overflow-wrap: anywhere;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_detail--code {
+                        border-bottom: var(--ptm-border-medium) solid var(--ptm-color-cyan);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_detail--code strong {
+                        font-size: var(--ptm-text-lg);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_timeline_section {
+                        padding: var(--ptm-space-6);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_timeline_header {
+                        display: flex;
+                        min-width: 0;
+                        margin-bottom: var(--ptm-space-5);
+                        gap: var(--ptm-space-6);
+                        align-items: end;
+                        justify-content: space-between;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_timeline_header h3 {
+                        margin: var(--ptm-space-1) 0 0;
+                        font-family: var(--ptm-font-display);
+                        font-size: var(--ptm-text-xl);
+                        font-weight: 900;
+                        letter-spacing: var(--ptm-tracking-tight);
+                        line-height: 1;
+                        text-transform: uppercase;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_timeline_header p {
+                        max-width: 28rem;
+                        margin-bottom: 0;
+                        color: var(--ptm-color-muted);
+                        font-size: var(--ptm-text-sm);
+                        text-align: right;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_timeline {
+                        margin: 0;
+                        padding: 0;
+                        list-style: none;
+                        counter-reset: ptm-step;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_timeline li {
+                        position: relative;
+                        display: grid;
+                        min-width: 0;
+                        min-height: var(--ptm-control-size);
+                        padding: var(--ptm-space-4);
+                        grid-template-columns: var(--ptm-space-4) minmax(0, 1fr) auto;
+                        gap: var(--ptm-space-4);
+                        align-items: center;
+                        background: var(--ptm-color-surface);
+                        border-top: var(--ptm-border-thin) solid var(--ptm-color-line);
+                        counter-increment: ptm-step;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_timeline li:last-child {
+                        border-bottom: var(--ptm-border-thin) solid var(--ptm-color-line);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_timeline li::after {
+                        color: var(--ptm-color-subtle);
+                        content: counter(ptm-step, decimal-leading-zero);
+                        font-family: var(--ptm-font-mono);
+                        font-size: var(--ptm-text-xs);
+                        font-weight: 700;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_timeline_marker {
+                        position: relative;
+                        z-index: 1;
+                        display: block;
+                        width: var(--ptm-space-3);
+                        height: var(--ptm-space-3);
+                        background: var(--ptm-color-cyan);
+                        border: var(--ptm-border-medium) solid var(--ptm-color-surface-raised);
+                        outline: var(--ptm-border-thin) solid var(--ptm-color-cyan-dark);
+                        transform: rotate(45deg);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_timeline li:last-child .o_ptm_tracking_timeline_marker {
+                        background: var(--ptm-color-red);
+                        outline-color: var(--ptm-color-red-dark);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_event {
+                        display: grid;
+                        min-width: 0;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_event strong {
+                        color: var(--ptm-color-ink);
+                        font-family: var(--ptm-font-display);
+                        font-size: var(--ptm-text-base);
+                        font-weight: 900;
+                        letter-spacing: var(--ptm-tracking-tight);
+                        line-height: 1.2;
+                        text-transform: uppercase;
+                        overflow-wrap: anywhere;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_event time {
+                        margin-top: var(--ptm-space-1);
+                        color: var(--ptm-color-muted);
+                        font-family: var(--ptm-font-mono);
+                        font-size: var(--ptm-text-xs);
+                        overflow-wrap: anywhere;
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_timeline_empty {
+                        margin-bottom: 0;
+                        padding: var(--ptm-space-5);
+                        color: var(--ptm-color-muted);
+                        background: var(--ptm-color-surface-contrast);
+                        border-left: var(--ptm-border-accent) solid var(--ptm-color-cyan);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_footer {
+                        margin-top: auto;
+                        color: var(--ptm-color-night-muted);
+                        background: var(--ptm-color-night);
+                        border-top: var(--ptm-border-thin) solid var(--ptm-color-line-strong);
+                    }
+
+                    .o_ptm_public_tracking .o_ptm_tracking_footer_inner {
+                        display: flex;
+                        min-height: var(--ptm-control-size);
+                        padding-block: var(--ptm-space-3);
+                        gap: var(--ptm-space-4);
+                        align-items: center;
+                        justify-content: space-between;
+                        font-family: var(--ptm-font-mono);
+                        font-size: var(--ptm-text-2xs);
+                        letter-spacing: var(--ptm-tracking-wide);
+                    }
+
+                    @media (max-width: 48rem) {
+                        .o_ptm_public_tracking .o_ptm_tracking_main {
+                            padding-block: var(--ptm-space-8);
+                        }
+
+                        .o_ptm_public_tracking .o_ptm_tracking_hero {
+                            grid-template-columns: minmax(0, 1fr);
+                            gap: var(--ptm-space-8);
+                        }
+
+                        .o_ptm_public_tracking .o_ptm_tracking_hero_copy p {
+                            max-width: 40rem;
+                        }
+
+                        .o_ptm_public_tracking .o_ptm_tracking_state_area {
+                            margin-top: var(--ptm-space-8);
+                        }
+
+                        .o_ptm_public_tracking .o_ptm_tracking_result_header,
+                        .o_ptm_public_tracking .o_ptm_tracking_timeline_header {
+                            align-items: stretch;
+                            flex-direction: column;
+                        }
+
+                        .o_ptm_public_tracking .o_ptm_tracking_current_status {
+                            width: 100%;
+                            text-align: left;
+                        }
+
+                        .o_ptm_public_tracking .o_ptm_tracking_details {
+                            grid-template-columns: minmax(0, 1fr);
+                        }
+
+                        .o_ptm_public_tracking .o_ptm_tracking_detail,
+                        .o_ptm_public_tracking .o_ptm_tracking_detail:last-child {
+                            border-right: 0;
+                            border-bottom: var(--ptm-border-thin) solid var(--ptm-color-line);
+                        }
+
+                        .o_ptm_public_tracking .o_ptm_tracking_timeline_header p {
+                            max-width: none;
+                            text-align: left;
+                        }
+                    }
+
+                    @media (max-width: 30rem) {
+                        .o_ptm_public_tracking .o_ptm_tracking_header_inner {
+                            gap: var(--ptm-space-3);
+                        }
+
+                        .o_ptm_public_tracking .o_ptm_tracking_brand_copy strong {
+                            font-size: var(--ptm-text-lg);
+                        }
+
+                        .o_ptm_public_tracking .o_ptm_tracking_brand_copy small {
+                            font-size: var(--ptm-text-2xs);
+                            letter-spacing: var(--ptm-tracking-tight);
+                        }
+
+                        .o_ptm_public_tracking .o_ptm_tracking_mode {
+                            padding-left: var(--ptm-space-3);
+                        }
+
+                        .o_ptm_public_tracking .o_ptm_tracking_mode span {
+                            display: none;
+                        }
+
+                        .o_ptm_public_tracking .o_ptm_tracking_hero_copy {
+                            padding-left: var(--ptm-space-4);
+                        }
+
+                        .o_ptm_public_tracking .o_ptm_tracking_hero h1 {
+                            font-size: clamp(3rem, 15vw, 4rem);
+                        }
+
+                        .o_ptm_public_tracking .o_ptm_tracking_search_header,
+                        .o_ptm_public_tracking .o_ptm_tracking_form,
+                        .o_ptm_public_tracking .o_ptm_tracking_result_header,
+                        .o_ptm_public_tracking .o_ptm_tracking_timeline_section {
+                            padding: var(--ptm-space-4);
+                        }
+
+                        .o_ptm_public_tracking .o_ptm_tracking_controls {
+                            gap: var(--ptm-space-2);
+                            grid-template-columns: minmax(0, 1fr);
+                        }
+
+                        .o_ptm_public_tracking .o_ptm_tracking_input {
+                            border-right: var(--ptm-border-medium) solid var(--ptm-color-ink);
+                            border-radius: var(--ptm-radius-control);
+                        }
+
+                        .o_ptm_public_tracking .o_ptm_tracking_button {
+                            width: 100%;
+                            border-radius: var(--ptm-radius-control);
+                        }
+
+                        .o_ptm_public_tracking .o_ptm_tracking_idle,
+                        .o_ptm_public_tracking .o_ptm_tracking_not_found {
+                            padding: var(--ptm-space-4);
+                            grid-template-columns: minmax(0, 1fr);
+                            gap: var(--ptm-space-3);
+                        }
+
+                        .o_ptm_public_tracking .o_ptm_tracking_detail {
+                            padding: var(--ptm-space-4);
+                        }
+
+                        .o_ptm_public_tracking .o_ptm_tracking_timeline li {
+                            padding-inline: var(--ptm-space-3);
+                            gap: var(--ptm-space-3);
+                        }
+
+                        .o_ptm_public_tracking .o_ptm_tracking_footer_inner {
+                            align-items: flex-start;
+                            flex-direction: column;
+                            justify-content: center;
+                        }
+                    }
+
+                    @media (prefers-reduced-motion: reduce) {
+                        .o_ptm_public_tracking .o_ptm_tracking_input,
+                        .o_ptm_public_tracking .o_ptm_tracking_button {
+                            scroll-behavior: auto;
+                            transition: none;
+                        }
+                    }
+
+                    @media (forced-colors: active) {
+                        .o_ptm_public_tracking .o_ptm_tracking_atmosphere,
+                        .o_ptm_public_tracking .o_ptm_tracking_search_panel::before,
+                        .o_ptm_public_tracking .o_ptm_tracking_idle::after {
+                            display: none;
+                        }
+
+                        .o_ptm_public_tracking .o_ptm_tracking_brand_glyph,
+                        .o_ptm_public_tracking .o_ptm_tracking_button,
+                        .o_ptm_public_tracking .o_ptm_tracking_kicker i {
+                            clip-path: none;
+                        }
+
+                        .o_ptm_public_tracking .o_ptm_tracking_input:focus-visible,
+                        .o_ptm_public_tracking .o_ptm_tracking_button:focus-visible {
+                            outline-color: var(--ptm-color-forced-text);
+                            box-shadow: 0 0 0 var(--ptm-space-1) var(--ptm-color-forced-canvas);
+                        }
+                    }
+                </style>
+            </head>
+            <body class="o_ptm_public_tracking">
+                <div class="o_ptm_tracking_atmosphere" aria-hidden="true">
+                    <span class="o_ptm_tracking_grid" />
+                    <span class="o_ptm_tracking_slash" />
+                    <span class="o_ptm_tracking_slash o_ptm_tracking_slash--cyan" />
+                </div>
+
+                <header class="o_ptm_tracking_header">
+                    <div class="o_ptm_tracking_shell o_ptm_tracking_header_inner">
+                        <div class="o_ptm_tracking_brand" aria-label="Parcel Transport Management">
+                            <span class="o_ptm_tracking_brand_glyph" aria-hidden="true">
+                                <i />
+                                <i />
+                            </span>
+                            <span class="o_ptm_tracking_brand_copy">
+                                <strong>PARCEL</strong>
+                                <small>TRANSPORT MANAGEMENT</small>
+                            </span>
+                        </div>
+                        <div class="o_ptm_tracking_mode" aria-label="Public parcel tracking">
+                            <span>PUBLIC SIGNAL</span>
+                            <strong>TRACK / 01</strong>
+                        </div>
+                    </div>
+                </header>
+
+                <main class="o_ptm_tracking_shell o_ptm_tracking_main">
+                    <section class="o_ptm_tracking_hero" aria-labelledby="ptm-tracking-title">
+                        <div class="o_ptm_tracking_hero_copy">
+                            <span class="o_ptm_tracking_kicker">
+                                <i aria-hidden="true" />
+                                Live parcel route
+                            </span>
+                            <h1 id="ptm-tracking-title">
+                                <span>Track your</span>
+                                <em>parcel</em>
+                            </h1>
+                            <p>Enter your tracking code to see the latest parcel updates.</p>
+                        </div>
+
+                        <section
+                            class="o_ptm_tracking_search_panel"
+                            aria-labelledby="ptm-search-title"
+                        >
+                            <header class="o_ptm_tracking_search_header">
+                                <h2 id="ptm-search-title">Find a parcel</h2>
+                                <span>INPUT / 01</span>
+                            </header>
+                            <form class="o_ptm_tracking_form" action="/parcel/track" method="post">
+                                <input
+                                    type="hidden"
+                                    name="csrf_token"
+                                    t-att-value="page['csrf_token']"
+                                />
+                                <label class="o_ptm_tracking_label" for="ptm-tracking-code">
+                                    <span>Tracking code</span>
+                                    <small
+                                    >Enter the full PTM reference, with or without hyphens.</small>
+                                </label>
+                                <div class="o_ptm_tracking_controls">
+                                    <input
+                                        id="ptm-tracking-code"
+                                        class="o_ptm_tracking_input"
+                                        type="text"
+                                        name="tracking_code"
+                                        required="required"
+                                        autocomplete="off"
+                                        autocapitalize="characters"
+                                        spellcheck="false"
+                                        t-att-aria-invalid="'true' if page['not_found'] else 'false'"
+                                        aria-describedby="ptm-tracking-hint"
+                                        placeholder="PTM-XXXX-XXXX-XXXX-XXXX"
+                                    />
+                                    <button class="o_ptm_tracking_button" type="submit">
+                                        <span>Track</span>
+                                        <span aria-hidden="true">→</span>
+                                    </button>
+                                </div>
+                                <p class="o_ptm_tracking_hint" id="ptm-tracking-hint">
+                                    Only the tracking code is required. Parcel status appears below.
+                                </p>
+                            </form>
+                        </section>
+                    </section>
+
+                    <div class="o_ptm_tracking_state_area">
+                        <t t-if="not page['not_found'] and not page['tracking']">
+                            <section class="o_ptm_tracking_idle" aria-labelledby="ptm-idle-title">
+                                <span class="o_ptm_tracking_state_mark" aria-hidden="true">00</span>
+                                <div class="o_ptm_tracking_state_copy">
+                                    <span
+                                        class="o_ptm_tracking_section_index"
+                                    >Status / waiting</span>
+                                    <h2 id="ptm-idle-title">Ready for a tracking code</h2>
+                                    <p
+                                    >Submit the code above to reveal its verified parcel timeline.</p>
+                                </div>
+                            </section>
+                        </t>
+
+                        <t t-if="page['not_found']">
+                            <section
+                                class="o_ptm_tracking_not_found"
+                                role="alert"
+                                aria-labelledby="ptm-not-found-title"
+                            >
+                                <span class="o_ptm_tracking_state_mark" aria-hidden="true">!</span>
+                                <div class="o_ptm_tracking_state_copy">
+                                    <span
+                                        class="o_ptm_tracking_section_index"
+                                    >Lookup / no match</span>
+                                    <h2
+                                        id="ptm-not-found-title"
+                                    >Tracking information unavailable</h2>
+                                    <p
+                                    >We could not find tracking information for that code. Check the code and try again.</p>
+                                    <p
+                                        class="o_ptm_tracking_state_help"
+                                    >Review every character, then submit the tracking code again.</p>
+                                </div>
+                            </section>
+                        </t>
+
+                        <t t-if="page['tracking']">
+                            <t t-set="tracking" t-value="page['tracking']" />
+                            <section
+                                class="o_ptm_tracking_result"
+                                aria-live="polite"
+                                aria-labelledby="ptm-result-title"
+                            >
+                                <header class="o_ptm_tracking_result_header">
+                                    <div>
+                                        <span
+                                            class="o_ptm_tracking_section_index"
+                                        >Live result / verified</span>
+                                        <h2 id="ptm-result-title">Parcel status</h2>
+                                    </div>
+                                    <p class="o_ptm_tracking_current_status">
+                                        <span>Current status</span>
+                                        <strong>
+                                            <t
+                                                t-call="parcel_transport_management.public_tracking_status_label"
+                                            >
+                                                <t
+                                                    t-set="status_code"
+                                                    t-value="tracking['current_status']"
+                                                />
+                                            </t>
+                                        </strong>
+                                    </p>
+                                </header>
+
+                                <div
+                                    class="o_ptm_tracking_details"
+                                    aria-label="Parcel tracking summary"
+                                >
+                                    <p class="o_ptm_tracking_detail o_ptm_tracking_detail--code">
+                                        <span>Tracking code</span>
+                                        <strong t-esc="tracking['tracking_code']" />
+                                    </p>
+                                    <p
+                                        class="o_ptm_tracking_detail"
+                                        t-if="tracking['expected_delivery_at']"
+                                    >
+                                        <span>Expected delivery</span>
+                                        <time t-esc="tracking['expected_delivery_at']" />
+                                    </p>
+                                    <p
+                                        class="o_ptm_tracking_detail"
+                                        t-if="tracking['last_updated_at']"
+                                    >
+                                        <span>Last updated</span>
+                                        <time t-esc="tracking['last_updated_at']" />
+                                    </p>
+                                </div>
+
+                                <section
+                                    class="o_ptm_tracking_timeline_section"
+                                    aria-labelledby="ptm-timeline-title"
+                                >
+                                    <header class="o_ptm_tracking_timeline_header">
+                                        <div>
+                                            <span
+                                                class="o_ptm_tracking_section_index"
+                                            >Route history / events</span>
+                                            <h3 id="ptm-timeline-title">Timeline</h3>
+                                        </div>
+                                        <p
+                                        >Verified handling events, ordered from first to most recent.</p>
+                                    </header>
+                                    <ol class="o_ptm_tracking_timeline" t-if="tracking['timeline']">
+                                        <li t-foreach="tracking['timeline']" t-as="item">
+                                            <span
+                                                class="o_ptm_tracking_timeline_marker"
+                                                aria-hidden="true"
+                                            />
+                                            <span class="o_ptm_tracking_event">
+                                                <strong>
+                                                    <t
+                                                        t-call="parcel_transport_management.public_tracking_status_label"
+                                                    >
+                                                        <t
+                                                            t-set="status_code"
+                                                            t-value="item['status']"
+                                                        />
+                                                    </t>
+                                                </strong>
+                                                <time t-esc="item['occurred_at']" />
+                                            </span>
+                                        </li>
+                                    </ol>
+                                    <p
+                                        class="o_ptm_tracking_timeline_empty"
+                                        t-else=""
+                                        role="status"
+                                    >
+                                        No parcel events are available yet. Check again after the first handling update.
+                                    </p>
+                                </section>
+                            </section>
+                        </t>
+                    </div>
+                </main>
+
+                <footer class="o_ptm_tracking_footer">
+                    <div class="o_ptm_tracking_shell o_ptm_tracking_footer_inner">
+                        <span>PARCEL TRANSPORT MANAGEMENT // PUBLIC TRACKING</span>
+                        <span>STATUS DATA ONLY</span>
+                    </div>
+                </footer>
+            </body>
+        </html>
+    </template>
+</odoo>

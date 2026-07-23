@@ -1,0 +1,31 @@
+{
+    "name": "parcel-transport-management",
+    "version": "1.0.0",
+    "private": true,
+    "description": "Reproducible quality tooling for the Parcel Transport Management Odoo addon",
+    "license": "LGPL-3.0-only",
+    "engines": {
+        "node": ">=20.19.0"
+    },
+    "packageManager": "npm@11.16.0",
+    "scripts": {
+        "quality": "npm run lint && npm run format:check",
+        "lint": "npm run lint:python && npm run lint:javascript",
+        "lint:python": "uv run ruff check addons",
+        "lint:javascript": "eslint \"addons/**/static/src/**/*.js\"",
+        "format:check": "npm run format:python:check && npm run format:web:check",
+        "format:python:check": "uv run ruff format --check addons",
+        "format:web:check": "prettier --check . --ignore-unknown",
+        "format": "uv run ruff format addons && prettier --write . --ignore-unknown",
+        "fix": "uv run ruff check --fix addons && npm run format",
+        "hooks:install": "uv run pre-commit install"
+    },
+    "devDependencies": {
+        "@eslint/js": "10.0.1",
+        "@odoo/eslint-plugin-owl": "1.1.0",
+        "@prettier/plugin-xml": "3.4.2",
+        "eslint": "10.7.0",
+        "globals": "17.7.0",
+        "prettier": "3.9.6"
+    }
+}

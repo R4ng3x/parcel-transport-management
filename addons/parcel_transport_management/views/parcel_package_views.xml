@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_ptm_package_list" model="ir.ui.view">
+        <field name="name">parcel.package.list</field>
+        <field name="model">parcel.package</field>
+        <field name="arch" type="xml">
+            <list
+                class="o_ptm_native_view o_ptm_package_view"
+                string="Packages"
+                create="false"
+                edit="false"
+                delete="false"
+                default_order="id desc"
+                decoration-success="delivery_event_id"
+                decoration-info="pickup_event_id and not delivery_event_id"
+            >
+                <field name="tracking_code" />
+                <field name="shipment_id" />
+                <field name="weight" />
+                <field name="weight_uom_id" />
+                <field name="weight_kg" optional="show" />
+                <field name="pickup_event_id" optional="show" />
+                <field name="delivery_event_id" optional="show" />
+                <field name="company_id" groups="base.group_multi_company" optional="hide" />
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ptm_package_kanban" model="ir.ui.view">
+        <field name="name">parcel.package.kanban</field>
+        <field name="model">parcel.package</field>
+        <field name="arch" type="xml">
+            <kanban
+                class="o_ptm_native_view o_ptm_package_view"
+                string="Packages"
+                create="false"
+                edit="false"
+                delete="false"
+                quick_create="false"
+                records_draggable="false"
+            >
+                <field name="tracking_code" />
+                <field name="shipment_id" />
+                <field name="weight" />
+                <field name="weight_uom_id" />
+                <field name="weight_kg" />
+                <field name="pickup_event_id" />
+                <field name="delivery_event_id" />
+                <templates>
+                    <t t-name="card">
+                        <div
+                            class="o_ptm_kanban_card_header d-flex justify-content-between align-items-start gap-2"
+                        >
+                            <div>
+                                <span class="o_ptm_eyebrow">Tracking code</span>
+                                <strong class="d-block fs-5">
+                                    <field name="tracking_code" />
+                                </strong>
+                            </div>
+                            <span
+                                t-if="record.delivery_event_id.raw_value"
+                                class="badge text-bg-success"
+                            >Delivered</span>
+                            <span
+                                t-elif="record.pickup_event_id.raw_value"
+                                class="badge text-bg-info"
+                            >Picked up</span>
+                            <span t-else="" class="badge text-bg-secondary">Awaiting pickup</span>
+                        </div>
+                        <div class="o_ptm_package_weight">
+                            <span>Declared weight</span>
+                            <strong>
+                                <field name="weight" />
+                                <field name="weight_uom_id" />
+                            </strong>
+                            <small><field name="weight_kg" /> kg normalized</small>
+                        </div>
+                        <footer>
+                            <span>Shipment</span>
+                            <strong class="ms-auto">
+                                <field name="shipment_id" />
+                            </strong>
+                        </footer>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_ptm_package_form" model="ir.ui.view">
+        <field name="name">parcel.package.form</field>
+        <field name="model">parcel.package</field>
+        <field name="arch" type="xml">
+            <form
+                class="o_ptm_native_view o_ptm_package_view"
+                string="Package"
+                create="false"
+                edit="false"
+                delete="false"
+                duplicate="false"
+            >
+                <sheet>
+                    <div class="oe_title">
+                        <span class="o_ptm_eyebrow">Parcel identifier</span>
+                        <label for="tracking_code" />
+                        <h1>
+                            <field name="tracking_code" readonly="1" />
+                        </h1>
+                        <h2>
+                            <field name="shipment_id" readonly="1" />
+                        </h2>
+                    </div>
+                    <group>
+                        <group string="Weight">
+                            <field name="weight" readonly="1" />
+                            <field name="weight_uom_id" readonly="1" />
+                            <field name="weight_kg" readonly="1" />
+                        </group>
+                        <group string="Custody">
+                            <field name="pickup_event_id" readonly="1" />
+                            <field name="delivery_event_id" readonly="1" />
+                            <field
+                                name="company_id"
+                                readonly="1"
+                                groups="base.group_multi_company"
+                            />
+                        </group>
+                    </group>
+                    <div class="o_ptm_readonly_note" role="note">
+                        Package details are managed from the draft shipment. Operational events are append-only.
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ptm_package_search" model="ir.ui.view">
+        <field name="name">parcel.package.search</field>
+        <field name="model">parcel.package</field>
+        <field name="arch" type="xml">
+            <search string="Search Packages">
+                <field name="tracking_code" />
+                <field name="shipment_id" />
+                <filter
+                    name="awaiting_pickup"
+                    string="Awaiting Pickup"
+                    domain="[('pickup_event_id', '=', False)]"
+                />
+                <filter
+                    name="picked_up"
+                    string="Picked Up"
+                    domain="[('pickup_event_id', '!=', False), ('delivery_event_id', '=', False)]"
+                />
+                <filter
+                    name="delivered"
+                    string="Delivered"
+                    domain="[('delivery_event_id', '!=', False)]"
+                />
+                <group name="group_by">
+                    <filter
+                        name="group_shipment"
+                        string="Shipment"
+                        context="{'group_by': 'shipment_id'}"
+                    />
+                    <filter
+                        name="group_weight_uom"
+                        string="Weight Unit"
+                        context="{'group_by': 'weight_uom_id'}"
+                    />
+                    <filter
+                        name="group_company"
+                        string="Company"
+                        context="{'group_by': 'company_id'}"
+                        groups="base.group_multi_company"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ptm_package" model="ir.actions.act_window">
+        <field name="name">Packages</field>
+        <field name="res_model">parcel.package</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="search_view_id" ref="view_ptm_package_search" />
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No packages are visible yet</p>
+            <p
+            >Open a draft shipment to add packages. Tracking codes are generated automatically.</p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,19 @@
+{
+    "$schema": "https://json.schemastore.org/prettierrc",
+    "plugins": ["@prettier/plugin-xml"],
+    "tabWidth": 4,
+    "semi": true,
+    "singleQuote": false,
+    "printWidth": 100,
+    "endOfLine": "lf",
+    "overrides": [
+        {
+            "files": "*.xml",
+            "options": {
+                "parser": "xml",
+                "xmlWhitespaceSensitivity": "preserve",
+                "singleAttributePerLine": false
+            }
+        }
+    ]
+}

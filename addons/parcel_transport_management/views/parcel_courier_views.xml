@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_ptm_courier_list" model="ir.ui.view">
+        <field name="name">parcel.courier.list</field>
+        <field name="model">parcel.courier</field>
+        <field name="arch" type="xml">
+            <list
+                class="o_ptm_native_view o_ptm_courier_view"
+                string="Couriers"
+                default_order="availability, name"
+                decoration-success="availability == 'available'"
+                decoration-muted="availability == 'unavailable' or not active"
+            >
+                <field name="name" />
+                <field name="user_id" optional="show" />
+                <field
+                    name="availability"
+                    widget="badge"
+                    decoration-success="availability == 'available'"
+                    decoration-muted="availability == 'unavailable'"
+                />
+                <field name="current_shipment_count" />
+                <field name="max_concurrent_shipments" />
+                <field name="current_weight" />
+                <field name="current_weight_uom_id" />
+                <field name="max_concurrent_weight" optional="show" />
+                <field name="zone_ids" widget="many2many_tags" optional="show" />
+                <field name="company_id" groups="base.group_multi_company" optional="hide" />
+                <field name="active" column_invisible="True" />
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ptm_courier_kanban" model="ir.ui.view">
+        <field name="name">parcel.courier.kanban</field>
+        <field name="model">parcel.courier</field>
+        <field name="arch" type="xml">
+            <kanban
+                class="o_ptm_native_view o_ptm_courier_view"
+                string="Couriers"
+                default_group_by="availability"
+                quick_create="false"
+                records_draggable="false"
+            >
+                <field name="name" />
+                <field name="user_id" />
+                <field name="availability" />
+                <field name="current_shipment_count" />
+                <field name="max_concurrent_shipments" />
+                <field name="current_weight" />
+                <field name="current_weight_uom_id" />
+                <field name="max_concurrent_weight" />
+                <field name="zone_ids" />
+                <field name="active" />
+                <templates>
+                    <t t-name="card">
+                        <div
+                            class="o_ptm_kanban_card_header d-flex justify-content-between align-items-start gap-2"
+                        >
+                            <div>
+                                <span class="o_ptm_eyebrow">Courier</span>
+                                <strong class="d-block fs-5">
+                                    <field name="name" />
+                                </strong>
+                                <small>
+                                    <field name="user_id" />
+                                </small>
+                            </div>
+                            <field
+                                name="availability"
+                                widget="badge"
+                                decoration-success="availability == 'available'"
+                                decoration-muted="availability == 'unavailable'"
+                            />
+                        </div>
+                        <div class="o_ptm_capacity_grid">
+                            <div>
+                                <span>Active load</span>
+                                <strong><field name="current_shipment_count" /> / <field
+                                    name="max_concurrent_shipments"
+                                /></strong>
+                                <div class="small">shipments</div>
+                            </div>
+                            <div>
+                                <span>Weight load</span>
+                                <strong><field name="current_weight" /> / <field
+                                    name="max_concurrent_weight"
+                                /></strong>
+                                <small>
+                                    <field name="current_weight_uom_id" />
+                                </small>
+                            </div>
+                        </div>
+                        <footer>
+                            <span>Coverage</span>
+                            <field name="zone_ids" widget="many2many_tags" class="ms-auto" />
+                        </footer>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_ptm_courier_form" model="ir.ui.view">
+        <field name="name">parcel.courier.form</field>
+        <field name="model">parcel.courier</field>
+        <field name="arch" type="xml">
+            <form class="o_ptm_native_view o_ptm_courier_view" string="Courier">
+                <header>
+                    <field
+                        name="availability"
+                        widget="statusbar"
+                        statusbar_visible="available,unavailable"
+                    />
+                </header>
+                <sheet>
+                    <widget
+                        name="web_ribbon"
+                        title="ARCHIVED"
+                        bg_color="text-bg-danger"
+                        invisible="active"
+                    />
+                    <div class="oe_title">
+                        <span class="o_ptm_eyebrow">Delivery network</span>
+                        <label for="name" />
+                        <h1>
+                            <field name="name" placeholder="Courier name" />
+                        </h1>
+                        <h2>
+                            <field name="user_id" placeholder="Related Odoo user" />
+                        </h2>
+                    </div>
+                    <group>
+                        <group string="Identity">
+                            <field name="company_id" groups="base.group_multi_company" />
+                            <field name="user_id" options="{'no_create': True}" />
+                            <field name="availability" />
+                            <field name="active" />
+                        </group>
+                        <group string="Capacity">
+                            <field name="max_concurrent_shipments" />
+                            <field name="max_concurrent_weight" />
+                            <field
+                                name="max_weight_uom_id"
+                                options="{'no_create': True, 'no_open': True}"
+                            />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Coverage" name="coverage">
+                            <field
+                                name="zone_ids"
+                                widget="many2many_tags"
+                                options="{'no_create': True}"
+                            />
+                        </page>
+                        <page string="Current Load" name="current_load">
+                            <group>
+                                <group string="Live Capacity">
+                                    <field name="current_shipment_count" readonly="1" />
+                                    <field name="current_weight" readonly="1" />
+                                    <field name="current_weight_uom_id" readonly="1" />
+                                </group>
+                                <group string="Configured Limits">
+                                    <field name="max_concurrent_shipments" readonly="1" />
+                                    <field name="max_concurrent_weight" readonly="1" />
+                                    <field name="max_weight_uom_id" readonly="1" />
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Shipments" name="shipments">
+                            <field name="shipment_ids" readonly="1">
+                                <list
+                                    create="false"
+                                    edit="false"
+                                    delete="false"
+                                    default_order="id desc"
+                                    decoration-info="state == 'in_transit'"
+                                    decoration-success="state == 'delivered'"
+                                    decoration-muted="state == 'cancelled'"
+                                >
+                                    <field name="reference" />
+                                    <field name="recipient_id" />
+                                    <field name="destination_zone_id" optional="show" />
+                                    <field name="total_weight_kg" />
+                                    <field name="expected_delivery_at" />
+                                    <field name="state" widget="badge" />
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ptm_courier_search" model="ir.ui.view">
+        <field name="name">parcel.courier.search</field>
+        <field name="model">parcel.courier</field>
+        <field name="arch" type="xml">
+            <search string="Search Couriers">
+                <field name="name" />
+                <field name="user_id" />
+                <field name="zone_ids" />
+                <filter
+                    name="available"
+                    string="Available"
+                    domain="[('availability', '=', 'available')]"
+                />
+                <filter
+                    name="unavailable"
+                    string="Unavailable"
+                    domain="[('availability', '=', 'unavailable')]"
+                />
+                <separator />
+                <filter name="active" string="Active" domain="[('active', '=', True)]" />
+                <filter name="archived" string="Archived" domain="[('active', '=', False)]" />
+                <group name="group_by">
+                    <filter
+                        name="group_availability"
+                        string="Availability"
+                        context="{'group_by': 'availability'}"
+                    />
+                    <filter
+                        name="group_company"
+                        string="Company"
+                        context="{'group_by': 'company_id'}"
+                        groups="base.group_multi_company"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ptm_courier" model="ir.actions.act_window">
+        <field name="name">Couriers</field>
+        <field name="res_model">parcel.courier</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_ptm_courier_search" />
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add the first courier</p>
+            <p
+            >Set shipment and weight capacity, then define the delivery zones this courier can cover.</p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="action_ptm_dashboard" model="ir.actions.client">
+        <field name="name">Command Center</field>
+        <field name="tag">parcel_transport_management.CommandCenter</field>
+    </record>
+</odoo>

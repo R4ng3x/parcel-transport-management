@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data noupdate="1">
+        <!-- Logical delivery zones / Zonas lógicas de reparto -->
+        <record id="zone_madrid_ring" model="parcel.delivery.zone">
+            <field name="name">Madrid Ring / Anillo de Madrid</field>
+            <field name="code">MAD-RING</field>
+            <field name="company_id" ref="base.main_company" />
+            <field name="default_sla_hours">30.0</field>
+        </record>
+        <record id="zone_madrid_centre" model="parcel.delivery.zone">
+            <field name="name">Madrid Centre / Centro de Madrid</field>
+            <field name="code">MAD-CENTRE</field>
+            <field name="company_id" ref="base.main_company" />
+            <field name="default_sla_hours">18.0</field>
+        </record>
+        <record id="zone_barcelona_ring" model="parcel.delivery.zone">
+            <field name="name">Barcelona Ring / Anillo de Barcelona</field>
+            <field name="code">BCN-RING</field>
+            <field name="company_id" ref="base.main_company" />
+            <field name="default_sla_hours">28.0</field>
+        </record>
+        <record id="zone_barcelona_centre" model="parcel.delivery.zone">
+            <field name="name">Barcelona Centre / Centro de Barcelona</field>
+            <field name="code">BCN-CENTRE</field>
+            <field name="company_id" ref="base.main_company" />
+            <field name="default_sla_hours">16.0</field>
+        </record>
+
+        <!-- Longest matching prefix wins: 280 overlaps 28, and 080 overlaps 08. -->
+        <record id="postcode_rule_madrid_ring" model="parcel.zone.postcode.rule">
+            <field name="zone_id" ref="zone_madrid_ring" />
+            <field name="country_id" ref="base.es" />
+            <field name="postcode_prefix">28</field>
+        </record>
+        <record id="postcode_rule_madrid_centre" model="parcel.zone.postcode.rule">
+            <field name="zone_id" ref="zone_madrid_centre" />
+            <field name="country_id" ref="base.es" />
+            <field name="postcode_prefix">280</field>
+        </record>
+        <record id="postcode_rule_barcelona_ring" model="parcel.zone.postcode.rule">
+            <field name="zone_id" ref="zone_barcelona_ring" />
+            <field name="country_id" ref="base.es" />
+            <field name="postcode_prefix">08</field>
+        </record>
+        <record id="postcode_rule_barcelona_centre" model="parcel.zone.postcode.rule">
+            <field name="zone_id" ref="zone_barcelona_centre" />
+            <field name="country_id" ref="base.es" />
+            <field name="postcode_prefix">080</field>
+        </record>
+
+        <!-- Couriers / Repartidores -->
+        <record id="courier_madrid_runner" model="parcel.courier">
+            <field name="name">Madrid Runner / Reparto Madrid</field>
+            <field name="company_id" ref="base.main_company" />
+            <field name="max_concurrent_shipments">6</field>
+            <field name="max_concurrent_weight">80.0</field>
+            <field name="max_weight_uom_id" ref="uom.product_uom_kgm" />
+            <field
+                name="zone_ids"
+                eval="[(6, 0, [ref('zone_madrid_ring'), ref('zone_madrid_centre')])]"
+            />
+        </record>
+        <record id="courier_cross_city" model="parcel.courier">
+            <field name="name">Cross-city Link / Enlace entre ciudades</field>
+            <field name="company_id" ref="base.main_company" />
+            <field name="max_concurrent_shipments">6</field>
+            <field name="max_concurrent_weight">100.0</field>
+            <field name="max_weight_uom_id" ref="uom.product_uom_kgm" />
+            <field
+                name="zone_ids"
+                eval="[(6, 0, [ref('zone_madrid_ring'), ref('zone_madrid_centre'), ref('zone_barcelona_ring'), ref('zone_barcelona_centre')])]"
+            />
+        </record>
+        <record id="courier_barcelona_route" model="parcel.courier">
+            <field name="name">Barcelona Route / Ruta Barcelona</field>
+            <field name="company_id" ref="base.main_company" />
+            <field name="max_concurrent_shipments">4</field>
+            <field name="max_concurrent_weight">60.0</field>
+            <field name="max_weight_uom_id" ref="uom.product_uom_kgm" />
+            <field
+                name="zone_ids"
+                eval="[(6, 0, [ref('zone_barcelona_ring'), ref('zone_barcelona_centre')])]"
+            />
+        </record>
+        <record id="courier_coastal_team" model="parcel.courier">
+            <field name="name">Coastal Team / Equipo de costa</field>
+            <field name="company_id" ref="base.main_company" />
+            <field name="max_concurrent_shipments">4</field>
+            <field name="max_concurrent_weight">70.0</field>
+            <field name="max_weight_uom_id" ref="uom.product_uom_kgm" />
+            <field
+                name="zone_ids"
+                eval="[(6, 0, [ref('zone_barcelona_ring'), ref('zone_barcelona_centre')])]"
+            />
+        </record>
+
+        <!-- Entirely fictional demo contacts; no real personal data. -->
+        <record id="partner_sender_madrid" model="res.partner">
+            <field name="name">Demo Sender Madrid / Remitente Demo Madrid</field>
+            <field name="company_id" ref="base.main_company" />
+            <field name="street">Avenida Demo 10</field>
+            <field name="city">Madrid</field>
+            <field name="zip">28013</field>
+            <field name="country_id" ref="base.es" />
+        </record>
+        <record id="partner_recipient_madrid" model="res.partner">
+            <field name="name">Demo Recipient Madrid / Destinatario Demo Madrid</field>
+            <field name="company_id" ref="base.main_company" />
+            <field name="street">Calle Muestra 24</field>
+            <field name="city">Ciudad Demo Madrid</field>
+            <field name="zip">28901</field>
+            <field name="country_id" ref="base.es" />
+        </record>
+        <record id="partner_sender_barcelona" model="res.partner">
+            <field name="name">Demo Sender Barcelona / Remitente Demo Barcelona</field>
+            <field name="company_id" ref="base.main_company" />
+            <field name="street">Passeig de la Mostra 8</field>
+            <field name="city">Barcelona</field>
+            <field name="zip">08001</field>
+            <field name="country_id" ref="base.es" />
+        </record>
+        <record id="partner_recipient_barcelona" model="res.partner">
+            <field name="name">Demo Recipient Barcelona / Destinatario Demo Barcelona</field>
+            <field name="company_id" ref="base.main_company" />
+            <field name="street">Rambla Ficticia 16</field>
+            <field name="city">Ciudad Demo Barcelona</field>
+            <field name="zip">08901</field>
+            <field name="country_id" ref="base.es" />
+        </record>
+        <record id="partner_sender_uncovered" model="res.partner">
+            <field name="name">Outside Sender / Remitente sin cobertura</field>
+            <field name="company_id" ref="base.main_company" />
+            <field name="street">Camino Imaginario 3</field>
+            <field name="city">Ciudad Fuera Demo</field>
+            <field name="zip">41001</field>
+            <field name="country_id" ref="base.es" />
+        </record>
+        <record id="partner_recipient_uncovered" model="res.partner">
+            <field name="name">Outside Recipient / Destinatario sin cobertura</field>
+            <field name="company_id" ref="base.main_company" />
+            <field name="street">Plaza Ejemplo 7</field>
+            <field name="city">Destino Fuera Demo</field>
+            <field name="zip">46001</field>
+            <field name="country_id" ref="base.es" />
+        </record>
+
+        <!-- Draft, intentionally unassigned / Borrador sin asignar -->
+        <record id="shipment_draft_unassigned" model="parcel.shipment">
+            <field name="company_id" ref="base.main_company" />
+            <field name="sender_id" ref="partner_sender_madrid" />
+            <field name="recipient_id" ref="partner_recipient_madrid" />
+        </record>
+        <record id="package_draft_unassigned" model="parcel.package">
+            <field name="shipment_id" ref="shipment_draft_unassigned" />
+            <field name="weight">3.0</field>
+            <field name="weight_uom_id" ref="uom.product_uom_kgm" />
+        </record>
+
+        <!-- Assigned; its courier is made unavailable only after assignment. -->
+        <record id="shipment_assigned_unavailable_courier" model="parcel.shipment">
+            <field name="company_id" ref="base.main_company" />
+            <field name="sender_id" ref="partner_sender_madrid" />
+            <field name="recipient_id" ref="partner_recipient_madrid" />
+        </record>
+        <record id="package_assigned_unavailable_a" model="parcel.package">
+            <field name="shipment_id" ref="shipment_assigned_unavailable_courier" />
+            <field name="weight">4.0</field>
+            <field name="weight_uom_id" ref="uom.product_uom_kgm" />
+        </record>
+        <record id="package_assigned_unavailable_b" model="parcel.package">
+            <field name="shipment_id" ref="shipment_assigned_unavailable_courier" />
+            <field name="weight">6.0</field>
+            <field name="weight_uom_id" ref="uom.product_uom_kgm" />
+        </record>
+        <function
+            model="parcel.shipment"
+            name="action_assign"
+            eval="([ref('shipment_assigned_unavailable_courier')], ref('courier_madrid_runner'))"
+        />
+        <record id="courier_madrid_runner" model="parcel.courier">
+            <field name="availability">unavailable</field>
+        </record>
+
+        <!-- Partial pickup / Recogida parcial -->
+        <record id="shipment_partially_picked_up" model="parcel.shipment">
+            <field name="company_id" ref="base.main_company" />
+            <field name="sender_id" ref="partner_sender_madrid" />
+            <field name="recipient_id" ref="partner_recipient_barcelona" />
+        </record>
+        <record id="package_partial_pickup_collected" model="parcel.package">
+            <field name="shipment_id" ref="shipment_partially_picked_up" />
+            <field name="weight">3.0</field>
+            <field name="weight_uom_id" ref="uom.product_uom_kgm" />
+        </record>
+        <record id="package_partial_pickup_waiting" model="parcel.package">
+            <field name="shipment_id" ref="shipment_partially_picked_up" />
+            <field name="weight">4.0</field>
+            <field name="weight_uom_id" ref="uom.product_uom_kgm" />
+        </record>
+        <function
+            model="parcel.shipment"
+            name="action_assign"
+            eval="([ref('shipment_partially_picked_up')], ref('courier_cross_city'))"
+        />
+        <function
+            model="parcel.shipment"
+            name="action_record_pickup"
+            eval="([ref('shipment_partially_picked_up')], [ref('package_partial_pickup_collected')], 'First parcel collected / Primer bulto recogido')"
+        />
+
+        <!-- In transit / En tránsito -->
+        <record id="shipment_in_transit" model="parcel.shipment">
+            <field name="company_id" ref="base.main_company" />
+            <field name="sender_id" ref="partner_sender_barcelona" />
+            <field name="recipient_id" ref="partner_recipient_barcelona" />
+        </record>
+        <record id="package_in_transit_a" model="parcel.package">
+            <field name="shipment_id" ref="shipment_in_transit" />
+            <field name="weight">3.5</field>
+            <field name="weight_uom_id" ref="uom.product_uom_kgm" />
+        </record>
+        <record id="package_in_transit_b" model="parcel.package">
+            <field name="shipment_id" ref="shipment_in_transit" />
+            <field name="weight">4.5</field>
+            <field name="weight_uom_id" ref="uom.product_uom_kgm" />
+        </record>
+        <function
+            model="parcel.shipment"
+            name="action_assign"
+            eval="([ref('shipment_in_transit')], ref('courier_barcelona_route'))"
+        />
+        <function
+            model="parcel.shipment"
+            name="action_record_pickup"
+            eval="([ref('shipment_in_transit')], [ref('package_in_transit_a'), ref('package_in_transit_b')], 'Complete pickup / Recogida completa')"
+        />
+        <function
+            model="parcel.shipment"
+            name="action_start_transit"
+            eval="([ref('shipment_in_transit')],)"
+        />
+
+        <!-- Partial delivery / Entrega parcial -->
+        <record id="shipment_partially_delivered" model="parcel.shipment">
+            <field name="company_id" ref="base.main_company" />
+            <field name="sender_id" ref="partner_sender_barcelona" />
+            <field name="recipient_id" ref="partner_recipient_barcelona" />
+        </record>
+        <record id="package_partial_delivery_delivered" model="parcel.package">
+            <field name="shipment_id" ref="shipment_partially_delivered" />
+            <field name="weight">5.0</field>
+            <field name="weight_uom_id" ref="uom.product_uom_kgm" />
+        </record>
+        <record id="package_partial_delivery_pending" model="parcel.package">
+            <field name="shipment_id" ref="shipment_partially_delivered" />
+            <field name="weight">6.0</field>
+            <field name="weight_uom_id" ref="uom.product_uom_kgm" />
+        </record>
+        <function
+            model="parcel.shipment"
+            name="action_assign"
+            eval="([ref('shipment_partially_delivered')], ref('courier_coastal_team'))"
+        />
+        <function
+            model="parcel.shipment"
+            name="action_record_pickup"
+            eval="([ref('shipment_partially_delivered')], [ref('package_partial_delivery_delivered'), ref('package_partial_delivery_pending')], 'Complete pickup / Recogida completa')"
+        />
+        <function
+            model="parcel.shipment"
+            name="action_start_transit"
+            eval="([ref('shipment_partially_delivered')],)"
+        />
+        <function
+            model="parcel.shipment"
+            name="action_record_delivery"
+            eval="([ref('shipment_partially_delivered')], [ref('package_partial_delivery_delivered')], 'Demo Recipient / Destinatario Demo', 'One parcel pending / Un bulto pendiente')"
+        />
+
+        <!-- Assigned with a dynamically expired SLA / Asignado con SLA vencido dinámico -->
+        <record id="shipment_delayed_assigned" model="parcel.shipment">
+            <field name="company_id" ref="base.main_company" />
+            <field name="sender_id" ref="partner_sender_madrid" />
+            <field name="recipient_id" ref="partner_recipient_madrid" />
+            <field name="expected_delivery_at" eval="datetime.now() - timedelta(hours=6)" />
+        </record>
+        <record id="package_delayed_assigned" model="parcel.package">
+            <field name="shipment_id" ref="shipment_delayed_assigned" />
+            <field name="weight">5.0</field>
+            <field name="weight_uom_id" ref="uom.product_uom_kgm" />
+        </record>
+        <function
+            model="parcel.shipment"
+            name="action_assign"
+            eval="([ref('shipment_delayed_assigned')], ref('courier_cross_city'))"
+        />
+
+        <!-- Draft with automatic coverage warning / Borrador con aviso de cobertura -->
+        <record id="shipment_draft_coverage_warning" model="parcel.shipment">
+            <field name="company_id" ref="base.main_company" />
+            <field name="sender_id" ref="partner_sender_uncovered" />
+            <field name="recipient_id" ref="partner_recipient_uncovered" />
+        </record>
+        <record id="package_draft_coverage_warning" model="parcel.package">
+            <field name="shipment_id" ref="shipment_draft_coverage_warning" />
+            <field name="weight">2.0</field>
+            <field name="weight_uom_id" ref="uom.product_uom_kgm" />
+        </record>
+    </data>
+</odoo>

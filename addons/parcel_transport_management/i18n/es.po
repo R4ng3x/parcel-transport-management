@@ -1,0 +1,3727 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* parcel_transport_management
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0-20260630\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-23 10:35+0000\n"
+"PO-Revision-Date: 2026-07-23 10:35+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+msgid ""
+"<i class=\"fa fa-exclamation-triangle\" title=\"Coverage warning\" aria-"
+"hidden=\"true\"/>"
+msgstr ""
+"<i class=\"fa fa-exclamation-triangle\" title=\"Advertencia de cobertura\" "
+"aria-hidden=\"true\"/>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_kanban
+msgid ""
+"<i class=\"fa fa-exclamation-triangle\" title=\"Coverage warning\" aria-hidden=\"true\"/>\n"
+"                            <span>Coverage review required</span>"
+msgstr ""
+"<i class=\"fa fa-exclamation-triangle\" title=\"Advertencia de cobertura\" aria-hidden=\"true\"/>\n"
+"                            <span>Es necesario revisar la cobertura</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+msgid ""
+"<i class=\"fa fa-long-arrow-right\" invisible=\"not origin_zone_id or not "
+"destination_zone_id\" title=\"Route direction\" aria-hidden=\"true\"/>"
+msgstr ""
+"<i class=\"fa fa-long-arrow-right\" invisible=\"not origin_zone_id or not "
+"destination_zone_id\" title=\"Dirección de la ruta\" aria-hidden=\"true\"/>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_kanban
+msgid "<i class=\"fa fa-user\" title=\"Assigned courier\" aria-hidden=\"true\"/>"
+msgstr "<i class=\"fa fa-user\" title=\"Repartidor asignado\" aria-hidden=\"true\"/>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_sla_revision_form
+msgid "<span class=\"o_ptm_eyebrow\">Append-only SLA record</span>"
+msgstr "<span class=\"o_ptm_eyebrow\">Registro de SLA de solo adición</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_reassignment_form
+msgid "<span class=\"o_ptm_eyebrow\">Append-only courier record</span>"
+msgstr ""
+"<span class=\"o_ptm_eyebrow\">Registro de repartidor de solo adición</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_delivery_event_form
+msgid "<span class=\"o_ptm_eyebrow\">Append-only delivery record</span>"
+msgstr "<span class=\"o_ptm_eyebrow\">Registro de entrega de solo adición</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_pickup_event_form
+msgid "<span class=\"o_ptm_eyebrow\">Append-only pickup record</span>"
+msgstr "<span class=\"o_ptm_eyebrow\">Registro de recogida de solo adición</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_route_correction_form
+msgid "<span class=\"o_ptm_eyebrow\">Append-only route record</span>"
+msgstr "<span class=\"o_ptm_eyebrow\">Registro de ruta de solo adición</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_kanban
+msgid "<span class=\"o_ptm_eyebrow\">Courier</span>"
+msgstr "<span class=\"o_ptm_eyebrow\">Repartidor</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_form
+msgid "<span class=\"o_ptm_eyebrow\">Delivery network</span>"
+msgstr "<span class=\"o_ptm_eyebrow\">Red de entrega</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_zone_kanban
+msgid "<span class=\"o_ptm_eyebrow\">Delivery zone</span>"
+msgstr "<span class=\"o_ptm_eyebrow\">Zona de entrega</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_zone_form
+msgid "<span class=\"o_ptm_eyebrow\">Network coverage</span>"
+msgstr "<span class=\"o_ptm_eyebrow\">Cobertura de la red</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_package_form
+msgid "<span class=\"o_ptm_eyebrow\">Parcel identifier</span>"
+msgstr "<span class=\"o_ptm_eyebrow\">Identificador del paquete</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+msgid "<span class=\"o_ptm_eyebrow\">Parcel operation</span>"
+msgstr "<span class=\"o_ptm_eyebrow\">Operación del paquete</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_kanban
+msgid "<span class=\"o_ptm_eyebrow\">Shipment</span>"
+msgstr "<span class=\"o_ptm_eyebrow\">Envío</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_package_kanban
+msgid "<span class=\"o_ptm_eyebrow\">Tracking code</span>"
+msgstr "<span class=\"o_ptm_eyebrow\">Código de seguimiento</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid ""
+"<span class=\"o_ptm_tracking_brand_glyph\" aria-hidden=\"true\">\n"
+"                                <i/>\n"
+"                                <i/>\n"
+"                            </span>\n"
+"                            <span class=\"o_ptm_tracking_brand_copy\">\n"
+"                                <strong>PARCEL</strong>\n"
+"                                <small>TRANSPORT MANAGEMENT</small>\n"
+"                            </span>"
+msgstr ""
+"<span class=\"o_ptm_tracking_brand_glyph\" aria-hidden=\"true\">\n"
+"                                <i/>\n"
+"                                <i/>\n"
+"                            </span>\n"
+"                            <span class=\"o_ptm_tracking_brand_copy\">\n"
+"                                <strong>PARCEL</strong>\n"
+"                                <small>GESTIÓN DEL TRANSPORTE</small>\n"
+"                            </span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid ""
+"<span class=\"o_ptm_tracking_kicker\">\n"
+"                                <i aria-hidden=\"true\"/>\n"
+"                                Live parcel route\n"
+"                            </span>"
+msgstr ""
+"<span class=\"o_ptm_tracking_kicker\">\n"
+"                                <i aria-hidden=\"true\"/>\n"
+"                                Ruta del paquete en directo\n"
+"                            </span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid "<span class=\"o_ptm_tracking_section_index\">Live result / verified</span>"
+msgstr ""
+"<span class=\"o_ptm_tracking_section_index\">Resultado en directo / "
+"verificado</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid "<span class=\"o_ptm_tracking_section_index\">Lookup / no match</span>"
+msgstr ""
+"<span class=\"o_ptm_tracking_section_index\">Búsqueda / sin "
+"coincidencias</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid "<span class=\"o_ptm_tracking_section_index\">Route history / events</span>"
+msgstr ""
+"<span class=\"o_ptm_tracking_section_index\">Historial de la ruta / "
+"eventos</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid "<span class=\"o_ptm_tracking_section_index\">Status / waiting</span>"
+msgstr "<span class=\"o_ptm_tracking_section_index\">Estado / en espera</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid "<span class=\"o_ptm_tracking_state_mark\" aria-hidden=\"true\">!</span>"
+msgstr ""
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid "<span class=\"o_ptm_tracking_state_mark\" aria-hidden=\"true\">00</span>"
+msgstr ""
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_kanban
+msgid "<span>Active load</span>"
+msgstr "<span>Carga activa</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_zone_kanban
+msgid "<span>Couriers</span>"
+msgstr "<span>Repartidores</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_kanban
+msgid "<span>Coverage</span>"
+msgstr "<span>Cobertura</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid "<span>Current status</span>"
+msgstr "<span>Estado actual</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_package_kanban
+msgid "<span>Declared weight</span>"
+msgstr "<span>Peso declarado</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_zone_kanban
+msgid "<span>Default SLA</span>"
+msgstr "<span>SLA predeterminado</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_kanban
+msgid "<span>Delivery</span>"
+msgstr "<span>Entrega</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid "<span>Expected delivery</span>"
+msgstr "<span>Entrega prevista</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid "<span>INPUT / 01</span>"
+msgstr "<span>ENTRADA / 01</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid "<span>Last updated</span>"
+msgstr "<span>Última actualización</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid ""
+"<span>PARCEL TRANSPORT MANAGEMENT // PUBLIC TRACKING</span>\n"
+"                        <span>STATUS DATA ONLY</span>"
+msgstr ""
+"<span>GESTIÓN DEL TRANSPORTE DE PARCEL // SEGUIMIENTO PÚBLICO</span>\n"
+"                        <span>SOLO DATOS DE ESTADO</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid ""
+"<span>PUBLIC SIGNAL</span>\n"
+"                            <strong>TRACK / 01</strong>"
+msgstr ""
+"<span>SEÑAL PÚBLICA</span>\n"
+"                            <strong>SEGUIMIENTO / 01</strong>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_kanban
+msgid "<span>Pickup</span>"
+msgstr "<span>Recogida</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_package_kanban
+msgid "<span>Shipment</span>"
+msgstr "<span>Envío</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_kanban
+msgid "<span>Target</span>"
+msgstr "<span>Objetivo</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid ""
+"<span>Track your</span>\n"
+"                                <em>parcel</em>"
+msgstr ""
+"<span>Realiza el seguimiento de tu</span>\n"
+"                                <em>paquete</em>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid ""
+"<span>Track</span>\n"
+"                                        <span aria-hidden=\"true\">→</span>"
+msgstr ""
+"<span>Realizar seguimiento</span>\n"
+"                                        <span aria-hidden=\"true\">→</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid "<span>Tracking code</span>"
+msgstr "<span>Código de seguimiento</span>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid ""
+"<span>Tracking code</span>\n"
+"                                    <small>Enter the full PTM reference, with or without hyphens.</small>"
+msgstr ""
+"<span>Código de seguimiento</span>\n"
+"                                    <small>Introduce la referencia PTM completa, con o sin guiones.</small>"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_kanban
+msgid "<span>Weight load</span>"
+msgstr "<span>Carga de peso</span>"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "A / 01"
+msgstr ""
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "A cancellation reason is required."
+msgstr "Se requiere un motivo de cancelación."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "A company, sender, and recipient are required."
+msgstr "Se requieren una empresa, un remitente y un destinatario."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/courier.py:0
+msgid "A courier's company cannot be changed after creation."
+msgstr "La empresa de un repartidor no se puede cambiar después de crearlo."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/zone.py:0
+msgid "A delivery zone's company cannot be changed after creation."
+msgstr ""
+"La empresa de una zona de entrega no se puede cambiar después de crearla."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "A package cannot be delivered before pickup."
+msgstr "Un paquete no se puede entregar antes de su recogida."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "A reason is required to reassign a shipment after pickup."
+msgstr "Se requiere un motivo para reasignar un envío después de la recogida."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/reassignment.py:0
+msgid "A reassignment must change the shipment courier."
+msgstr "Una reasignación debe cambiar el repartidor del envío."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/revisions.py:0
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "A route correction reason is required."
+msgstr "Se requiere un motivo para corregir la ruta."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/events.py:0
+msgid "A shipment and courier are required."
+msgstr "Se requieren un envío y un repartidor."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "A shipment must contain at least one package."
+msgstr "Un envío debe contener al menos un paquete."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "A shipment's company cannot be changed."
+msgstr "La empresa de un envío no se puede cambiar."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "A terminal shipment SLA cannot be revised."
+msgstr "No se puede revisar el SLA de un envío en estado final."
+
+#. module: parcel_transport_management
+#: model:ir.model.constraint,message:parcel_transport_management.constraint_parcel_courier_user_company_unique
+msgid "A user can be linked to only one courier per company."
+msgstr "Un usuario solo puede estar vinculado a un repartidor por empresa."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "A valid courier is required."
+msgstr "Se requiere un repartidor válido."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "A valid revised delivery deadline is required."
+msgstr "Se requiere una nueva fecha límite de entrega válida."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "A valid route country is required."
+msgstr "Se requiere un país de ruta válido."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/reassignment.py:0
+msgid "A valid shipment and both couriers are required."
+msgstr "Se requieren un envío válido y ambos repartidores."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/package.py:0
+#: code:addons/parcel_transport_management/models/revisions.py:0
+msgid "A valid shipment is required."
+msgstr "Se requiere un envío válido."
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "ACTIVE"
+msgstr "ACTIVOS"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "ADD COURIER"
+msgstr "AÑADIR REPARTIDOR"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_form
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_zone_form
+msgid "ARCHIVED"
+msgstr "ARCHIVADO"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_route_correction_form
+msgid "AUDIT ONLY"
+msgstr "SOLO AUDITORÍA"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__message_needaction
+msgid "Action Needed"
+msgstr "Acción necesaria"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_courier__active
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_zone__active
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_search
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_zone_search
+msgid "Active"
+msgstr "Activo"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid ""
+"Active shipments will appear here when they have a destination endpoint."
+msgstr "Los envíos activos aparecerán aquí cuando tengan un destino."
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__activity_ids
+msgid "Activities"
+msgstr "Actividades"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr "Decoración de excepción de actividad"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__activity_state
+msgid "Activity State"
+msgstr "Estado de la actividad"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__activity_type_icon
+msgid "Activity Type Icon"
+msgstr "Icono del tipo de actividad"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "Add courier capacity before assigning active shipments."
+msgstr "Añada capacidad al repartidor antes de asignarle envíos activos."
+
+#. module: parcel_transport_management
+#: model_terms:ir.actions.act_window,help:parcel_transport_management.action_ptm_shipment
+msgid ""
+"Add every package while the shipment is in draft, then assign a courier to "
+"begin the operational flow."
+msgstr ""
+"Añada todos los paquetes mientras el envío esté en borrador y, después, "
+"asigne un repartidor para iniciar el flujo operativo."
+
+#. module: parcel_transport_management
+#: model_terms:ir.actions.act_window,help:parcel_transport_management.action_ptm_courier
+msgid "Add the first courier"
+msgstr "Añadir el primer repartidor"
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "Address parties must be changed one shipment at a time."
+msgstr "Las partes de la dirección deben modificarse envío por envío."
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "Aggregate workload counts from the verified operational snapshot."
+msgstr "Recuentos agregados de carga a partir de la instantánea operativa verificada."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/revisions.py:0
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "An SLA revision reason is required."
+msgstr "Se requiere un motivo para revisar el SLA."
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_correction__applied
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_route_correction_search
+msgid "Applied"
+msgstr "Aplicado"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_search
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_zone_search
+msgid "Archived"
+msgstr "Archivado"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_assignment_wizard_form
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+msgid "Assign Courier"
+msgstr "Asignar repartidor"
+
+#. module: parcel_transport_management
+#: model:ir.actions.act_window,name:parcel_transport_management.action_ptm_assignment_wizard
+msgid "Assign or Reassign Courier"
+msgstr "Asignar o reasignar repartidor"
+
+#. module: parcel_transport_management
+#: model:ir.model,name:parcel_transport_management.model_parcel_assignment_wizard
+msgid "Assign or Reassign Parcel Shipment"
+msgstr "Asignar o reasignar envío de Parcel"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/js/parcel_dashboard.js:0
+#: model:ir.model.fields.selection,name:parcel_transport_management.selection__parcel_shipment__state__assigned
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_status_label
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_search
+msgid "Assigned"
+msgstr "Asignado"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/js/parcel_dashboard.js:0
+msgid "At capacity"
+msgstr "Al límite de capacidad"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__message_attachment_count
+msgid "Attachment Count"
+msgstr "Número de archivos adjuntos"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_reassignment_form
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_route_correction_form
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_sla_revision_form
+msgid "Audit"
+msgstr "Auditoría"
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/wizards/route.py:0
+msgid "Audit Annotation Recorded"
+msgstr "Anotación de auditoría registrada"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_route_correction_search
+msgid "Audit Only"
+msgstr "Solo auditoría"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "Automatic refresh every 60 seconds"
+msgstr "Actualización automática cada 60 segundos"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_courier__availability
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_search
+msgid "Availability"
+msgstr "Disponibilidad"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/js/parcel_dashboard.js:0
+#: model:ir.model.fields.selection,name:parcel_transport_management.selection__parcel_courier__availability__available
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_search
+msgid "Available"
+msgstr "Disponible"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_package_search
+msgid "Awaiting Pickup"
+msgstr "Pendiente de recogida"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_package_kanban
+msgid "Awaiting pickup"
+msgstr "Pendiente de recogida"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "B / 02"
+msgstr ""
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "C / 03"
+msgstr ""
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+msgid "CANCELLED"
+msgstr "CANCELADO"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "CC/19"
+msgstr ""
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "CENTER"
+msgstr "CENTRO"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "CLOSED"
+msgstr "CERRADO"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "COMMAND"
+msgstr "MANDO"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "CONNECTING"
+msgstr "CONECTANDO"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "COURIER LOAD"
+msgstr "CARGA DEL REPARTIDOR"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "COURIERS"
+msgstr "REPARTIDORES"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "COVERAGE"
+msgstr "COBERTURA"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "COVERAGE REVIEW"
+msgstr "REVISIÓN DE COBERTURA"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "COVERAGE REVIEWS"
+msgstr "REVISIONES DE COBERTURA"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "CREATE SHIPMENT"
+msgstr "CREAR ENVÍO"
+
+#. module: parcel_transport_management
+#: model:ir.model,name:parcel_transport_management.model_parcel_cancel_wizard
+msgid "Cancel Parcel Shipment"
+msgstr "Cancelar envío de Parcel"
+
+#. module: parcel_transport_management
+#: model:ir.actions.act_window,name:parcel_transport_management.action_ptm_cancel_wizard
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_cancel_wizard_form
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+msgid "Cancel Shipment"
+msgstr "Cancelar envío"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+msgid "Cancellation"
+msgstr "Cancelación"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_cancel_wizard__reason
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__cancellation_reason
+msgid "Cancellation Reason"
+msgstr "Motivo de cancelación"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields.selection,name:parcel_transport_management.selection__parcel_shipment__state__cancelled
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_status_label
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_search
+msgid "Cancelled"
+msgstr "Cancelado"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__cancelled_at
+msgid "Cancelled At"
+msgstr "Cancelado el"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_form
+msgid "Capacity"
+msgstr "Capacidad"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_courier__max_weight_uom_id
+msgid "Capacity Weight Unit"
+msgstr "Unidad de peso de capacidad"
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/wizards/route.py:0
+msgid "Change at least one route field."
+msgstr "Cambie al menos un campo de la ruta."
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_correction__changed_at
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_sla_revision__changed_at
+msgid "Changed At"
+msgstr "Modificado el"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_courier_reassignment__changed_by_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_correction__changed_by_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_sla_revision__changed_by_id
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_reassignment_search
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_route_correction_search
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_sla_revision_search
+msgid "Changed By"
+msgstr "Modificado por"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_zone__code
+msgid "Code"
+msgstr "Código"
+
+#. module: parcel_transport_management
+#: model:ir.actions.client,name:parcel_transport_management.action_ptm_dashboard
+#: model:ir.ui.menu,name:parcel_transport_management.menu_ptm_dashboard
+msgid "Command Center"
+msgstr "Centro de mando"
+
+#. module: parcel_transport_management
+#: model:ir.model,name:parcel_transport_management.model_res_company
+msgid "Companies"
+msgstr "Compañías"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_assignment_wizard__company_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_cancel_wizard__company_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_courier__company_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_courier_reassignment__company_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_event__company_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_wizard__company_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_zone__company_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_package__company_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_pickup_event__company_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_pickup_wizard__company_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_correction__company_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_wizard__company_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__company_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_sla_revision__company_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_sla_wizard__company_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_zone_postcode_rule__company_id
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_reassignment_search
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_search
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_delivery_event_search
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_package_search
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_pickup_event_search
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_route_correction_search
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_search
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_sla_revision_search
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_zone_search
+msgid "Company"
+msgstr "Empresa"
+
+#. module: parcel_transport_management
+#: model:ir.model,name:parcel_transport_management.model_res_config_settings
+msgid "Config Settings"
+msgstr "Ajustes de configuración"
+
+#. module: parcel_transport_management
+#: model:ir.ui.menu,name:parcel_transport_management.menu_ptm_configuration
+msgid "Configuration"
+msgstr "Configuración"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_form
+msgid "Configured Limits"
+msgstr "Límites configurados"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_assignment_wizard_form
+msgid "Confirm Assignment"
+msgstr "Confirmar asignación"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_event__confirmed_by_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_pickup_event__confirmed_by_id
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_delivery_event_search
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_pickup_event_search
+msgid "Confirmed By"
+msgstr "Confirmado por"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "Connection unavailable"
+msgstr "Conexión no disponible"
+
+#. module: parcel_transport_management
+#: model:ir.model,name:parcel_transport_management.model_parcel_route_wizard
+msgid "Correct Parcel Shipment Route"
+msgstr "Corregir ruta del envío de Parcel"
+
+#. module: parcel_transport_management
+#: model:ir.actions.act_window,name:parcel_transport_management.action_ptm_route_wizard
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_route_wizard_form
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+msgid "Correct Route"
+msgstr "Corregir ruta"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_route_correction_form
+msgid "Corrected Snapshot"
+msgstr "Instantánea corregida"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_route_correction_search
+msgid "Correction Date"
+msgstr "Fecha de corrección"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_wizard__reason
+msgid "Correction Reason"
+msgstr "Motivo de la corrección"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_zone_postcode_rule__country_id
+msgid "Country"
+msgstr "País"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_event__courier_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_pickup_event__courier_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__courier_id
+#: model:res.groups,name:parcel_transport_management.group_ptm_courier
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_form
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_delivery_event_search
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_pickup_event_search
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_search
+msgid "Courier"
+msgstr "Repartidor"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_reassignment_form
+msgid "Courier Change"
+msgstr "Cambio de repartidor"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_res_config_settings_form
+msgid "Courier Defaults"
+msgstr "Valores predeterminados del repartidor"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_reassignment_form
+msgid "Courier Reassignment"
+msgstr "Reasignación de repartidor"
+
+#. module: parcel_transport_management
+#: model:ir.actions.act_window,name:parcel_transport_management.action_ptm_courier_reassignment_history
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__courier_reassignment_ids
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_reassignment_list
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+msgid "Courier Reassignments"
+msgstr "Reasignaciones de repartidor"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "Courier capacity held"
+msgstr "Capacidad del repartidor reservada"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_form
+msgid "Courier name"
+msgstr "Nombre del repartidor"
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/reassignment.py:0
+msgid ""
+"Courier reassignment history can only be recorded by reassignment actions."
+msgstr ""
+"El historial de reasignaciones de repartidor solo se puede registrar "
+"mediante las acciones de reasignación."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/reassignment.py:0
+msgid "Courier reassignment history is append-only and cannot be changed."
+msgstr ""
+"El historial de reasignaciones de repartidor es de solo adición y no se "
+"puede modificar."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/reassignment.py:0
+msgid "Courier reassignment history is append-only and cannot be deleted."
+msgstr ""
+"El historial de reasignaciones de repartidor es de solo adición y no se "
+"puede eliminar."
+
+#. module: parcel_transport_management
+#: model:ir.actions.act_window,name:parcel_transport_management.action_ptm_courier
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_zone__courier_ids
+#: model:ir.ui.menu,name:parcel_transport_management.menu_ptm_couriers
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_kanban
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_list
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_zone_form
+msgid "Couriers"
+msgstr "Repartidores"
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "Couriers can only operate their assigned shipments."
+msgstr ""
+"Los repartidores solo pueden gestionar los envíos que tengan asignados."
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_form
+msgid "Coverage"
+msgstr "Cobertura"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_search
+msgid "Coverage Review"
+msgstr "Revisión de cobertura"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__coverage_warning
+msgid "Coverage Warning"
+msgstr "Advertencia de cobertura"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid ""
+"Create and manage shipments in the native workspace; active work will appear"
+" here automatically."
+msgstr ""
+"Cree y gestione envíos en el espacio de trabajo nativo; el trabajo activo "
+"aparecerá aquí automáticamente."
+
+#. module: parcel_transport_management
+#: model_terms:ir.actions.act_window,help:parcel_transport_management.action_ptm_shipment
+msgid "Create the first parcel shipment"
+msgstr "Crear el primer envío de paquetería"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_assignment_wizard__create_uid
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_cancel_wizard__create_uid
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_courier__create_uid
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_courier_reassignment__create_uid
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_event__create_uid
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_wizard__create_uid
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_zone__create_uid
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_package__create_uid
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_pickup_event__create_uid
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_pickup_wizard__create_uid
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_correction__create_uid
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_wizard__create_uid
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__create_uid
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_sla_revision__create_uid
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_sla_wizard__create_uid
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_zone_postcode_rule__create_uid
+msgid "Created by"
+msgstr "Creado por"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_assignment_wizard__create_date
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_cancel_wizard__create_date
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_courier__create_date
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_courier_reassignment__create_date
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_event__create_date
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_wizard__create_date
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_zone__create_date
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_package__create_date
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_pickup_event__create_date
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_pickup_wizard__create_date
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_correction__create_date
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_wizard__create_date
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__create_date
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_sla_revision__create_date
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_sla_wizard__create_date
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_zone_postcode_rule__create_date
+msgid "Created on"
+msgstr "Creado el"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_assignment_wizard__current_courier_id
+msgid "Current Courier"
+msgstr "Repartidor actual"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_form
+msgid "Current Load"
+msgstr "Carga actual"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_courier__current_shipment_count
+msgid "Current Shipment Load"
+msgstr "Carga actual de envíos"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_courier__current_weight
+msgid "Current Weight Load"
+msgstr "Carga de peso actual"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_courier__current_weight_uom_id
+msgid "Current Weight Unit"
+msgstr "Unidad de peso actual"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_package_form
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_pickup_event_form
+msgid "Custody"
+msgstr "Custodia"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "D / 04"
+msgstr ""
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+msgid "DELIVERED"
+msgstr "ENTREGADO"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "DESTINATION"
+msgstr "DESTINO"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "DESTINATION PRESSURE"
+msgstr "PRESIÓN DE DESTINO"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "DESTINATIONS"
+msgstr "DESTINOS"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_reassignment_search
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_delivery_event_search
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_pickup_event_search
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_route_correction_search
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_sla_revision_search
+msgid "Day"
+msgstr "Día"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_sla_revision_form
+msgid "Deadline Change"
+msgstr "Cambio de fecha límite"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_res_company__parcel_default_courier_max_shipments
+#: model:ir.model.fields,field_description:parcel_transport_management.field_res_config_settings__parcel_default_courier_max_shipments
+msgid "Default Courier Shipment Capacity"
+msgstr "Capacidad de envíos predeterminada del repartidor"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_res_company__parcel_default_courier_max_weight
+#: model:ir.model.fields,field_description:parcel_transport_management.field_res_config_settings__parcel_default_courier_max_weight
+msgid "Default Courier Weight Capacity"
+msgstr "Capacidad de peso predeterminada del repartidor"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_res_company__parcel_default_courier_weight_uom_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_res_config_settings__parcel_default_courier_weight_uom_id
+msgid "Default Courier Weight Unit"
+msgstr "Unidad de peso predeterminada del repartidor"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_zone__default_sla_hours
+msgid "Default SLA (Hours)"
+msgstr "ANS predeterminado (horas)"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_res_config_settings_form
+msgid "Default Shipment Capacity"
+msgstr "Capacidad de envíos predeterminada"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_res_config_settings_form
+msgid "Default Weight Capacity"
+msgstr "Capacidad de peso predeterminada"
+
+#. module: parcel_transport_management
+#: model_terms:ir.actions.act_window,help:parcel_transport_management.action_ptm_zone
+msgid "Define the first delivery zone"
+msgstr "Definir la primera zona de entrega"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_list
+msgid "Delay (h)"
+msgstr "Retraso (h)"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__delay_hours
+msgid "Delay Hours"
+msgstr "Horas de retraso"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_search
+msgid "Delayed"
+msgstr "Con retraso"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "Delayed shipments"
+msgstr "Envíos con retraso"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields.selection,name:parcel_transport_management.selection__parcel_shipment__state__delivered
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_status_label
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_package_kanban
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_package_search
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_search
+msgid "Delivered"
+msgstr "Entregado"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__delivered_at
+msgid "Delivered At"
+msgstr "Entregado el"
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "Delivered or cancelled shipments cannot be cancelled."
+msgstr "Los envíos entregados o cancelados no se pueden cancelar."
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "Delivered today"
+msgstr "Entregados hoy"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_route_wizard_form
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+msgid "Delivery"
+msgstr "Entrega"
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/events.py:0
+msgid "Delivery %(shipment)s at %(timestamp)s (#%(event_id)s)"
+msgstr "Entrega de %(shipment)s a las %(timestamp)s (#%(event_id)s)"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_wizard__delivery_city
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__delivery_city
+msgid "Delivery City"
+msgstr "Ciudad de entrega"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+msgid "Delivery Commitment"
+msgstr "Compromiso de entrega"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_wizard__delivery_country_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__delivery_country_id
+msgid "Delivery Country"
+msgstr "País de entrega"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_delivery_event_search
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_search
+msgid "Delivery Date"
+msgstr "Fecha de entrega"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_package__delivery_event_id
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_delivery_event_form
+msgid "Delivery Event"
+msgstr "Evento de entrega"
+
+#. module: parcel_transport_management
+#: model:ir.actions.act_window,name:parcel_transport_management.action_ptm_delivery_history
+#: model:ir.ui.menu,name:parcel_transport_management.menu_ptm_delivery_history
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_delivery_event_list
+msgid "Delivery Events"
+msgstr "Eventos de entrega"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_wizard__delivery_name
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__delivery_name
+msgid "Delivery Name"
+msgstr "Nombre de entrega"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_wizard__note
+msgid "Delivery Note"
+msgstr "Nota de entrega"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_wizard__delivery_street
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__delivery_street
+msgid "Delivery Street"
+msgstr "Calle de entrega"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_wizard__delivery_street2
+msgid "Delivery Street 2"
+msgstr "Calle de entrega 2"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__delivery_street2
+msgid "Delivery Street2"
+msgstr "Calle de entrega 2"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_wizard__delivery_zip
+msgid "Delivery ZIP"
+msgstr "Código postal de entrega"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__delivery_zip
+msgid "Delivery Zip"
+msgstr "Código postal de entrega"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_route_correction_form
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_search
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_zone_form
+msgid "Delivery Zone"
+msgstr "Zona de entrega"
+
+#. module: parcel_transport_management
+#: model:ir.actions.act_window,name:parcel_transport_management.action_ptm_zone
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_courier__zone_ids
+#: model:ir.ui.menu,name:parcel_transport_management.menu_ptm_zones
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_zone_kanban
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_zone_list
+msgid "Delivery Zones"
+msgstr "Zonas de entrega"
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "Delivery can only be recorded while in transit."
+msgstr ""
+"La entrega solo se puede registrar mientras el envío está en tránsito."
+
+#. module: parcel_transport_management
+#: model_terms:ir.actions.act_window,help:parcel_transport_management.action_ptm_delivery_history
+msgid ""
+"Delivery confirmations appear here after they are recorded from a shipment."
+msgstr ""
+"Las confirmaciones de entrega aparecen aquí después de registrarse desde un "
+"envío."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/events.py:0
+msgid "Delivery event actor, timestamp, and packages are server-controlled."
+msgstr ""
+"El servidor controla el actor, la marca de tiempo y los paquetes del evento "
+"de entrega."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/events.py:0
+msgid "Delivery events are append-only and cannot be changed."
+msgstr "Los eventos de entrega son de solo adición y no se pueden modificar."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/events.py:0
+msgid "Delivery events are append-only and cannot be deleted."
+msgstr "Los eventos de entrega son de solo adición y no se pueden eliminar."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/events.py:0
+msgid "Delivery events require a shipment in transit."
+msgstr "Los eventos de entrega requieren que el envío esté en tránsito."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "Delivery has already been recorded for a selected package."
+msgstr "Ya se ha registrado la entrega de uno de los paquetes seleccionados."
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/js/parcel_dashboard.js:0
+msgid "Delivery recorded"
+msgstr "Entrega registrada"
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "Delivery requires an assigned courier."
+msgstr "La entrega requiere un repartidor asignado."
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__destination_zone_id
+msgid "Destination Zone"
+msgstr "Zona de destino"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_assignment_wizard_form
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_delivery_wizard_form
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_pickup_wizard_form
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_route_wizard_form
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_sla_wizard_form
+msgid "Discard"
+msgstr "Descartar"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_assignment_wizard__display_name
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_cancel_wizard__display_name
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_courier__display_name
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_courier_reassignment__display_name
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_event__display_name
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_wizard__display_name
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_zone__display_name
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_package__display_name
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_pickup_event__display_name
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_pickup_wizard__display_name
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_correction__display_name
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_wizard__display_name
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__display_name
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_sla_revision__display_name
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_sla_wizard__display_name
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_zone_postcode_rule__display_name
+#: model:ir.model.fields,field_description:parcel_transport_management.field_res_company__display_name
+#: model:ir.model.fields,field_description:parcel_transport_management.field_res_config_settings__display_name
+msgid "Display Name"
+msgstr "Nombre mostrado"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields.selection,name:parcel_transport_management.selection__parcel_shipment__state__draft
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_status_label
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_search
+msgid "Draft"
+msgstr "Borrador"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "EXCEPTIONS"
+msgstr "EXCEPCIONES"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "EXPECTED"
+msgstr "PREVISTO"
+
+#. module: parcel_transport_management
+#: model_terms:ir.actions.act_window,help:parcel_transport_management.action_ptm_courier_reassignment_history
+msgid ""
+"Each actual courier change is preserved with its actor, timestamp, and "
+"reason."
+msgstr ""
+"Cada cambio real de repartidor se conserva con su autor, fecha y motivo."
+
+#. module: parcel_transport_management
+#: model_terms:ir.actions.act_window,help:parcel_transport_management.action_ptm_sla_history
+msgid "Each manager-approved delivery deadline change is preserved here."
+msgstr ""
+"Aquí se conserva cada cambio de la fecha límite de entrega aprobado por un "
+"responsable."
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid "Enter your tracking code to see the latest parcel updates."
+msgstr ""
+"Introduzca su código de seguimiento para consultar las últimas novedades del"
+" paquete."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "Every package must be picked up before transit starts."
+msgstr "Todos los paquetes deben recogerse antes de iniciar el tránsito."
+
+#. module: parcel_transport_management
+#: model_terms:ir.actions.act_window,help:parcel_transport_management.action_ptm_route_history
+msgid ""
+"Every route snapshot correction is preserved, including audit-only changes "
+"to terminal shipments."
+msgstr ""
+"Se conserva cada corrección de la instantánea de la ruta, incluidos los "
+"cambios exclusivamente de auditoría en envíos finalizados."
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "Exceptions are surfaced first"
+msgstr "Las excepciones se muestran primero"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__expected_delivery_at
+msgid "Expected Delivery At"
+msgstr "Entrega prevista a las"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_sla_wizard_form
+msgid "Explain the deadline revision"
+msgstr "Explique la revisión del plazo"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_route_wizard_form
+msgid "Explain the route correction"
+msgstr "Explique la corrección de la ruta"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_cancel_wizard_form
+msgid "Explain why this shipment must be cancelled"
+msgstr "Explique por qué debe cancelarse este envío"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid "Find a parcel"
+msgstr "Buscar un paquete"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__first_picked_up_at
+msgid "First Picked Up At"
+msgstr "Primera recogida a las"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__message_follower_ids
+msgid "Followers"
+msgstr "Seguidores"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "Seguidores (contactos)"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,help:parcel_transport_management.field_parcel_shipment__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr "Icono de Font Awesome, p. ej., fa-tasks"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__has_message
+msgid "Has Message"
+msgstr "Tiene mensajes"
+
+#. module: parcel_transport_management
+#: model:ir.ui.menu,name:parcel_transport_management.menu_ptm_history
+msgid "History"
+msgstr "Historial"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+msgid "History & Audit"
+msgstr "Historial y auditoría"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_assignment_wizard__id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_cancel_wizard__id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_courier__id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_courier_reassignment__id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_event__id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_wizard__id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_zone__id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_package__id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_pickup_event__id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_pickup_wizard__id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_correction__id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_wizard__id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_sla_revision__id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_sla_wizard__id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_zone_postcode_rule__id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_res_company__id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_res_config_settings__id
+msgid "ID"
+msgstr ""
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__activity_exception_icon
+msgid "Icon"
+msgstr "Icono"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,help:parcel_transport_management.field_parcel_shipment__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr "Icono que indica una actividad excepcional."
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_form
+msgid "Identity"
+msgstr "Identidad"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,help:parcel_transport_management.field_parcel_shipment__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "Si se marca, los mensajes nuevos requieren su atención."
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,help:parcel_transport_management.field_parcel_shipment__message_has_error
+#: model:ir.model.fields,help:parcel_transport_management.field_parcel_shipment__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "Si se marca, algunos mensajes presentan un error de entrega."
+
+#. module: parcel_transport_management
+#: model:ir.model.fields.selection,name:parcel_transport_management.selection__parcel_shipment__state__in_transit
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_search
+msgid "In Transit"
+msgstr "En tránsito"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_status_label
+msgid "In transit"
+msgstr "En tránsito"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__message_is_follower
+msgid "Is Follower"
+msgstr "Es seguidor"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_cancel_wizard_form
+msgid "Keep Shipment"
+msgstr "Conservar envío"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "LANE RANKING"
+msgstr "CLASIFICACIÓN DE CARRILES"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "LANES"
+msgstr "CARRILES"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "LAST FRAME"
+msgstr "ÚLTIMO FOTOGRAMA"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "LATE"
+msgstr "CON RETRASO"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "LIMITED RANKING"
+msgstr "CLASIFICACIÓN LIMITADA"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "LIVE"
+msgstr "EN DIRECTO"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "LOAD"
+msgstr "CARGA"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_assignment_wizard__write_uid
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_cancel_wizard__write_uid
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_courier__write_uid
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_courier_reassignment__write_uid
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_event__write_uid
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_wizard__write_uid
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_zone__write_uid
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_package__write_uid
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_pickup_event__write_uid
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_pickup_wizard__write_uid
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_correction__write_uid
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_wizard__write_uid
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__write_uid
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_sla_revision__write_uid
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_sla_wizard__write_uid
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_zone_postcode_rule__write_uid
+msgid "Last Updated by"
+msgstr "Última actualización por"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_assignment_wizard__write_date
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_cancel_wizard__write_date
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_courier__write_date
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_courier_reassignment__write_date
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_event__write_date
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_wizard__write_date
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_zone__write_date
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_package__write_date
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_pickup_event__write_date
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_pickup_wizard__write_date
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_correction__write_date
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_wizard__write_date
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__write_date
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_sla_revision__write_date
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_sla_wizard__write_date
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_zone_postcode_rule__write_date
+msgid "Last Updated on"
+msgstr "Última actualización el"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_form
+msgid "Live Capacity"
+msgstr "Capacidad en tiempo real"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "Live synchronization is unavailable"
+msgstr "La sincronización en tiempo real no está disponible"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_zone_form
+msgid ""
+"Longer postcode prefixes take precedence over shorter prefixes in the same "
+"company and country."
+msgstr ""
+"Los prefijos de código postal más largos tienen prioridad sobre los más "
+"cortos en la misma empresa y el mismo país."
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "MAIN LANES"
+msgstr "CARRILES PRINCIPALES"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "MOVING"
+msgstr "EN MOVIMIENTO"
+
+#. module: parcel_transport_management
+#: model:res.groups,name:parcel_transport_management.group_ptm_manager
+msgid "Manager"
+msgstr "Responsable"
+
+#. module: parcel_transport_management
+#: model_terms:ir.actions.act_window,help:parcel_transport_management.action_ptm_zone
+msgid ""
+"Map postcode prefixes to an SLA and assign couriers that can cover the area."
+msgstr ""
+"Asocie los prefijos de código postal a un SLA y asigne repartidores que "
+"puedan cubrir la zona."
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_courier__max_concurrent_shipments
+msgid "Maximum Concurrent Shipments"
+msgstr "Máximo de envíos simultáneos"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_courier__max_concurrent_weight
+msgid "Maximum Concurrent Weight"
+msgstr "Peso máximo simultáneo"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_res_company__parcel_max_package_weight
+#: model:ir.model.fields,field_description:parcel_transport_management.field_res_config_settings__parcel_max_package_weight
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_res_config_settings_form
+msgid "Maximum Package Weight"
+msgstr "Peso máximo del paquete"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_res_company__parcel_max_package_weight_uom_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_res_config_settings__parcel_max_package_weight_uom_id
+msgid "Maximum Package Weight Unit"
+msgstr "Unidad de peso máximo del paquete"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__message_has_error
+msgid "Message Delivery error"
+msgstr "Error de entrega del mensaje"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__message_ids
+msgid "Messages"
+msgstr "Mensajes"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr "Fecha límite de mi actividad"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "NETWORK LEDGER"
+msgstr "REGISTRO DE RED"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "NETWORK PRESSURE"
+msgstr "PRESIÓN DE RED"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "NO ACTIVE LANES"
+msgstr "NO HAY CARRILES ACTIVOS"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "NO COURIERS AVAILABLE"
+msgstr "NO HAY REPARTIDORES DISPONIBLES"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "NO DESTINATION PRESSURE"
+msgstr "NO HAY PRESIÓN DE DESTINO"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "NO OPERATIONAL SNAPSHOT IS AVAILABLE"
+msgstr "NO HAY NINGUNA INSTANTÁNEA OPERATIVA DISPONIBLE"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "NO RECENT HANDOFFS"
+msgstr "NO HAY TRASPASOS RECIENTES"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_courier__name
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_zone__name
+msgid "Name"
+msgstr "Nombre"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "Network online"
+msgstr "Red en línea"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_assignment_wizard__courier_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_courier_reassignment__new_courier_id
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_reassignment_search
+msgid "New Courier"
+msgstr "Nuevo repartidor"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_correction__new_destination_zone_id
+msgid "New Destination Zone"
+msgstr "Nueva zona de destino"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_sla_revision__new_expected_delivery_at
+msgid "New Expected Delivery At"
+msgstr "Nueva fecha y hora de entrega previstas"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_correction__new_origin_zone_id
+msgid "New Origin Zone"
+msgstr "Nueva zona de origen"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_correction__new_values
+msgid "New Values"
+msgstr "Nuevos valores"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr "Fecha límite de la siguiente actividad"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__activity_summary
+msgid "Next Activity Summary"
+msgstr "Resumen de la siguiente actividad"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__activity_type_id
+msgid "Next Activity Type"
+msgstr "Tipo de la siguiente actividad"
+
+#. module: parcel_transport_management
+#: model_terms:ir.actions.act_window,help:parcel_transport_management.action_ptm_sla_history
+msgid "No SLA revisions recorded"
+msgstr "No se han registrado revisiones del SLA"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "No courier capacity is available in this company."
+msgstr "No hay capacidad de repartidores disponible en esta empresa."
+
+#. module: parcel_transport_management
+#: model_terms:ir.actions.act_window,help:parcel_transport_management.action_ptm_courier_reassignment_history
+msgid "No courier reassignments recorded"
+msgstr "No hay reasignaciones de repartidor registradas"
+
+#. module: parcel_transport_management
+#: model_terms:ir.actions.act_window,help:parcel_transport_management.action_ptm_delivery_history
+msgid "No delivery events recorded"
+msgstr "No se han registrado eventos de entrega"
+
+#. module: parcel_transport_management
+#: model_terms:ir.actions.act_window,help:parcel_transport_management.action_ptm_package
+msgid "No packages are visible yet"
+msgstr "Aún no hay paquetes visibles"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid ""
+"No parcel events are available yet. Check again after the first handling "
+"update."
+msgstr ""
+"Aún no hay eventos disponibles para el paquete. Vuelve a comprobarlo después"
+" de la primera actualización de manipulación."
+
+#. module: parcel_transport_management
+#: model_terms:ir.actions.act_window,help:parcel_transport_management.action_ptm_pickup_history
+msgid "No pickup events recorded"
+msgstr "No se han registrado eventos de recogida"
+
+#. module: parcel_transport_management
+#: model_terms:ir.actions.act_window,help:parcel_transport_management.action_ptm_route_history
+msgid "No route corrections recorded"
+msgstr "No se han registrado correcciones de ruta"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_event__note
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_pickup_event__note
+msgid "Note"
+msgstr "Nota"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__message_needaction_counter
+msgid "Number of Actions"
+msgstr "Número de acciones"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__message_has_error_counter
+msgid "Number of errors"
+msgstr "Número de errores"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,help:parcel_transport_management.field_parcel_shipment__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "Número de mensajes que requieren una acción"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,help:parcel_transport_management.field_parcel_shipment__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "Número de mensajes con error de entrega"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "ODOO COMMUNITY 19"
+msgstr ""
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "OF"
+msgstr "DE"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "OFF / LINE"
+msgstr "FUERA DE LÍNEA"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "OPEN COURIERS"
+msgstr "ABRIR REPARTIDORES"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "OPEN SHIPMENTS"
+msgstr "ABRIR ENVÍOS"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "OPEN ZONE SETUP"
+msgstr "ABRIR CONFIGURACIÓN DE ZONAS"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "OPEN ZONES"
+msgstr "ABRIR ZONAS"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "ORIGIN"
+msgstr "ORIGEN"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_courier_reassignment__occurred_at
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_event__occurred_at
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_pickup_event__occurred_at
+msgid "Occurred At"
+msgstr "Ocurrido el"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "Offline snapshot"
+msgstr "Instantánea sin conexión"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/js/parcel_dashboard.js:0
+msgid "On route"
+msgstr "En ruta"
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "Only active assigned shipments can be reassigned."
+msgstr "Solo se pueden reasignar los envíos asignados activos."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "Only assigned shipments can be unassigned."
+msgstr "Solo se puede anular la asignación de los envíos asignados."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "Only draft shipments can be assigned."
+msgstr "Solo se pueden asignar los envíos en borrador."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "Only draft shipments can be deleted."
+msgstr "Solo se pueden eliminar los envíos en borrador."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "Only parcel managers can cancel shipments."
+msgstr "Solo los responsables de Parcel pueden cancelar envíos."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/revisions.py:0
+msgid "Only parcel managers can correct shipment routes."
+msgstr ""
+"Solo los responsables de Parcel pueden corregir las rutas de los envíos."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "Only parcel managers can perform this operation."
+msgstr "Solo los responsables de Parcel pueden realizar esta operación."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/revisions.py:0
+msgid "Only parcel managers can revise shipment SLAs."
+msgstr "Solo los responsables de Parcel pueden revisar los SLA de los envíos."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "Only parcel operators or managers can dispatch shipments."
+msgstr "Solo los operadores o responsables de Parcel pueden despachar envíos."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "Only shipment route snapshot fields can be corrected."
+msgstr ""
+"Solo se pueden corregir los campos de la instantánea de la ruta del envío."
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid "Only the tracking code is required. Parcel status appears below."
+msgstr ""
+"Solo se necesita el código de seguimiento. El estado del paquete aparece a "
+"continuación."
+
+#. module: parcel_transport_management
+#: model_terms:ir.actions.act_window,help:parcel_transport_management.action_ptm_package
+msgid ""
+"Open a draft shipment to add packages. Tracking codes are generated "
+"automatically."
+msgstr ""
+"Abra un envío en borrador para añadir paquetes. Los códigos de seguimiento "
+"se generan automáticamente."
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "Open courier:"
+msgstr "Abrir repartidor:"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "Open destination zone:"
+msgstr "Abrir zona de destino:"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "Open shipment:"
+msgstr "Abrir envío:"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid ""
+"Open shipments with assigned endpoints will appear in the server-ranked lane"
+" view."
+msgstr "Los envíos abiertos con extremos asignados aparecerán en la vista de carriles clasificada por el servidor."
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "Open the native shipment workspace to review the full parcel ledger."
+msgstr ""
+"Abra el espacio de trabajo nativo de envíos para revisar el registro "
+"completo de paquetería."
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "Open the native zone workspace for the complete set."
+msgstr "Abra el espacio de trabajo nativo de zonas para consultar el conjunto completo."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/wizards/common.py:0
+msgid "Open this assistant from a shipment."
+msgstr "Abra este asistente desde un envío."
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+msgid "Operational Milestones"
+msgstr "Hitos operativos"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "Operational key performance indicators"
+msgstr "Indicadores clave de rendimiento operativo"
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "Operational shipment fields cannot be set directly."
+msgstr "Los campos operativos del envío no se pueden establecer directamente."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "Operational shipment fields cannot be written directly."
+msgstr "No se puede escribir directamente en los campos operativos del envío."
+
+#. module: parcel_transport_management
+#: model:ir.ui.menu,name:parcel_transport_management.menu_ptm_operations
+msgid "Operations"
+msgstr "Operaciones"
+
+#. module: parcel_transport_management
+#: model:res.groups,name:parcel_transport_management.group_ptm_operator
+msgid "Operator"
+msgstr "Operador"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_delivery_wizard_form
+msgid "Optional delivery note"
+msgstr "Nota de entrega opcional"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_pickup_wizard_form
+msgid "Optional operational note"
+msgstr "Nota operativa opcional"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__origin_zone_id
+msgid "Origin Zone"
+msgstr "Zona de origen"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+msgid "Original Delay (h)"
+msgstr "Retraso original (h)"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__original_delay_hours
+msgid "Original Delay Hours"
+msgstr "Horas de retraso originales"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__original_expected_delivery_at
+msgid "Original Expected Delivery At"
+msgstr "Fecha y hora de entrega prevista original"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "PACKAGES"
+msgstr "PAQUETES"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "PACKAGES DELIVERED"
+msgstr "PAQUETES ENTREGADOS"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "PARCEL"
+msgstr "PAQUETE"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "PARCEL TRANSPORT MANAGEMENT // COMMAND CENTER"
+msgstr "GESTIÓN DEL TRANSPORTE DE PARCEL // CENTRO DE CONTROL"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "PARTIAL HANDOFFS"
+msgstr "TRANSFERENCIAS PARCIALES"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "PICKED UP"
+msgstr "RECOGIDO"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "PRESSURE RANKING"
+msgstr "CLASIFICACIÓN DE PRESIÓN"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "PTM"
+msgstr ""
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid "PTM-XXXX-XXXX-XXXX-XXXX"
+msgstr ""
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_package_form
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+msgid "Package"
+msgstr "Paquete"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_package_form
+msgid ""
+"Package details are managed from the draft shipment. Operational events are "
+"append-only."
+msgstr ""
+"Los detalles del paquete se gestionan desde el envío en borrador. Los "
+"eventos operativos son de solo adición."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/package.py:0
+msgid "Package events cannot be set directly."
+msgstr "Los eventos del paquete no se pueden establecer directamente."
+
+#. module: parcel_transport_management
+#: model:ir.model.constraint,message:parcel_transport_management.constraint_parcel_package_tracking_code_unique
+msgid "Package tracking codes must be globally unique."
+msgstr ""
+"Los códigos de seguimiento de los paquetes deben ser únicos a nivel global."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/package.py:0
+msgid "Package weight exceeds the company maximum of %(maximum)s %(unit)s."
+msgstr ""
+"El peso del paquete supera el máximo de la empresa de %(maximum)s %(unit)s."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/package.py:0
+#: model:ir.model.constraint,message:parcel_transport_management.constraint_parcel_package_weight_positive
+msgid "Package weight must be strictly positive."
+msgstr "El peso del paquete debe ser estrictamente positivo."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/package.py:0
+msgid "Package weight must use a weight unit."
+msgstr "El peso del paquete debe utilizar una unidad de peso."
+
+#. module: parcel_transport_management
+#: model:ir.actions.act_window,name:parcel_transport_management.action_ptm_package
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_event__package_ids
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_pickup_event__package_ids
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__package_ids
+#: model:ir.ui.menu,name:parcel_transport_management.menu_ptm_packages
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_delivery_event_form
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_package_kanban
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_package_list
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_pickup_event_form
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+msgid "Packages"
+msgstr "Paquetes"
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/package.py:0
+msgid "Packages can only be added to draft shipments."
+msgstr "Solo se pueden añadir paquetes a los envíos en borrador."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/package.py:0
+msgid "Packages can only be changed on draft shipments."
+msgstr "Solo se pueden modificar los paquetes de los envíos en borrador."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/package.py:0
+msgid "Packages can only be removed from draft shipments."
+msgstr "Solo se pueden eliminar paquetes de los envíos en borrador."
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_wizard__package_ids
+msgid "Packages to Deliver"
+msgstr "Paquetes que entregar"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_pickup_wizard__package_ids
+msgid "Packages to Pick Up"
+msgstr "Paquetes que recoger"
+
+#. module: parcel_transport_management
+#: model:ir.model,name:parcel_transport_management.model_parcel_courier
+msgid "Parcel Courier"
+msgstr "Repartidor de Parcel"
+
+#. module: parcel_transport_management
+#: model:ir.model,name:parcel_transport_management.model_parcel_courier_reassignment
+msgid "Parcel Courier Reassignment"
+msgstr "Reasignación de repartidor de paquetería"
+
+#. module: parcel_transport_management
+#: model:ir.model,name:parcel_transport_management.model_parcel_delivery_event
+msgid "Parcel Delivery Event"
+msgstr "Evento de entrega de Parcel"
+
+#. module: parcel_transport_management
+#: model:ir.model,name:parcel_transport_management.model_parcel_delivery_zone
+msgid "Parcel Delivery Zone"
+msgstr "Zona de entrega de Parcel"
+
+#. module: parcel_transport_management
+#: model:ir.ui.menu,name:parcel_transport_management.menu_ptm_root
+msgid "Parcel Ops"
+msgstr ""
+
+#. module: parcel_transport_management
+#: model:ir.model,name:parcel_transport_management.model_parcel_package
+msgid "Parcel Package"
+msgstr "Paquete de Parcel"
+
+#. module: parcel_transport_management
+#: model:ir.model,name:parcel_transport_management.model_parcel_pickup_event
+msgid "Parcel Pickup Event"
+msgstr "Evento de recogida de Parcel"
+
+#. module: parcel_transport_management
+#: model:ir.model,name:parcel_transport_management.model_parcel_route_correction
+msgid "Parcel Route Correction"
+msgstr "Corrección de ruta de Parcel"
+
+#. module: parcel_transport_management
+#: model:ir.model,name:parcel_transport_management.model_parcel_sla_revision
+msgid "Parcel SLA Revision"
+msgstr "Revisión del SLA de Parcel"
+
+#. module: parcel_transport_management
+#: model:ir.model,name:parcel_transport_management.model_parcel_shipment
+msgid "Parcel Shipment"
+msgstr "Envío de paquetes"
+
+#. module: parcel_transport_management
+#: model:ir.module.category,name:parcel_transport_management.module_category_parcel_transport
+#: model:res.groups.privilege,name:parcel_transport_management.res_groups_privilege_parcel_transport
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_res_config_settings_form
+msgid "Parcel Transport"
+msgstr "Transporte de paquetes"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid "Parcel Transport Management"
+msgstr "Gestión del transporte de paquetes"
+
+#. module: parcel_transport_management
+#: model:ir.actions.act_window,name:parcel_transport_management.action_ptm_settings
+msgid "Parcel Transport Settings"
+msgstr "Ajustes del transporte de paquetes"
+
+#. module: parcel_transport_management
+#: model:ir.model,name:parcel_transport_management.model_parcel_zone_postcode_rule
+msgid "Parcel Zone Postcode Rule"
+msgstr "Regla de código postal de zona de paquetería"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "Parcel network detail"
+msgstr "Detalle de la red de paquetería"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid "Parcel status"
+msgstr "Estado del paquete"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid "Parcel tracking summary"
+msgstr "Resumen del seguimiento del paquete"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "Parcel workspace"
+msgstr "Espacio de trabajo de paquetería"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields.selection,name:parcel_transport_management.selection__parcel_shipment__state__partially_delivered
+msgid "Partially Delivered"
+msgstr "Entregado parcialmente"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields.selection,name:parcel_transport_management.selection__parcel_shipment__state__partially_picked_up
+msgid "Partially Picked Up"
+msgstr "Recogido parcialmente"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_status_label
+msgid "Partially delivered"
+msgstr "Entregado parcialmente"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_status_label
+msgid "Partially picked up"
+msgstr "Recogido parcialmente"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+msgid "Parties"
+msgstr "Partes"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields.selection,name:parcel_transport_management.selection__parcel_shipment__state__picked_up
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_package_search
+msgid "Picked Up"
+msgstr "Recogido"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_status_label
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_package_kanban
+msgid "Picked up"
+msgstr "Recogido"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_route_wizard_form
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+msgid "Pickup"
+msgstr "Recogida"
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/events.py:0
+msgid "Pickup %(shipment)s at %(timestamp)s (#%(event_id)s)"
+msgstr "Recogida de %(shipment)s a las %(timestamp)s (#%(event_id)s)"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_wizard__pickup_city
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__pickup_city
+msgid "Pickup City"
+msgstr "Ciudad de recogida"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_wizard__pickup_country_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__pickup_country_id
+msgid "Pickup Country"
+msgstr "País de recogida"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_pickup_event_search
+msgid "Pickup Date"
+msgstr "Fecha de recogida"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_package__pickup_event_id
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_pickup_event_form
+msgid "Pickup Event"
+msgstr "Evento de recogida"
+
+#. module: parcel_transport_management
+#: model:ir.actions.act_window,name:parcel_transport_management.action_ptm_pickup_history
+#: model:ir.ui.menu,name:parcel_transport_management.menu_ptm_pickup_history
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_pickup_event_list
+msgid "Pickup Events"
+msgstr "Eventos de recogida"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_wizard__pickup_name
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__pickup_name
+msgid "Pickup Name"
+msgstr "Nombre de recogida"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_pickup_wizard__note
+msgid "Pickup Note"
+msgstr "Nota de recogida"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_wizard__pickup_street
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__pickup_street
+msgid "Pickup Street"
+msgstr "Dirección de recogida"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_wizard__pickup_street2
+msgid "Pickup Street 2"
+msgstr "Dirección de recogida 2"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__pickup_street2
+msgid "Pickup Street2"
+msgstr "Dirección de recogida 2"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_wizard__pickup_zip
+msgid "Pickup ZIP"
+msgstr "Código postal de recogida"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__pickup_zip
+msgid "Pickup Zip"
+msgstr "Código postal de recogida"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_route_correction_form
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_search
+msgid "Pickup Zone"
+msgstr "Zona de recogida"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "Pickup and delivery events will form the operational trail."
+msgstr "Los eventos de recogida y entrega formarán el historial operativo."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "Pickup can only be recorded for an assigned shipment."
+msgstr "La recogida solo puede registrarse para un envío asignado."
+
+#. module: parcel_transport_management
+#: model_terms:ir.actions.act_window,help:parcel_transport_management.action_ptm_pickup_history
+msgid ""
+"Pickup confirmations appear here after they are recorded from a shipment."
+msgstr ""
+"Las confirmaciones de recogida aparecerán aquí una vez registradas desde un "
+"envío."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/events.py:0
+msgid "Pickup event actor, timestamp, and packages are server-controlled."
+msgstr ""
+"El actor, la fecha y hora y los paquetes del evento de recogida están "
+"controlados por el servidor."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/events.py:0
+msgid "Pickup events are append-only and cannot be changed."
+msgstr ""
+"Los eventos de recogida solo se pueden añadir y no se pueden modificar."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/events.py:0
+msgid "Pickup events are append-only and cannot be deleted."
+msgstr ""
+"Los eventos de recogida solo se pueden añadir y no se pueden eliminar."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/events.py:0
+msgid "Pickup events require an assigned shipment."
+msgstr "Los eventos de recogida requieren un envío asignado."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "Pickup has already been recorded for a selected package."
+msgstr "Ya se ha registrado la recogida de uno de los paquetes seleccionados."
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_search
+msgid "Pickup in Progress"
+msgstr "Recogida en curso"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/js/parcel_dashboard.js:0
+msgid "Pickup recorded"
+msgstr "Recogida registrada"
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "Pickup requires an assigned courier."
+msgstr "La recogida requiere un repartidor asignado."
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_zone_form
+msgid "Postcode Coverage"
+msgstr "Cobertura de códigos postales"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_zone_postcode_rule__postcode_prefix
+msgid "Postcode Prefix"
+msgstr "Prefijo del código postal"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_zone__postcode_rule_ids
+msgid "Postcode Rules"
+msgstr "Reglas de códigos postales"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_courier_reassignment__previous_courier_id
+msgid "Previous Courier"
+msgstr "Repartidor anterior"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_correction__previous_destination_zone_id
+msgid "Previous Destination Zone"
+msgstr "Zona de destino anterior"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_sla_revision__previous_expected_delivery_at
+msgid "Previous Expected Delivery At"
+msgstr "Fecha y hora de entrega previstas anteriores"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_correction__previous_origin_zone_id
+msgid "Previous Origin Zone"
+msgstr "Zona de origen anterior"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_route_correction_form
+msgid "Previous Snapshot"
+msgstr "Instantánea anterior"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_correction__previous_values
+msgid "Previous Values"
+msgstr "Valores anteriores"
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/package.py:0
+msgid "Protected package fields cannot be written directly."
+msgstr ""
+"Los campos protegidos del paquete no se pueden modificar directamente."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "Provide at least one route field to correct."
+msgstr "Indique al menos un campo de la ruta que corregir."
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid "Public parcel tracking"
+msgstr "Seguimiento público de paquetes"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "READ-ONLY OPERATIONAL FRAME"
+msgstr "MARCO OPERATIVO DE SOLO LECTURA"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "RECENT ACTIVITY"
+msgstr "ACTIVIDAD RECIENTE"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "RECONNECT"
+msgstr "VOLVER A CONECTAR"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "RECONNECTING"
+msgstr "RECONECTANDO"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "RECOVERED FROM DELAY"
+msgstr "RECUPERADO DEL RETRASO"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "RESERVED"
+msgstr "RESERVADO"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "RETRY CONNECTION"
+msgstr "REINTENTAR LA CONEXIÓN"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "Reading shipments, routes, and courier capacity."
+msgstr "Leyendo envíos, rutas y capacidad de los repartidores."
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid "Ready for a tracking code"
+msgstr "Listo para introducir un código de seguimiento"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_courier_reassignment__reason
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_correction__reason
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_sla_revision__reason
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_reassignment_form
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_route_correction_form
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_sla_revision_form
+msgid "Reason"
+msgstr "Motivo"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+msgid "Reassign Courier"
+msgstr "Reasignar repartidor"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_reassignment_search
+msgid "Reassignment Date"
+msgstr "Fecha de reasignación"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_assignment_wizard__reason
+msgid "Reassignment Reason"
+msgstr "Motivo de la reasignación"
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/reassignment.py:0
+msgid "Reassignment company, actor, and timestamp are server-controlled."
+msgstr ""
+"El servidor controla la empresa, el autor y la fecha de la reasignación."
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_delivery_event_form
+msgid "Receipt"
+msgstr "Recibo"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__recipient_id
+msgid "Recipient"
+msgstr "Destinatario"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_event__recipient_name
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_wizard__recipient_name
+msgid "Recipient Name"
+msgstr "Nombre del destinatario"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_delivery_event_form
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_pickup_event_form
+msgid "Record"
+msgstr "Registrar"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_route_wizard_form
+msgid "Record Audit Annotation"
+msgstr "Registrar anotación de auditoría"
+
+#. module: parcel_transport_management
+#: model:ir.actions.act_window,name:parcel_transport_management.action_ptm_delivery_wizard
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_delivery_wizard_form
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+msgid "Record Delivery"
+msgstr "Registrar entrega"
+
+#. module: parcel_transport_management
+#: model:ir.model,name:parcel_transport_management.model_parcel_delivery_wizard
+msgid "Record Parcel Delivery"
+msgstr "Registrar entrega de paquete"
+
+#. module: parcel_transport_management
+#: model:ir.model,name:parcel_transport_management.model_parcel_pickup_wizard
+msgid "Record Parcel Pickup"
+msgstr "Registrar recogida de paquete"
+
+#. module: parcel_transport_management
+#: model:ir.actions.act_window,name:parcel_transport_management.action_ptm_pickup_wizard
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_pickup_wizard_form
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+msgid "Record Pickup"
+msgstr "Registrar recogida"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+msgid "Record Route Audit"
+msgstr "Registrar auditoría de ruta"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__reference
+msgid "Reference"
+msgstr "Referencia"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "Refresh command center"
+msgstr "Actualizar el centro de control"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_res_config_settings_form
+msgid "Reject packages whose normalized weight exceeds this company limit."
+msgstr ""
+"Rechazar los paquetes cuyo peso normalizado supere este límite de la "
+"empresa."
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_form
+msgid "Related Odoo user"
+msgstr "Usuario de Odoo relacionado"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_courier__user_id
+msgid "Related User"
+msgstr "Usuario relacionado"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__activity_user_id
+msgid "Responsible User"
+msgstr "Usuario responsable"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid "Review every character, then submit the tracking code again."
+msgstr ""
+"Revisa todos los caracteres y vuelve a enviar el código de seguimiento."
+
+#. module: parcel_transport_management
+#: model:ir.model,name:parcel_transport_management.model_parcel_sla_wizard
+msgid "Revise Parcel Shipment SLA"
+msgstr "Revisar el SLA del envío de Parcel"
+
+#. module: parcel_transport_management
+#: model:ir.actions.act_window,name:parcel_transport_management.action_ptm_sla_wizard
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_sla_wizard_form
+msgid "Revise SLA"
+msgstr "Revisar SLA"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_sla_wizard__expected_delivery_at
+msgid "Revised Delivery Deadline"
+msgstr "Fecha límite de entrega revisada"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_sla_revision_search
+msgid "Revision Date"
+msgstr "Fecha de revisión"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_sla_wizard__reason
+msgid "Revision Reason"
+msgstr "Motivo de la revisión"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_route_correction_form
+msgid "Route Correction"
+msgstr "Corrección de ruta"
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/wizards/route.py:0
+msgid "Route Correction Applied"
+msgstr "Corrección de ruta aplicada"
+
+#. module: parcel_transport_management
+#: model:ir.actions.act_window,name:parcel_transport_management.action_ptm_route_history
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__route_correction_ids
+#: model:ir.ui.menu,name:parcel_transport_management.menu_ptm_route_history
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_route_correction_list
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+msgid "Route Corrections"
+msgstr "Correcciones de ruta"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+msgid "Route Snapshot"
+msgstr "Instantánea de la ruta"
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/revisions.py:0
+msgid "Route correction company, actor, and timestamp are server-controlled."
+msgstr ""
+"La empresa, el autor y la marca de tiempo de la corrección de ruta están "
+"controlados por el servidor."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/revisions.py:0
+msgid "Route corrections are append-only and cannot be changed."
+msgstr ""
+"Las correcciones de ruta son de solo adición y no se pueden modificar."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/revisions.py:0
+msgid "Route corrections are append-only and cannot be deleted."
+msgstr "Las correcciones de ruta son de solo adición y no se pueden eliminar."
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_kanban
+msgid "Route direction"
+msgstr "Dirección de la ruta"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "SERVER-RANKED OPERATING VIEW"
+msgstr "VISTA OPERATIVA CLASIFICADA POR EL SERVIDOR"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "SHIPMENT QUEUE"
+msgstr "COLA DE ENVÍOS"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "SHIPMENTS"
+msgstr "ENVÍOS"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "SHOWN OF"
+msgstr "MOSTRADOS DE"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_sla_revision_form
+msgid "SLA Revision"
+msgstr "Revisión del SLA"
+
+#. module: parcel_transport_management
+#: model:ir.actions.act_window,name:parcel_transport_management.action_ptm_sla_history
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__sla_revision_ids
+#: model:ir.ui.menu,name:parcel_transport_management.menu_ptm_sla_history
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_sla_revision_list
+msgid "SLA Revisions"
+msgstr "Revisiones del SLA"
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/revisions.py:0
+msgid "SLA revision company, actor, and timestamp are server-controlled."
+msgstr ""
+"La empresa, el autor y la marca de tiempo de la revisión del SLA están "
+"controlados por el servidor."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/revisions.py:0
+msgid "SLA revisions are append-only and cannot be changed."
+msgstr "Las revisiones del SLA son de solo adición y no se pueden modificar."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/revisions.py:0
+msgid "SLA revisions are append-only and cannot be deleted."
+msgstr "Las revisiones del SLA son de solo adición y no se pueden eliminar."
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "Error de entrega de SMS"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_reassignment_search
+msgid "Search Courier Reassignments"
+msgstr "Buscar reasignaciones de repartidor"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_search
+msgid "Search Couriers"
+msgstr "Buscar repartidores"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_delivery_event_search
+msgid "Search Delivery Events"
+msgstr "Buscar eventos de entrega"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_zone_search
+msgid "Search Delivery Zones"
+msgstr "Buscar zonas de entrega"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_package_search
+msgid "Search Packages"
+msgstr "Buscar paquetes"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_pickup_event_search
+msgid "Search Pickup Events"
+msgstr "Buscar eventos de recogida"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_route_correction_search
+msgid "Search Route Corrections"
+msgstr "Buscar correcciones de ruta"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_sla_revision_search
+msgid "Search SLA Revisions"
+msgstr "Buscar revisiones del SLA"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_search
+msgid "Search Shipments"
+msgstr "Buscar envíos"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid ""
+"See network pressure, parcel movement, and courier capacity without leaving "
+"the native Odoo workflow."
+msgstr ""
+"Consulte la presión de la red, el movimiento de paquetes y la capacidad de "
+"los repartidores sin salir del flujo de trabajo nativo de Odoo."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "Select packages belonging to this shipment."
+msgstr "Seleccione los paquetes que pertenecen a este envío."
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__sender_id
+msgid "Sender"
+msgstr "Remitente"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "Server-ranked destination pressure"
+msgstr "Presión de destino clasificada por el servidor"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "Server-ranked shipment lanes"
+msgstr "Carriles de envíos clasificados por el servidor"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_zone_form
+msgid "Service Configuration"
+msgstr "Configuración del servicio"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+msgid "Service Level"
+msgstr "Nivel de servicio"
+
+#. module: parcel_transport_management
+#: model_terms:ir.actions.act_window,help:parcel_transport_management.action_ptm_courier
+msgid ""
+"Set shipment and weight capacity, then define the delivery zones this "
+"courier can cover."
+msgstr ""
+"Establezca la capacidad de envíos y de peso y, a continuación, defina las "
+"zonas de entrega que puede cubrir este repartidor."
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_res_config_settings_form
+msgid ""
+"Set the concurrent shipment limit proposed for new couriers in this company."
+msgstr ""
+"Establezca el límite de envíos simultáneos propuesto para los nuevos "
+"repartidores de esta empresa."
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_res_config_settings_form
+msgid ""
+"Set the concurrent weight capacity proposed for new couriers in this "
+"company."
+msgstr ""
+"Establezca la capacidad de peso simultánea propuesta para los nuevos "
+"repartidores de esta empresa."
+
+#. module: parcel_transport_management
+#: model:ir.ui.menu,name:parcel_transport_management.menu_ptm_settings
+msgid "Settings"
+msgstr "Ajustes"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_assignment_wizard__shipment_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_cancel_wizard__shipment_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_courier_reassignment__shipment_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_event__shipment_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_delivery_wizard__shipment_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_package__shipment_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_pickup_event__shipment_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_pickup_wizard__shipment_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_correction__shipment_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_wizard__shipment_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_sla_revision__shipment_id
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_sla_wizard__shipment_id
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_reassignment_search
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_delivery_event_search
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_package_search
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_pickup_event_search
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_route_correction_search
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_sla_revision_search
+msgid "Shipment"
+msgstr "Envío"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_res_config_settings_form
+msgid "Shipment Limits"
+msgstr "Límites de envío"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/js/parcel_dashboard.js:0
+msgid "Shipment activity"
+msgstr "Actividad del envío"
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "Shipment details can only be changed in draft."
+msgstr ""
+"Los detalles del envío solo se pueden modificar en estado de borrador."
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/js/parcel_dashboard.js:0
+msgid "Shipment event"
+msgstr "Evento del envío"
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "Shipment references are generated by the server."
+msgstr "El servidor genera las referencias de los envíos."
+
+#. module: parcel_transport_management
+#: model:ir.model.constraint,message:parcel_transport_management.constraint_parcel_shipment_reference_unique
+msgid "Shipment references must be unique."
+msgstr "Las referencias de los envíos deben ser únicas."
+
+#. module: parcel_transport_management
+#: model:ir.actions.act_window,name:parcel_transport_management.action_ptm_shipment
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_courier__shipment_ids
+#: model:ir.ui.menu,name:parcel_transport_management.menu_ptm_shipments
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_form
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_kanban
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_list
+msgid "Shipments"
+msgstr "Envíos"
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "Shipments can only be created in an allowed company."
+msgstr "Los envíos solo se pueden crear en una empresa permitida."
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+msgid "Start Transit"
+msgstr "Iniciar tránsito"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_assignment_wizard__shipment_state
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_route_wizard__shipment_state
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__state
+msgid "State"
+msgstr "Estado"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_search
+msgid "Status"
+msgstr "Estado"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,help:parcel_transport_management.field_parcel_shipment__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
+"Estado basado en las actividades\n"
+"Vencida: la fecha límite ya ha pasado\n"
+"Hoy: la fecha de la actividad es hoy\n"
+"Planificada: actividades futuras."
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_status_label
+msgid "Status update"
+msgstr "Actualización de estado"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid "Submit the code above to reveal its verified parcel timeline."
+msgstr ""
+"Envía el código anterior para mostrar el historial verificado del paquete."
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "Synchronizing the parcel network"
+msgstr "Sincronizando la red de paquetería"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "THE ACTIVE QUEUE IS CLEAR"
+msgstr "LA COLA ACTIVA ESTÁ VACÍA"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "TRANSPORT / 19"
+msgstr "TRANSPORTE / 19"
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "The assigned courier does not cover every shipment zone."
+msgstr "El repartidor asignado no cubre todas las zonas del envío."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/package.py:0
+msgid "The company maximum package weight unit is not configured."
+msgstr ""
+"La unidad de peso máximo de los paquetes de la empresa no está configurada."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "The courier and shipment must belong to the same company."
+msgstr "El repartidor y el envío deben pertenecer a la misma empresa."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/courier.py:0
+msgid "The courier capacity unit must be a weight unit."
+msgstr "La unidad de capacidad del repartidor debe ser una unidad de peso."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/zone.py:0
+msgid "The default SLA must be a finite, strictly positive number of hours."
+msgstr ""
+"El SLA predeterminado debe ser un número de horas finito y estrictamente "
+"positivo."
+
+#. module: parcel_transport_management
+#: model:ir.model.constraint,message:parcel_transport_management.constraint_parcel_delivery_zone_default_sla_hours_positive
+msgid "The default SLA must be strictly positive."
+msgstr "El SLA predeterminado debe ser estrictamente positivo."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/res_company.py:0
+msgid "The default courier capacity unit must be a weight unit."
+msgstr ""
+"La unidad predeterminada de capacidad del repartidor debe ser una unidad de "
+"peso."
+
+#. module: parcel_transport_management
+#: model:ir.model.constraint,message:parcel_transport_management.constraint_res_company_parcel_default_courier_max_shipments_positive
+msgid "The default courier shipment capacity must be strictly positive."
+msgstr ""
+"La capacidad predeterminada de envíos del repartidor debe ser estrictamente "
+"positiva."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/res_company.py:0
+msgid ""
+"The default courier weight capacity must be a finite, strictly positive "
+"value."
+msgstr ""
+"La capacidad de peso predeterminada del repartidor debe ser un valor finito "
+"y estrictamente positivo."
+
+#. module: parcel_transport_management
+#: model:ir.model.constraint,message:parcel_transport_management.constraint_res_company_parcel_default_courier_max_weight_positive
+msgid "The default courier weight capacity must be strictly positive."
+msgstr ""
+"La capacidad de peso predeterminada del repartidor debe ser estrictamente "
+"positiva."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "The delivery address is outside configured zone coverage."
+msgstr ""
+"La dirección de entrega está fuera de la cobertura de las zonas "
+"configuradas."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/events.py:0
+msgid "The event courier must be assigned to the shipment."
+msgstr "El repartidor del evento debe estar asignado al envío."
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "The last verified snapshot remains on screen."
+msgstr "La última instantánea verificada permanece en pantalla."
+
+#. module: parcel_transport_management
+#: model:ir.model.constraint,message:parcel_transport_management.constraint_parcel_courier_max_concurrent_shipments_positive
+msgid "The maximum concurrent shipment capacity must be strictly positive."
+msgstr ""
+"La capacidad máxima de envíos simultáneos debe ser estrictamente positiva."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/courier.py:0
+msgid ""
+"The maximum concurrent weight must be a finite, strictly positive value."
+msgstr ""
+"El peso simultáneo máximo debe ser un valor finito y estrictamente positivo."
+
+#. module: parcel_transport_management
+#: model:ir.model.constraint,message:parcel_transport_management.constraint_parcel_courier_max_concurrent_weight_positive
+msgid "The maximum concurrent weight must be strictly positive."
+msgstr "El peso máximo simultáneo debe ser estrictamente positivo."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/res_company.py:0
+msgid "The maximum package weight must be a finite, strictly positive value."
+msgstr ""
+"El peso máximo por paquete debe ser un valor finito y estrictamente "
+"positivo."
+
+#. module: parcel_transport_management
+#: model:ir.model.constraint,message:parcel_transport_management.constraint_res_company_parcel_max_package_weight_positive
+msgid "The maximum package weight must be strictly positive."
+msgstr "El peso máximo del paquete debe ser estrictamente positivo."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/res_company.py:0
+msgid "The maximum package weight unit must be a weight unit."
+msgstr "La unidad de peso máximo por paquete debe ser una unidad de peso."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "The pickup address is outside configured zone coverage."
+msgstr ""
+"La dirección de recogida está fuera de la cobertura de las zonas "
+"configuradas."
+
+#. module: parcel_transport_management
+#: model:ir.model.constraint,message:parcel_transport_management.constraint_parcel_zone_postcode_rule_postcode_prefix_not_empty
+msgid "The postcode prefix cannot be empty."
+msgstr "El prefijo del código postal no puede estar vacío."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/zone.py:0
+#: model:ir.model.constraint,message:parcel_transport_management.constraint_parcel_zone_postcode_rule_postcode_prefix_company_coun_877fd1ed
+msgid "The postcode prefix must be unique per company and country."
+msgstr "El prefijo del código postal debe ser único por empresa y país."
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid ""
+"The previous frame cannot be shown because this session has not completed a "
+"successful synchronization."
+msgstr ""
+"No se puede mostrar el fotograma anterior porque esta sesión no ha "
+"completado correctamente ninguna sincronización."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/events.py:0
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "The recipient name is required."
+msgstr "El nombre del destinatario es obligatorio."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "The revised delivery deadline must be different."
+msgstr "La fecha límite de entrega revisada debe ser diferente."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/wizards/route.py:0
+msgid "The route snapshot was updated and the correction was recorded."
+msgstr "La instantánea de la ruta se actualizó y se registró la corrección."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "The selected courier has no capacity weight unit."
+msgstr ""
+"El repartidor seleccionado no tiene ninguna unidad de peso para la "
+"capacidad."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "The selected courier has no shipment capacity."
+msgstr "El repartidor seleccionado no tiene capacidad de envíos."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "The selected courier has no weight capacity."
+msgstr "El repartidor seleccionado no tiene capacidad de peso."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "The selected courier is archived."
+msgstr "El repartidor seleccionado está archivado."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "The selected courier is unavailable."
+msgstr "El repartidor seleccionado no está disponible."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/wizards/common.py:0
+msgid "The selected shipment no longer exists."
+msgstr "El envío seleccionado ya no existe."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/reassignment.py:0
+msgid "The shipment and couriers must belong to the same company."
+msgstr "El envío y los repartidores deben pertenecer a la misma empresa."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "The shipment has no SLA to revise."
+msgstr "El envío no tiene ningún SLA que revisar."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/wizards/route.py:0
+msgid ""
+"The terminal shipment snapshot was not changed; the correction was recorded "
+"for audit only."
+msgstr ""
+"La instantánea del envío finalizado no cambió; la corrección se registró "
+"únicamente para auditoría."
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_route_wizard_form
+msgid ""
+"This shipment is terminal. Changes will be recorded for audit only;\n"
+"                    the route snapshot will not change."
+msgstr ""
+"Este envío está finalizado. Los cambios se registrarán solo para auditoría; "
+"la instantánea de la ruta no cambiará."
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+msgid "Timeline"
+msgstr "Cronología"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__total_weight_kg
+msgid "Total Weight (kg)"
+msgstr "Peso total (kg)"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "Total shipments"
+msgstr "Total de envíos"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_package__tracking_code
+msgid "Tracking Code"
+msgstr "Código de seguimiento"
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/package.py:0
+msgid "Tracking codes are generated by the server."
+msgstr "El servidor genera los códigos de seguimiento."
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid "Tracking information unavailable"
+msgstr "Información de seguimiento no disponible"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__transit_started_at
+msgid "Transit Started At"
+msgstr "Inicio del tránsito"
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/shipment.py:0
+msgid "Transit requires an assigned courier."
+msgstr "El tránsito requiere un repartidor asignado."
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,help:parcel_transport_management.field_parcel_shipment__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr "Tipo de actividad de excepción registrada."
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "URBAN DELIVERY CONTROL"
+msgstr "CONTROL DE REPARTO URBANO"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/js/parcel_dashboard.js:0
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_kanban
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_search
+msgid "Unassigned"
+msgstr "Sin asignar"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/js/parcel_dashboard.js:0
+#: model:ir.model.fields.selection,name:parcel_transport_management.selection__parcel_courier__availability__unavailable
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_search
+msgid "Unavailable"
+msgstr "No disponible"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/js/parcel_dashboard.js:0
+msgid "Unmapped"
+msgstr "Sin correspondencia"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_route_wizard_form
+msgid "Update Route Snapshot"
+msgstr "Actualizar instantánea de ruta"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "VERIFIED FRAME"
+msgstr "FOTOGRAMA VERIFICADO"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "VIEW ALL SHIPMENTS"
+msgstr "VER TODOS LOS ENVÍOS"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "VIEW ZONES"
+msgstr "VER ZONAS"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid "Verified handling events, ordered from first to most recent."
+msgstr ""
+"Eventos de manipulación verificados, ordenados del primero al más reciente."
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "WEIGHT"
+msgstr "PESO"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.public_tracking_page
+msgid ""
+"We could not find tracking information for that code. Check the code and try"
+" again."
+msgstr ""
+"No hemos encontrado información de seguimiento para ese código. Compruebe el"
+" código e inténtelo de nuevo."
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__website_message_ids
+msgid "Website Messages"
+msgstr "Mensajes del sitio web"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,help:parcel_transport_management.field_parcel_shipment__website_message_ids
+msgid "Website communication history"
+msgstr "Historial de comunicaciones del sitio web"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_package__weight
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_package_form
+msgid "Weight"
+msgstr "Peso"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_package__weight_kg
+msgid "Weight (kg)"
+msgstr "Peso (kg)"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_package__weight_uom_id
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_package_search
+msgid "Weight Unit"
+msgstr "Unidad de peso"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_delivery_event_search
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_pickup_event_search
+msgid "With Note"
+msgstr "Con nota"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_zone_search
+msgid "Without Couriers"
+msgstr "Sin repartidores"
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/courier.py:0
+msgid ""
+"You cannot create a courier for a company outside your allowed companies."
+msgstr ""
+"No puede crear un repartidor para una empresa que no esté entre sus empresas"
+" permitidas."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/zone.py:0
+msgid ""
+"You cannot create a delivery zone for a company outside your allowed "
+"companies."
+msgstr ""
+"No puede crear una zona de entrega para una empresa que no esté entre sus "
+"empresas permitidas."
+
+#. module: parcel_transport_management
+#. odoo-python
+#: code:addons/parcel_transport_management/models/events.py:0
+msgid "You cannot record events for another courier's shipment."
+msgstr "No puede registrar eventos para el envío de otro repartidor."
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "ZONES"
+msgstr "ZONAS"
+
+#. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_zone_postcode_rule__zone_id
+msgid "Zone"
+msgstr "Zona"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_zone_form
+msgid "Zone code"
+msgstr "Código de zona"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_zone_form
+msgid "Zone name"
+msgstr "Nombre de la zona"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_zone_kanban
+msgid "h"
+msgstr ""
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/js/parcel_dashboard.js:0
+msgid "h late"
+msgstr "h de retraso"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_form
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_kanban
+msgid "kg"
+msgstr ""
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_package_kanban
+msgid "kg normalized"
+msgstr "kg normalizados"
+
+#. module: parcel_transport_management
+#: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_courier_kanban
+msgid "shipments"
+msgstr "envíos"
+
+#. module: parcel_transport_management
+#. odoo-javascript
+#: code:addons/parcel_transport_management/static/src/xml/parcel_dashboard.xml:0
+msgid "· TRUNCATED"
+msgstr "· TRUNCADO"

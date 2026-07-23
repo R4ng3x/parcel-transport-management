@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_ptm_zone_list" model="ir.ui.view">
+        <field name="name">parcel.delivery.zone.list</field>
+        <field name="model">parcel.delivery.zone</field>
+        <field name="arch" type="xml">
+            <list
+                class="o_ptm_native_view o_ptm_zone_view"
+                string="Delivery Zones"
+                default_order="name"
+                decoration-muted="not active"
+            >
+                <field name="name" />
+                <field name="code" />
+                <field name="default_sla_hours" />
+                <field name="courier_ids" widget="many2many_tags" optional="show" />
+                <field name="company_id" groups="base.group_multi_company" optional="hide" />
+                <field name="active" column_invisible="True" />
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ptm_zone_kanban" model="ir.ui.view">
+        <field name="name">parcel.delivery.zone.kanban</field>
+        <field name="model">parcel.delivery.zone</field>
+        <field name="arch" type="xml">
+            <kanban
+                class="o_ptm_native_view o_ptm_zone_view"
+                string="Delivery Zones"
+                quick_create="false"
+                records_draggable="false"
+            >
+                <field name="name" />
+                <field name="code" />
+                <field name="default_sla_hours" />
+                <field name="courier_ids" />
+                <field name="active" />
+                <templates>
+                    <t t-name="card">
+                        <div
+                            class="o_ptm_kanban_card_header d-flex justify-content-between align-items-start gap-2"
+                        >
+                            <div>
+                                <span class="o_ptm_eyebrow">Delivery zone</span>
+                                <strong class="d-block fs-5">
+                                    <field name="name" />
+                                </strong>
+                            </div>
+                            <span class="o_ptm_zone_code">
+                                <field name="code" />
+                            </span>
+                        </div>
+                        <div class="o_ptm_zone_signal o_ptm_zone_signal--single">
+                            <div>
+                                <span>Default SLA</span>
+                                <strong><field name="default_sla_hours" /> h</strong>
+                            </div>
+                        </div>
+                        <footer class="o_ptm_zone_couriers">
+                            <span>Couriers</span>
+                            <field name="courier_ids" widget="many2many_tags" />
+                        </footer>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_ptm_zone_form" model="ir.ui.view">
+        <field name="name">parcel.delivery.zone.form</field>
+        <field name="model">parcel.delivery.zone</field>
+        <field name="arch" type="xml">
+            <form class="o_ptm_native_view o_ptm_zone_view" string="Delivery Zone">
+                <sheet>
+                    <widget
+                        name="web_ribbon"
+                        title="ARCHIVED"
+                        bg_color="text-bg-danger"
+                        invisible="active"
+                    />
+                    <div class="oe_title">
+                        <span class="o_ptm_eyebrow">Network coverage</span>
+                        <label for="name" />
+                        <h1>
+                            <field name="name" placeholder="Zone name" />
+                        </h1>
+                        <h2>
+                            <field name="code" placeholder="Zone code" />
+                        </h2>
+                    </div>
+                    <group string="Service Configuration">
+                        <field name="company_id" groups="base.group_multi_company" />
+                        <field name="default_sla_hours" />
+                        <field name="active" />
+                    </group>
+                    <notebook>
+                        <page string="Postcode Coverage" name="postcode_coverage">
+                            <field name="postcode_rule_ids">
+                                <list editable="bottom">
+                                    <field
+                                        name="country_id"
+                                        options="{'no_create': True, 'no_open': True}"
+                                    />
+                                    <field name="postcode_prefix" />
+                                    <field
+                                        name="company_id"
+                                        groups="base.group_multi_company"
+                                        column_invisible="True"
+                                    />
+                                </list>
+                            </field>
+                            <div class="o_ptm_readonly_note" role="note">
+                                Longer postcode prefixes take precedence over shorter prefixes in the same company and country.
+                            </div>
+                        </page>
+                        <page string="Couriers" name="couriers">
+                            <field
+                                name="courier_ids"
+                                widget="many2many_tags"
+                                options="{'no_create': True}"
+                            />
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ptm_zone_search" model="ir.ui.view">
+        <field name="name">parcel.delivery.zone.search</field>
+        <field name="model">parcel.delivery.zone</field>
+        <field name="arch" type="xml">
+            <search string="Search Delivery Zones">
+                <field name="name" />
+                <field name="code" />
+                <field name="courier_ids" />
+                <filter name="active" string="Active" domain="[('active', '=', True)]" />
+                <filter
+                    name="without_couriers"
+                    string="Without Couriers"
+                    domain="[('courier_ids', '=', False)]"
+                />
+                <filter name="archived" string="Archived" domain="[('active', '=', False)]" />
+                <group name="group_by">
+                    <filter
+                        name="group_company"
+                        string="Company"
+                        context="{'group_by': 'company_id'}"
+                        groups="base.group_multi_company"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ptm_zone" model="ir.actions.act_window">
+        <field name="name">Delivery Zones</field>
+        <field name="res_model">parcel.delivery.zone</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_ptm_zone_search" />
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Define the first delivery zone</p>
+            <p>Map postcode prefixes to an SLA and assign couriers that can cover the area.</p>
+        </field>
+    </record>
+</odoo>

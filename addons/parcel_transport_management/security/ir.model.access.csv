@@ -1,0 +1,39 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ptm_courier_shipment,PTM courier shipment,model_parcel_shipment,group_ptm_courier,1,1,0,0
+access_ptm_courier_package,PTM courier package,model_parcel_package,group_ptm_courier,1,1,0,0
+access_ptm_courier_pickup_event,PTM courier pickup event,model_parcel_pickup_event,group_ptm_courier,1,0,1,0
+access_ptm_courier_delivery_event,PTM courier delivery event,model_parcel_delivery_event,group_ptm_courier,1,0,1,0
+access_ptm_courier_profile,PTM courier profile,model_parcel_courier,group_ptm_courier,1,0,0,0
+access_ptm_courier_zone,PTM courier delivery zone,model_parcel_delivery_zone,group_ptm_courier,1,0,0,0
+access_ptm_courier_postcode_rule,PTM courier postcode rule,model_parcel_zone_postcode_rule,group_ptm_courier,1,0,0,0
+access_ptm_courier_sla_revision,PTM courier SLA revision,model_parcel_sla_revision,group_ptm_courier,1,0,0,0
+access_ptm_courier_route_correction,PTM courier route correction,model_parcel_route_correction,group_ptm_courier,1,0,0,0
+access_ptm_courier_reassignment,PTM courier reassignment,model_parcel_courier_reassignment,group_ptm_courier,1,0,0,0
+access_ptm_operator_shipment,PTM operator shipment,model_parcel_shipment,group_ptm_operator,1,1,1,0
+access_ptm_operator_package,PTM operator package,model_parcel_package,group_ptm_operator,1,1,1,1
+access_ptm_operator_pickup_event,PTM operator pickup event,model_parcel_pickup_event,group_ptm_operator,1,0,1,0
+access_ptm_operator_delivery_event,PTM operator delivery event,model_parcel_delivery_event,group_ptm_operator,1,0,1,0
+access_ptm_operator_courier,PTM operator courier,model_parcel_courier,group_ptm_operator,1,1,1,0
+access_ptm_operator_zone,PTM operator delivery zone,model_parcel_delivery_zone,group_ptm_operator,1,0,0,0
+access_ptm_operator_postcode_rule,PTM operator postcode rule,model_parcel_zone_postcode_rule,group_ptm_operator,1,0,0,0
+access_ptm_operator_sla_revision,PTM operator SLA revision,model_parcel_sla_revision,group_ptm_operator,1,0,0,0
+access_ptm_operator_route_correction,PTM operator route correction,model_parcel_route_correction,group_ptm_operator,1,0,0,0
+access_ptm_operator_reassignment,PTM operator reassignment,model_parcel_courier_reassignment,group_ptm_operator,1,0,1,0
+access_ptm_manager_shipment,PTM manager shipment,model_parcel_shipment,group_ptm_manager,1,1,1,1
+access_ptm_manager_package,PTM manager package,model_parcel_package,group_ptm_manager,1,1,1,1
+access_ptm_manager_pickup_event,PTM manager pickup event,model_parcel_pickup_event,group_ptm_manager,1,0,1,0
+access_ptm_manager_delivery_event,PTM manager delivery event,model_parcel_delivery_event,group_ptm_manager,1,0,1,0
+access_ptm_manager_courier,PTM manager courier,model_parcel_courier,group_ptm_manager,1,1,1,1
+access_ptm_manager_zone,PTM manager delivery zone,model_parcel_delivery_zone,group_ptm_manager,1,1,1,1
+access_ptm_manager_postcode_rule,PTM manager postcode rule,model_parcel_zone_postcode_rule,group_ptm_manager,1,1,1,1
+access_ptm_manager_sla_revision,PTM manager SLA revision,model_parcel_sla_revision,group_ptm_manager,1,0,1,0
+access_ptm_manager_route_correction,PTM manager route correction,model_parcel_route_correction,group_ptm_manager,1,0,1,0
+access_ptm_manager_reassignment,PTM manager reassignment,model_parcel_courier_reassignment,group_ptm_manager,1,0,1,0
+access_ptm_operator_assignment_wizard,PTM operator assignment wizard,model_parcel_assignment_wizard,group_ptm_operator,1,1,1,1
+access_ptm_courier_pickup_wizard,PTM courier pickup wizard,model_parcel_pickup_wizard,group_ptm_courier,1,1,1,1
+access_ptm_operator_pickup_wizard,PTM operator pickup wizard,model_parcel_pickup_wizard,group_ptm_operator,1,1,1,1
+access_ptm_courier_delivery_wizard,PTM courier delivery wizard,model_parcel_delivery_wizard,group_ptm_courier,1,1,1,1
+access_ptm_operator_delivery_wizard,PTM operator delivery wizard,model_parcel_delivery_wizard,group_ptm_operator,1,1,1,1
+access_ptm_manager_cancel_wizard,PTM manager cancel wizard,model_parcel_cancel_wizard,group_ptm_manager,1,1,1,1
+access_ptm_manager_sla_wizard,PTM manager SLA wizard,model_parcel_sla_wizard,group_ptm_manager,1,1,1,1
+access_ptm_manager_route_wizard,PTM manager route wizard,model_parcel_route_wizard,group_ptm_manager,1,1,1,1

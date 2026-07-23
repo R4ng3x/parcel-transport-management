@@ -1,0 +1,842 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="parcel_transport_management.CommandCenter">
+        <div
+            class="o_ptm_command_center"
+            t-att-class="props.className"
+            t-att-aria-busy="state.loading || state.refreshing ? 'true' : 'false'"
+        >
+            <div class="o_ptm_atmosphere" aria-hidden="true">
+                <span class="o_ptm_atmosphere_grid" />
+                <span class="o_ptm_atmosphere_slash o_ptm_atmosphere_slash--top" />
+                <span class="o_ptm_atmosphere_slash o_ptm_atmosphere_slash--bottom" />
+            </div>
+
+            <t t-if="state.loading &amp;&amp; !state.hasSnapshot">
+                <div class="o_ptm_loader" role="status" aria-live="polite">
+                    <div class="o_ptm_loader_mark" aria-hidden="true">
+                        <span />
+                        <span />
+                        <span />
+                    </div>
+                    <div class="o_ptm_loader_copy">
+                        <strong>Synchronizing the parcel network</strong>
+                        <span>Reading shipments, routes, and courier capacity.</span>
+                    </div>
+                    <div class="o_ptm_loader_track" aria-hidden="true">
+                        <span />
+                    </div>
+                </div>
+            </t>
+
+            <t t-else="">
+                <header class="o_ptm_header">
+                    <div class="o_ptm_brand" aria-label="Parcel Transport Management">
+                        <span class="o_ptm_brand_glyph" aria-hidden="true">
+                            <i />
+                            <i />
+                        </span>
+                        <span class="o_ptm_brand_copy">
+                            <strong>PARCEL</strong>
+                            <small>TRANSPORT / 19</small>
+                        </span>
+                    </div>
+
+                    <nav class="o_ptm_nav" aria-label="Parcel workspace">
+                        <span
+                            class="o_ptm_nav_item o_ptm_nav_item--active"
+                            aria-current="page"
+                        ><small>01</small> CENTER</span>
+                        <button
+                            class="o_ptm_nav_item"
+                            type="button"
+                            t-on-click="openShipments"
+                        ><small>02</small> SHIPMENTS</button>
+                        <button
+                            class="o_ptm_nav_item"
+                            type="button"
+                            t-on-click="openCouriers"
+                        ><small>03</small> COURIERS</button>
+                        <button class="o_ptm_nav_item" type="button" t-on-click="openZones"><small
+                        >04</small> ZONES</button>
+                    </nav>
+
+                    <div class="o_ptm_header_status">
+                        <span
+                            class="o_ptm_connection"
+                            t-att-class="state.error ? 'o_ptm_connection--error' : 'o_ptm_connection--online'"
+                            role="status"
+                            aria-live="polite"
+                        >
+                            <i aria-hidden="true" />
+                            <span>
+                                <t
+                                    t-if="state.error &amp;&amp; state.hasSnapshot"
+                                >Offline snapshot</t>
+                                <t t-elif="state.error">Connection unavailable</t>
+                                <t t-else="">Network online</t>
+                            </span>
+                        </span>
+                        <span class="o_ptm_generated">
+                            <small>LAST FRAME</small>
+                            <strong t-esc="formatGeneratedAt(state.data.generated_at)" />
+                        </span>
+                        <button
+                            class="o_ptm_refresh"
+                            type="button"
+                            t-att-class="state.refreshing ? 'o_ptm_refresh--active' : ''"
+                            t-att-disabled="state.refreshing"
+                            t-on-click="() => this.loadDashboardData(false)"
+                            aria-label="Refresh command center"
+                        >
+                            <svg class="o_ptm_icon" viewBox="0 0 24 24" aria-hidden="true">
+                                <path
+                                    d="M20 11a8 8 0 0 0-14.9-4M4 4v5h5M4 13a8 8 0 0 0 14.9 4M20 20v-5h-5"
+                                />
+                            </svg>
+                        </button>
+                    </div>
+                </header>
+
+                <main class="o_ptm_stage">
+                    <div
+                        t-if="state.error &amp;&amp; state.hasSnapshot"
+                        class="o_ptm_error"
+                        role="alert"
+                    >
+                        <span class="o_ptm_error_mark" aria-hidden="true">!</span>
+                        <div class="o_ptm_error_copy">
+                            <strong>Live synchronization is unavailable</strong>
+                            <span>The last verified snapshot remains on screen.</span>
+                        </div>
+                        <button
+                            class="o_ptm_button o_ptm_button--danger"
+                            type="button"
+                            t-att-disabled="state.refreshing"
+                            t-on-click="() => this.loadDashboardData(false)"
+                        >
+                            <span>
+                                <t t-if="state.refreshing">RECONNECTING</t>
+                                <t t-else="">RETRY CONNECTION</t>
+                            </span>
+                        </button>
+                    </div>
+
+                    <t t-if="state.hasSnapshot">
+                        <section class="o_ptm_intro" aria-labelledby="o_ptm_command_title">
+                            <div class="o_ptm_intro_index" aria-hidden="true">
+                                <span>PTM</span>
+                                <strong>CC/19</strong>
+                            </div>
+                            <div class="o_ptm_intro_copy">
+                                <span class="o_ptm_kicker"><i /> URBAN DELIVERY CONTROL</span>
+                                <h1 id="o_ptm_command_title">COMMAND<br /><em>CENTER</em></h1>
+                                <p
+                                >See network pressure, parcel movement, and courier capacity without leaving the native Odoo workflow.</p>
+                            </div>
+                            <div class="o_ptm_intro_note">
+                                <span>READ-ONLY OPERATIONAL FRAME</span>
+                                <strong t-esc="formatGeneratedAt(state.data.generated_at)" />
+                                <small>Automatic refresh every 60 seconds</small>
+                            </div>
+                        </section>
+
+                        <section class="o_ptm_kpis" aria-labelledby="o_ptm_kpis_title">
+                            <h2
+                                id="o_ptm_kpis_title"
+                                class="o_ptm_sr_only"
+                            >Operational key performance indicators</h2>
+                            <article class="o_ptm_kpi o_ptm_kpi--total">
+                                <span><small>00</small> NETWORK LEDGER</span>
+                                <strong t-esc="formatInteger(state.data.stats.total_shipments)" />
+                                <p>Total shipments</p>
+                            </article>
+                            <article class="o_ptm_kpi">
+                                <span><small>01</small> RESERVED</span>
+                                <strong
+                                    t-esc="formatInteger(state.data.stats.reserved_shipments)"
+                                />
+                                <p>Courier capacity held</p>
+                            </article>
+                            <article class="o_ptm_kpi o_ptm_kpi--route">
+                                <span><small>02</small> MOVING</span>
+                                <strong
+                                    t-esc="formatInteger(state.data.stats.in_transit_shipments)"
+                                />
+                                <p>In transit</p>
+                            </article>
+                            <article class="o_ptm_kpi o_ptm_kpi--alert">
+                                <span><small>03</small> EXCEPTIONS</span>
+                                <strong t-esc="formatInteger(state.data.stats.delayed_shipments)" />
+                                <p>Delayed shipments</p>
+                            </article>
+                            <article class="o_ptm_kpi o_ptm_kpi--success">
+                                <span><small>04</small> CLOSED</span>
+                                <strong t-esc="formatInteger(state.data.stats.delivered_today)" />
+                                <p>Delivered today</p>
+                            </article>
+                        </section>
+
+                        <section class="o_ptm_support_stats" aria-label="Parcel network detail">
+                            <div>
+                                <span>PARTIAL HANDOFFS</span>
+                                <strong t-esc="formatInteger(state.data.stats.partial_shipments)" />
+                            </div>
+                            <div
+                                t-att-class="state.data.stats.coverage_warnings ? 'o_ptm_support_stat--alert' : ''"
+                            >
+                                <span>COVERAGE REVIEWS</span>
+                                <strong t-esc="formatInteger(state.data.stats.coverage_warnings)" />
+                            </div>
+                            <div>
+                                <span>PACKAGES DELIVERED</span>
+                                <strong>
+                                    <t t-esc="formatInteger(state.data.stats.delivered_packages)" />
+                                    <small> / <t
+                                        t-esc="formatInteger(state.data.stats.total_packages)"
+                                    /></small>
+                                </strong>
+                            </div>
+                        </section>
+
+                        <section class="o_ptm_command_grid">
+                            <article
+                                class="o_ptm_panel o_ptm_pressure_panel"
+                                aria-labelledby="o_ptm_pressure_heading"
+                            >
+                                <header class="o_ptm_panel_header">
+                                    <div>
+                                        <span class="o_ptm_section_index">A / 01</span>
+                                        <h2 id="o_ptm_pressure_heading">NETWORK PRESSURE</h2>
+                                    </div>
+                                    <div class="o_ptm_panel_header_actions">
+                                        <span class="o_ptm_count"><t
+                                            t-esc="formatInteger(state.data.lanes.length)"
+                                        /> SHOWN OF <t
+                                            t-esc="formatInteger(state.data.lane_total)"
+                                        /> LANES<t
+                                            t-if="state.data.lanes_truncated"
+                                        > · TRUNCATED</t></span>
+                                        <button
+                                            class="o_ptm_text_action"
+                                            type="button"
+                                            t-on-click="openZones"
+                                        >OPEN ZONES <span aria-hidden="true">→</span></button>
+                                    </div>
+                                </header>
+
+                                <div class="o_ptm_pressure_note">
+                                    <span>SERVER-RANKED OPERATING VIEW</span>
+                                    <p
+                                    >Aggregate workload counts from the verified operational snapshot.</p>
+                                </div>
+
+                                <div class="o_ptm_pressure_grid">
+                                    <section
+                                        class="o_ptm_pressure_section o_ptm_lane_section"
+                                        aria-labelledby="o_ptm_lanes_heading"
+                                    >
+                                        <header class="o_ptm_pressure_section_header">
+                                            <div>
+                                                <span
+                                                    class="o_ptm_pressure_section_index"
+                                                >LANE RANKING</span>
+                                                <h3 id="o_ptm_lanes_heading">MAIN LANES</h3>
+                                            </div>
+                                            <span class="o_ptm_count"><t
+                                                t-esc="formatInteger(state.data.lanes.length)"
+                                            /> / <t
+                                                t-esc="formatInteger(state.data.lane_total)"
+                                            /></span>
+                                        </header>
+
+                                        <ol
+                                            class="o_ptm_lane_list"
+                                            aria-label="Server-ranked shipment lanes"
+                                        >
+                                            <t t-if="state.data.lanes.length">
+                                                <li
+                                                    t-foreach="state.data.lanes"
+                                                    t-as="lane"
+                                                    t-key="laneKey(lane, lane_index)"
+                                                    class="o_ptm_lane"
+                                                    t-att-class="laneClass(lane)"
+                                                >
+                                                    <span class="o_ptm_pressure_rank">
+                                                        <t t-esc="lane_index + 1" />
+                                                    </span>
+                                                    <span class="o_ptm_lane_path">
+                                                        <span class="o_ptm_lane_endpoint">
+                                                            <small>ORIGIN</small>
+                                                            <strong
+                                                                t-esc="zoneName(lane.origin_zone)"
+                                                            />
+                                                            <span
+                                                                class="o_ptm_lane_code"
+                                                                t-esc="zoneCode(lane.origin_zone)"
+                                                            />
+                                                        </span>
+                                                        <i aria-hidden="true">→</i>
+                                                        <span class="o_ptm_lane_endpoint">
+                                                            <small>DESTINATION</small>
+                                                            <strong
+                                                                t-esc="zoneName(lane.destination_zone)"
+                                                            />
+                                                            <span
+                                                                class="o_ptm_lane_code"
+                                                                t-esc="zoneCode(lane.destination_zone)"
+                                                            />
+                                                        </span>
+                                                    </span>
+                                                    <span class="o_ptm_lane_metrics">
+                                                        <span>
+                                                            <strong
+                                                                t-esc="formatInteger(lane.shipment_count)"
+                                                            />
+                                                            <small>SHIPMENTS</small>
+                                                        </span>
+                                                        <span
+                                                            t-att-class="lane.delayed_shipments ? 'o_ptm_lane_metric--late' : ''"
+                                                        >
+                                                            <strong
+                                                                t-esc="formatInteger(lane.delayed_shipments)"
+                                                            />
+                                                            <small>LATE</small>
+                                                        </span>
+                                                        <span>
+                                                            <strong
+                                                                t-esc="formatInteger(lane.package_count)"
+                                                            />
+                                                            <small>PACKAGES</small>
+                                                        </span>
+                                                        <span t-if="lane.coverage_warnings">
+                                                            <strong
+                                                                t-esc="formatInteger(lane.coverage_warnings)"
+                                                            />
+                                                            <small>COVERAGE</small>
+                                                        </span>
+                                                    </span>
+                                                </li>
+                                            </t>
+                                            <li
+                                                t-else=""
+                                                class="o_ptm_empty_state o_ptm_empty_state--compact"
+                                            >
+                                                <span
+                                                    class="o_ptm_empty_index"
+                                                    aria-hidden="true"
+                                                >00</span>
+                                                <strong>NO ACTIVE LANES</strong>
+                                                <p
+                                                >Open shipments with assigned endpoints will appear in the server-ranked lane view.</p>
+                                                <button
+                                                    class="o_ptm_button"
+                                                    type="button"
+                                                    t-on-click="openShipments"
+                                                >OPEN SHIPMENTS</button>
+                                            </li>
+                                        </ol>
+                                    </section>
+
+                                    <section
+                                        class="o_ptm_pressure_section o_ptm_destination_section"
+                                        aria-labelledby="o_ptm_destination_pressure_heading"
+                                    >
+                                        <header class="o_ptm_pressure_section_header">
+                                            <div>
+                                                <span
+                                                    class="o_ptm_pressure_section_index"
+                                                >DESTINATION PRESSURE</span>
+                                                <h3
+                                                    id="o_ptm_destination_pressure_heading"
+                                                >PRESSURE RANKING</h3>
+                                            </div>
+                                            <div class="o_ptm_pressure_section_actions">
+                                                <span class="o_ptm_count"><t
+                                                    t-esc="formatInteger(state.data.zone_pressure.length)"
+                                                /> / <t
+                                                    t-esc="formatInteger(state.data.zone_pressure_total)"
+                                                /></span>
+                                                <button
+                                                    class="o_ptm_text_action"
+                                                    type="button"
+                                                    t-on-click="openZones"
+                                                >OPEN ZONES <span
+                                                    aria-hidden="true"
+                                                >→</span></button>
+                                            </div>
+                                        </header>
+
+                                        <ol
+                                            class="o_ptm_pressure_list"
+                                            aria-label="Server-ranked destination pressure"
+                                        >
+                                            <t t-if="state.data.zone_pressure.length">
+                                                <li
+                                                    t-foreach="state.data.zone_pressure"
+                                                    t-as="zone"
+                                                    t-key="zone.id"
+                                                >
+                                                    <button
+                                                        class="o_ptm_pressure_item"
+                                                        t-att-class="zonePressureClass(zone)"
+                                                        type="button"
+                                                        t-on-click="() => this.openZone(zone.id)"
+                                                    >
+                                                        <span
+                                                            class="o_ptm_sr_only"
+                                                        >Open destination zone: </span>
+                                                        <span
+                                                            class="o_ptm_pressure_rank"
+                                                            aria-hidden="true"
+                                                        >
+                                                            <t t-esc="zone_index + 1" />
+                                                        </span>
+                                                        <span class="o_ptm_pressure_identity">
+                                                            <small
+                                                                class="o_ptm_pressure_code"
+                                                                t-esc="zoneCode(zone)"
+                                                            />
+                                                            <strong t-esc="zone.name" />
+                                                            <small
+                                                                t-if="zone.archived"
+                                                            >ARCHIVED</small>
+                                                        </span>
+                                                        <span class="o_ptm_pressure_metrics">
+                                                            <span>
+                                                                <strong
+                                                                    t-esc="formatInteger(zone.active_shipments)"
+                                                                />
+                                                                <small>ACTIVE</small>
+                                                            </span>
+                                                            <span
+                                                                t-att-class="zone.delayed_shipments ? 'o_ptm_pressure_metric--late' : ''"
+                                                            >
+                                                                <strong
+                                                                    t-esc="formatInteger(zone.delayed_shipments)"
+                                                                />
+                                                                <small>LATE</small>
+                                                            </span>
+                                                            <span>
+                                                                <strong
+                                                                    t-esc="formatInteger(zone.package_count)"
+                                                                />
+                                                                <small>PACKAGES</small>
+                                                            </span>
+                                                            <span t-if="zone.coverage_warnings">
+                                                                <strong
+                                                                    t-esc="formatInteger(zone.coverage_warnings)"
+                                                                />
+                                                                <small>COVERAGE</small>
+                                                            </span>
+                                                        </span>
+                                                        <span
+                                                            class="o_ptm_pressure_open"
+                                                            aria-hidden="true"
+                                                        >↗</span>
+                                                    </button>
+                                                </li>
+                                            </t>
+                                            <li
+                                                t-else=""
+                                                class="o_ptm_empty_state o_ptm_empty_state--compact"
+                                            >
+                                                <span
+                                                    class="o_ptm_empty_index"
+                                                    aria-hidden="true"
+                                                >00</span>
+                                                <strong>NO DESTINATION PRESSURE</strong>
+                                                <p
+                                                >Active shipments will appear here when they have a destination endpoint.</p>
+                                                <button
+                                                    class="o_ptm_button"
+                                                    type="button"
+                                                    t-on-click="openZones"
+                                                >
+                                                    <t
+                                                        t-if="state.data.permissions.can_manage_zones"
+                                                    >OPEN ZONE SETUP</t>
+                                                    <t t-else="">VIEW ZONES</t>
+                                                </button>
+                                            </li>
+                                        </ol>
+                                    </section>
+                                </div>
+
+                                <div
+                                    t-if="state.data.lanes_truncated || state.data.zone_pressure_truncated"
+                                    class="o_ptm_pressure_limit"
+                                    role="status"
+                                    aria-live="polite"
+                                >
+                                    <strong>LIMITED RANKING</strong>
+                                    <span>
+                                        <t t-if="state.data.lanes_truncated">LANES <t
+                                            t-esc="formatInteger(state.data.lanes.length)"
+                                        /> OF <t t-esc="formatInteger(state.data.lane_total)" /></t>
+                                        <t
+                                            t-if="state.data.lanes_truncated &amp;&amp; state.data.zone_pressure_truncated"
+                                        > · </t>
+                                        <t t-if="state.data.zone_pressure_truncated">DESTINATIONS <t
+                                            t-esc="formatInteger(state.data.zone_pressure.length)"
+                                        /> OF <t
+                                            t-esc="formatInteger(state.data.zone_pressure_total)"
+                                        /></t>
+                                    </span>
+                                    <small
+                                    >Open the native zone workspace for the complete set.</small>
+                                </div>
+                            </article>
+
+                            <article
+                                class="o_ptm_panel o_ptm_queue_panel"
+                                aria-labelledby="o_ptm_queue_heading"
+                            >
+                                <header class="o_ptm_panel_header">
+                                    <div>
+                                        <span class="o_ptm_section_index">B / 02</span>
+                                        <h2 id="o_ptm_queue_heading">SHIPMENT QUEUE</h2>
+                                    </div>
+                                    <span class="o_ptm_count"><t
+                                        t-esc="formatInteger(state.data.shipments.length)"
+                                    /> SHOWN OF <t
+                                        t-esc="formatInteger(state.data.queue_total)"
+                                    /><t t-if="state.data.queue_truncated"> · TRUNCATED</t></span>
+                                </header>
+
+                                <div class="o_ptm_shipment_list">
+                                    <t t-if="state.data.shipments.length">
+                                        <button
+                                            t-foreach="state.data.shipments"
+                                            t-as="shipment"
+                                            t-key="shipment.id"
+                                            class="o_ptm_shipment"
+                                            t-att-class="shipmentClass(shipment)"
+                                            type="button"
+                                            t-on-click="() => this.openShipment(shipment.id)"
+                                        >
+                                            <span class="o_ptm_sr_only">Open shipment: </span>
+                                            <span class="o_ptm_shipment_edge" aria-hidden="true" />
+                                            <span class="o_ptm_shipment_primary">
+                                                <span class="o_ptm_shipment_topline">
+                                                    <strong t-esc="shipment.reference" />
+                                                    <span
+                                                        class="o_ptm_shipment_state"
+                                                        t-esc="shipment.state_label"
+                                                    />
+                                                </span>
+                                                <span class="o_ptm_shipment_route">
+                                                    <span t-esc="zoneName(shipment.origin_zone)" />
+                                                    <i aria-hidden="true">→</i>
+                                                    <span
+                                                        t-esc="zoneName(shipment.destination_zone)"
+                                                    />
+                                                </span>
+                                                <span class="o_ptm_shipment_badges">
+                                                    <small
+                                                        t-if="shipment.coverage_warning"
+                                                        class="o_ptm_badge o_ptm_badge--coverage"
+                                                        t-att-title="shipment.coverage_warning_reason || false"
+                                                    >COVERAGE REVIEW<t
+                                                        t-if="shipment.coverage_warning_reason"
+                                                    > · <t
+                                                        t-esc="shipment.coverage_warning_reason"
+                                                    /></t></small>
+                                                    <small
+                                                        t-if="shipment.delay_hours"
+                                                        class="o_ptm_badge o_ptm_badge--late"
+                                                        t-esc="formatDelay(shipment.delay_hours)"
+                                                    />
+                                                    <small
+                                                        t-if="!shipment.delay_hours &amp;&amp; shipment.original_delay_hours"
+                                                        class="o_ptm_badge"
+                                                    >RECOVERED FROM DELAY</small>
+                                                </span>
+                                            </span>
+                                            <span class="o_ptm_shipment_timing">
+                                                <small>EXPECTED</small>
+                                                <strong
+                                                    t-esc="formatExpectedAt(shipment.expected_delivery_at)"
+                                                />
+                                                <span t-esc="courierName(shipment.courier)" />
+                                            </span>
+                                            <span class="o_ptm_shipment_packages">
+                                                <span>
+                                                    <small>PICKED UP</small>
+                                                    <strong><t
+                                                        t-esc="formatInteger(shipment.picked_up_count)"
+                                                    /> / <t
+                                                        t-esc="formatInteger(shipment.package_count)"
+                                                    /></strong>
+                                                    <i
+                                                        class="o_ptm_progress"
+                                                        t-att-style="progressStyle(shipment.picked_up_count, shipment.package_count)"
+                                                    />
+                                                </span>
+                                                <span>
+                                                    <small>DELIVERED</small>
+                                                    <strong><t
+                                                        t-esc="formatInteger(shipment.delivered_count)"
+                                                    /> / <t
+                                                        t-esc="formatInteger(shipment.package_count)"
+                                                    /></strong>
+                                                    <i
+                                                        class="o_ptm_progress o_ptm_progress--success"
+                                                        t-att-style="progressStyle(shipment.delivered_count, shipment.package_count)"
+                                                    />
+                                                </span>
+                                            </span>
+                                            <span class="o_ptm_shipment_weight">
+                                                <strong
+                                                    t-esc="formatWeight(shipment.total_weight_kg, 'kg')"
+                                                />
+                                                <small>LOAD</small>
+                                            </span>
+                                            <span
+                                                class="o_ptm_shipment_open"
+                                                aria-hidden="true"
+                                            >↗</span>
+                                        </button>
+                                    </t>
+                                    <div t-else="" class="o_ptm_empty_state">
+                                        <span class="o_ptm_empty_index" aria-hidden="true">00</span>
+                                        <strong>THE ACTIVE QUEUE IS CLEAR</strong>
+                                        <p>
+                                            <t
+                                                t-if="state.data.permissions.can_create_shipments"
+                                            >Create and manage shipments in the native workspace; active work will appear here automatically.</t>
+                                            <t
+                                                t-else=""
+                                            >Open the native shipment workspace to review the full parcel ledger.</t>
+                                        </p>
+                                        <button
+                                            class="o_ptm_button"
+                                            type="button"
+                                            t-on-click="openShipments"
+                                        >
+                                            <t
+                                                t-if="state.data.permissions.can_create_shipments"
+                                            >CREATE SHIPMENT</t>
+                                            <t t-else="">OPEN SHIPMENTS</t>
+                                        </button>
+                                    </div>
+                                </div>
+                                <footer
+                                    t-if="state.data.shipments.length"
+                                    class="o_ptm_panel_footer"
+                                >
+                                    <span>Exceptions are surfaced first</span>
+                                    <button
+                                        class="o_ptm_text_action"
+                                        type="button"
+                                        t-on-click="openShipments"
+                                    >VIEW ALL SHIPMENTS <span aria-hidden="true">→</span></button>
+                                </footer>
+                            </article>
+                        </section>
+
+                        <section class="o_ptm_lower_grid">
+                            <article
+                                class="o_ptm_panel o_ptm_courier_panel"
+                                aria-labelledby="o_ptm_courier_heading"
+                            >
+                                <header class="o_ptm_panel_header">
+                                    <div>
+                                        <span class="o_ptm_section_index">C / 03</span>
+                                        <h2 id="o_ptm_courier_heading">COURIER LOAD</h2>
+                                    </div>
+                                    <div class="o_ptm_panel_header_actions">
+                                        <span class="o_ptm_count"><t
+                                            t-esc="formatInteger(state.data.couriers.length)"
+                                        /> SHOWN OF <t
+                                            t-esc="formatInteger(state.data.courier_total)"
+                                        /><t
+                                            t-if="state.data.couriers_truncated"
+                                        > · TRUNCATED</t></span>
+                                        <button
+                                            class="o_ptm_text_action"
+                                            type="button"
+                                            t-on-click="openCouriers"
+                                        >OPEN COURIERS <span aria-hidden="true">→</span></button>
+                                    </div>
+                                </header>
+                                <div class="o_ptm_courier_list">
+                                    <t t-if="state.data.couriers.length">
+                                        <button
+                                            t-foreach="state.data.couriers"
+                                            t-as="courier"
+                                            t-key="courier.id"
+                                            class="o_ptm_courier"
+                                            t-att-class="workloadClass(courier.workload_state)"
+                                            type="button"
+                                            t-on-click="() => this.openCourier(courier.id)"
+                                        >
+                                            <span class="o_ptm_sr_only">Open courier: </span>
+                                            <span
+                                                class="o_ptm_courier_avatar"
+                                                t-esc="courierInitials(courier.name)"
+                                            />
+                                            <span class="o_ptm_courier_identity">
+                                                <strong t-esc="courier.name" />
+                                                <small class="o_ptm_courier_status">
+                                                    <i aria-hidden="true" />
+                                                    <t
+                                                        t-esc="workloadLabel(courier.workload_state)"
+                                                    />
+                                                </small>
+                                            </span>
+                                            <span class="o_ptm_courier_meter">
+                                                <span>
+                                                    <small>SHIPMENTS</small>
+                                                    <strong><t
+                                                        t-esc="formatInteger(courier.current_shipment_count)"
+                                                    /> / <t
+                                                        t-esc="formatInteger(courier.max_concurrent_shipments)"
+                                                    /></strong>
+                                                </span>
+                                                <i
+                                                    class="o_ptm_progress"
+                                                    t-att-style="progressStyle(courier.current_shipment_count, courier.max_concurrent_shipments)"
+                                                />
+                                            </span>
+                                            <span class="o_ptm_courier_meter">
+                                                <span>
+                                                    <small>WEIGHT</small>
+                                                    <strong><t
+                                                        t-esc="formatWeight(courier.current_weight, courier.weight_uom)"
+                                                    /> / <t
+                                                        t-esc="formatWeight(courier.max_concurrent_weight, courier.weight_uom)"
+                                                    /></strong>
+                                                </span>
+                                                <i
+                                                    class="o_ptm_progress"
+                                                    t-att-style="progressStyle(courier.current_weight, courier.max_concurrent_weight)"
+                                                />
+                                            </span>
+                                            <span
+                                                class="o_ptm_courier_open"
+                                                aria-hidden="true"
+                                            >↗</span>
+                                        </button>
+                                    </t>
+                                    <div
+                                        t-else=""
+                                        class="o_ptm_empty_state o_ptm_empty_state--compact"
+                                    >
+                                        <span class="o_ptm_empty_index" aria-hidden="true">00</span>
+                                        <strong>NO COURIERS AVAILABLE</strong>
+                                        <p>
+                                            <t
+                                                t-if="state.data.permissions.can_create_couriers"
+                                            >Add courier capacity before assigning active shipments.</t>
+                                            <t
+                                                t-else=""
+                                            >No courier capacity is available in this company.</t>
+                                        </p>
+                                        <button
+                                            class="o_ptm_button"
+                                            type="button"
+                                            t-on-click="openCouriers"
+                                        >
+                                            <t
+                                                t-if="state.data.permissions.can_create_couriers"
+                                            >ADD COURIER</t>
+                                            <t t-else="">OPEN COURIERS</t>
+                                        </button>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article
+                                class="o_ptm_panel o_ptm_activity_panel"
+                                aria-labelledby="o_ptm_activity_heading"
+                            >
+                                <header class="o_ptm_panel_header">
+                                    <div>
+                                        <span class="o_ptm_section_index">D / 04</span>
+                                        <h2 id="o_ptm_activity_heading">RECENT ACTIVITY</h2>
+                                    </div>
+                                    <span class="o_ptm_live"><i aria-hidden="true" /> LIVE</span>
+                                </header>
+                                <ol class="o_ptm_activity">
+                                    <t t-if="state.data.activity.length">
+                                        <li
+                                            t-foreach="state.data.activity"
+                                            t-as="item"
+                                            t-key="activityKey(item, item_index)"
+                                        >
+                                            <button
+                                                type="button"
+                                                t-on-click="() => this.openShipmentReference(item.shipment_reference)"
+                                            >
+                                                <span class="o_ptm_sr_only">Open shipment: </span>
+                                                <span
+                                                    class="o_ptm_activity_marker"
+                                                    t-att-class="eventClass(item.event_type)"
+                                                    aria-hidden="true"
+                                                />
+                                                <span class="o_ptm_activity_copy">
+                                                    <strong t-esc="item.shipment_reference" />
+                                                    <small><t
+                                                        t-esc="eventLabel(item.event_type)"
+                                                    /> · <t
+                                                        t-esc="formatInteger(item.package_count)"
+                                                    /> PACKAGES</small>
+                                                </span>
+                                                <time
+                                                    t-att-datetime="item.occurred_at"
+                                                    t-esc="formatActivityTime(item.occurred_at)"
+                                                />
+                                            </button>
+                                        </li>
+                                    </t>
+                                    <li t-else="" class="o_ptm_activity_empty">
+                                        <strong>NO RECENT HANDOFFS</strong>
+                                        <span
+                                        >Pickup and delivery events will form the operational trail.</span>
+                                        <button
+                                            class="o_ptm_button"
+                                            type="button"
+                                            t-on-click="openShipments"
+                                        >
+                                            <t
+                                                t-if="state.data.permissions.can_create_shipments"
+                                            >CREATE SHIPMENT</t>
+                                            <t t-else="">OPEN SHIPMENTS</t>
+                                        </button>
+                                    </li>
+                                </ol>
+                            </article>
+                        </section>
+
+                        <footer class="o_ptm_footer">
+                            <span>PARCEL TRANSPORT MANAGEMENT // COMMAND CENTER</span>
+                            <span>VERIFIED FRAME <t
+                                t-esc="formatGeneratedAt(state.data.generated_at)"
+                            /></span>
+                            <span>ODOO COMMUNITY 19</span>
+                        </footer>
+                    </t>
+
+                    <div t-else="" class="o_ptm_fatal_state">
+                        <span class="o_ptm_fatal_code">OFF / LINE</span>
+                        <h1>NO OPERATIONAL SNAPSHOT IS AVAILABLE</h1>
+                        <p
+                        >The previous frame cannot be shown because this session has not completed a successful synchronization.</p>
+                        <button
+                            class="o_ptm_button o_ptm_button--primary"
+                            type="button"
+                            t-att-disabled="state.refreshing"
+                            t-on-click="() => this.loadDashboardData(false)"
+                        >
+                            <span>
+                                <t t-if="state.refreshing">CONNECTING</t>
+                                <t t-else="">RECONNECT</t>
+                            </span>
+                        </button>
+                    </div>
+                </main>
+            </t>
+        </div>
+    </t>
+</templates>

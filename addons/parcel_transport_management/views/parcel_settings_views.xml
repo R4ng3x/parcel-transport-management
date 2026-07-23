@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_ptm_res_config_settings_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.parcel.transport</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app
+                    name="parcel_transport_management"
+                    string="Parcel Transport"
+                    data-string="Parcel Transport"
+                    class="o_ptm_settings_view"
+                    groups="base.group_system"
+                >
+                    <block title="Shipment Limits" name="ptm_shipment_limits">
+                        <setting
+                            id="ptm_max_package_weight"
+                            string="Maximum Package Weight"
+                            help="Reject packages whose normalized weight exceeds this company limit."
+                            company_dependent="1"
+                        >
+                            <div class="content-group">
+                                <div class="row mt16">
+                                    <label
+                                        for="parcel_max_package_weight"
+                                        class="col-lg-4 o_light_label"
+                                    />
+                                    <field name="parcel_max_package_weight" class="oe_inline" />
+                                    <field
+                                        name="parcel_max_package_weight_uom_id"
+                                        class="oe_inline"
+                                        options="{'no_create': True, 'no_open': True}"
+                                    />
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
+                    <block title="Courier Defaults" name="ptm_courier_defaults">
+                        <setting
+                            id="ptm_default_courier_shipments"
+                            string="Default Shipment Capacity"
+                            help="Set the concurrent shipment limit proposed for new couriers in this company."
+                            company_dependent="1"
+                        >
+                            <field name="parcel_default_courier_max_shipments" />
+                        </setting>
+                        <setting
+                            id="ptm_default_courier_weight"
+                            string="Default Weight Capacity"
+                            help="Set the concurrent weight capacity proposed for new couriers in this company."
+                            company_dependent="1"
+                        >
+                            <div class="content-group">
+                                <div class="row mt16">
+                                    <label
+                                        for="parcel_default_courier_max_weight"
+                                        class="col-lg-4 o_light_label"
+                                    />
+                                    <field
+                                        name="parcel_default_courier_max_weight"
+                                        class="oe_inline"
+                                    />
+                                    <field
+                                        name="parcel_default_courier_weight_uom_id"
+                                        class="oe_inline"
+                                        options="{'no_create': True, 'no_open': True}"
+                                    />
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_ptm_settings" model="ir.actions.act_window">
+        <field name="name">Parcel Transport Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+        <field name="context">{'module': 'parcel_transport_management', 'bin_size': False}</field>
+    </record>
+</odoo>

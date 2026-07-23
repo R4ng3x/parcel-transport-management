@@ -1,0 +1,653 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_ptm_pickup_event_list" model="ir.ui.view">
+        <field name="name">parcel.pickup.event.list</field>
+        <field name="model">parcel.pickup.event</field>
+        <field name="arch" type="xml">
+            <list
+                class="o_ptm_native_view o_ptm_history_view"
+                string="Pickup Events"
+                create="false"
+                edit="false"
+                delete="false"
+                default_order="occurred_at desc, id desc"
+            >
+                <field name="occurred_at" />
+                <field name="shipment_id" />
+                <field name="courier_id" />
+                <field name="confirmed_by_id" />
+                <field name="package_ids" widget="many2many_tags" optional="show" />
+                <field name="note" optional="hide" />
+                <field name="company_id" groups="base.group_multi_company" optional="hide" />
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ptm_pickup_event_form" model="ir.ui.view">
+        <field name="name">parcel.pickup.event.form</field>
+        <field name="model">parcel.pickup.event</field>
+        <field name="arch" type="xml">
+            <form
+                class="o_ptm_native_view o_ptm_history_view"
+                string="Pickup Event"
+                create="false"
+                edit="false"
+                delete="false"
+                duplicate="false"
+            >
+                <sheet>
+                    <div class="oe_title">
+                        <span class="o_ptm_eyebrow">Append-only pickup record</span>
+                        <label for="shipment_id" />
+                        <h1>
+                            <field name="shipment_id" readonly="1" />
+                        </h1>
+                        <h2>
+                            <field name="occurred_at" readonly="1" />
+                        </h2>
+                    </div>
+                    <group>
+                        <group string="Custody">
+                            <field name="courier_id" readonly="1" />
+                            <field name="confirmed_by_id" readonly="1" />
+                            <field
+                                name="company_id"
+                                readonly="1"
+                                groups="base.group_multi_company"
+                            />
+                        </group>
+                        <group string="Record">
+                            <field name="occurred_at" readonly="1" />
+                            <field name="note" readonly="1" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Packages" name="packages">
+                            <field name="package_ids" readonly="1">
+                                <list create="false" edit="false" delete="false">
+                                    <field name="tracking_code" />
+                                    <field name="weight" />
+                                    <field name="weight_uom_id" />
+                                    <field name="delivery_event_id" optional="show" />
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ptm_pickup_event_search" model="ir.ui.view">
+        <field name="name">parcel.pickup.event.search</field>
+        <field name="model">parcel.pickup.event</field>
+        <field name="arch" type="xml">
+            <search string="Search Pickup Events">
+                <field name="shipment_id" />
+                <field name="courier_id" />
+                <field name="confirmed_by_id" />
+                <filter name="occurred_at" string="Pickup Date" date="occurred_at" />
+                <filter name="with_note" string="With Note" domain="[('note', '!=', False)]" />
+                <group name="group_by">
+                    <filter
+                        name="group_shipment"
+                        string="Shipment"
+                        context="{'group_by': 'shipment_id'}"
+                    />
+                    <filter
+                        name="group_courier"
+                        string="Courier"
+                        context="{'group_by': 'courier_id'}"
+                    />
+                    <filter
+                        name="group_confirmed_by"
+                        string="Confirmed By"
+                        context="{'group_by': 'confirmed_by_id'}"
+                    />
+                    <filter
+                        name="group_day"
+                        string="Day"
+                        context="{'group_by': 'occurred_at:day'}"
+                    />
+                    <filter
+                        name="group_company"
+                        string="Company"
+                        context="{'group_by': 'company_id'}"
+                        groups="base.group_multi_company"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ptm_pickup_history" model="ir.actions.act_window">
+        <field name="name">Pickup Events</field>
+        <field name="res_model">parcel.pickup.event</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ptm_pickup_event_search" />
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No pickup events recorded</p>
+            <p>Pickup confirmations appear here after they are recorded from a shipment.</p>
+        </field>
+    </record>
+
+    <record id="view_ptm_delivery_event_list" model="ir.ui.view">
+        <field name="name">parcel.delivery.event.list</field>
+        <field name="model">parcel.delivery.event</field>
+        <field name="arch" type="xml">
+            <list
+                class="o_ptm_native_view o_ptm_history_view"
+                string="Delivery Events"
+                create="false"
+                edit="false"
+                delete="false"
+                default_order="occurred_at desc, id desc"
+            >
+                <field name="occurred_at" />
+                <field name="shipment_id" />
+                <field name="recipient_name" />
+                <field name="courier_id" />
+                <field name="confirmed_by_id" />
+                <field name="package_ids" widget="many2many_tags" optional="show" />
+                <field name="note" optional="hide" />
+                <field name="company_id" groups="base.group_multi_company" optional="hide" />
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ptm_delivery_event_form" model="ir.ui.view">
+        <field name="name">parcel.delivery.event.form</field>
+        <field name="model">parcel.delivery.event</field>
+        <field name="arch" type="xml">
+            <form
+                class="o_ptm_native_view o_ptm_history_view"
+                string="Delivery Event"
+                create="false"
+                edit="false"
+                delete="false"
+                duplicate="false"
+            >
+                <sheet>
+                    <div class="oe_title">
+                        <span class="o_ptm_eyebrow">Append-only delivery record</span>
+                        <label for="shipment_id" />
+                        <h1>
+                            <field name="shipment_id" readonly="1" />
+                        </h1>
+                        <h2>
+                            <field name="occurred_at" readonly="1" />
+                        </h2>
+                    </div>
+                    <group>
+                        <group string="Receipt">
+                            <field name="recipient_name" readonly="1" />
+                            <field name="courier_id" readonly="1" />
+                            <field name="confirmed_by_id" readonly="1" />
+                        </group>
+                        <group string="Record">
+                            <field name="occurred_at" readonly="1" />
+                            <field name="note" readonly="1" />
+                            <field
+                                name="company_id"
+                                readonly="1"
+                                groups="base.group_multi_company"
+                            />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Packages" name="packages">
+                            <field name="package_ids" readonly="1">
+                                <list create="false" edit="false" delete="false">
+                                    <field name="tracking_code" />
+                                    <field name="weight" />
+                                    <field name="weight_uom_id" />
+                                    <field name="pickup_event_id" />
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ptm_delivery_event_search" model="ir.ui.view">
+        <field name="name">parcel.delivery.event.search</field>
+        <field name="model">parcel.delivery.event</field>
+        <field name="arch" type="xml">
+            <search string="Search Delivery Events">
+                <field name="shipment_id" />
+                <field name="recipient_name" />
+                <field name="courier_id" />
+                <field name="confirmed_by_id" />
+                <filter name="occurred_at" string="Delivery Date" date="occurred_at" />
+                <filter name="with_note" string="With Note" domain="[('note', '!=', False)]" />
+                <group name="group_by">
+                    <filter
+                        name="group_shipment"
+                        string="Shipment"
+                        context="{'group_by': 'shipment_id'}"
+                    />
+                    <filter
+                        name="group_courier"
+                        string="Courier"
+                        context="{'group_by': 'courier_id'}"
+                    />
+                    <filter
+                        name="group_confirmed_by"
+                        string="Confirmed By"
+                        context="{'group_by': 'confirmed_by_id'}"
+                    />
+                    <filter
+                        name="group_day"
+                        string="Day"
+                        context="{'group_by': 'occurred_at:day'}"
+                    />
+                    <filter
+                        name="group_company"
+                        string="Company"
+                        context="{'group_by': 'company_id'}"
+                        groups="base.group_multi_company"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ptm_delivery_history" model="ir.actions.act_window">
+        <field name="name">Delivery Events</field>
+        <field name="res_model">parcel.delivery.event</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ptm_delivery_event_search" />
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No delivery events recorded</p>
+            <p>Delivery confirmations appear here after they are recorded from a shipment.</p>
+        </field>
+    </record>
+
+    <record id="view_ptm_sla_revision_list" model="ir.ui.view">
+        <field name="name">parcel.sla.revision.list</field>
+        <field name="model">parcel.sla.revision</field>
+        <field name="arch" type="xml">
+            <list
+                class="o_ptm_native_view o_ptm_history_view"
+                string="SLA Revisions"
+                create="false"
+                edit="false"
+                delete="false"
+                default_order="changed_at desc, id desc"
+            >
+                <field name="changed_at" />
+                <field name="shipment_id" />
+                <field name="previous_expected_delivery_at" />
+                <field name="new_expected_delivery_at" />
+                <field name="changed_by_id" />
+                <field name="reason" optional="show" />
+                <field name="company_id" groups="base.group_multi_company" optional="hide" />
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ptm_sla_revision_form" model="ir.ui.view">
+        <field name="name">parcel.sla.revision.form</field>
+        <field name="model">parcel.sla.revision</field>
+        <field name="arch" type="xml">
+            <form
+                class="o_ptm_native_view o_ptm_history_view"
+                string="SLA Revision"
+                create="false"
+                edit="false"
+                delete="false"
+                duplicate="false"
+            >
+                <sheet>
+                    <div class="oe_title">
+                        <span class="o_ptm_eyebrow">Append-only SLA record</span>
+                        <label for="shipment_id" />
+                        <h1>
+                            <field name="shipment_id" readonly="1" />
+                        </h1>
+                        <h2>
+                            <field name="changed_at" readonly="1" />
+                        </h2>
+                    </div>
+                    <group>
+                        <group string="Deadline Change">
+                            <field name="previous_expected_delivery_at" readonly="1" />
+                            <field name="new_expected_delivery_at" readonly="1" />
+                        </group>
+                        <group string="Audit">
+                            <field name="changed_by_id" readonly="1" />
+                            <field name="changed_at" readonly="1" />
+                            <field
+                                name="company_id"
+                                readonly="1"
+                                groups="base.group_multi_company"
+                            />
+                        </group>
+                    </group>
+                    <group string="Reason">
+                        <field name="reason" nolabel="1" readonly="1" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ptm_sla_revision_search" model="ir.ui.view">
+        <field name="name">parcel.sla.revision.search</field>
+        <field name="model">parcel.sla.revision</field>
+        <field name="arch" type="xml">
+            <search string="Search SLA Revisions">
+                <field name="shipment_id" />
+                <field name="changed_by_id" />
+                <filter name="changed_at" string="Revision Date" date="changed_at" />
+                <group name="group_by">
+                    <filter
+                        name="group_shipment"
+                        string="Shipment"
+                        context="{'group_by': 'shipment_id'}"
+                    />
+                    <filter
+                        name="group_changed_by"
+                        string="Changed By"
+                        context="{'group_by': 'changed_by_id'}"
+                    />
+                    <filter
+                        name="group_day"
+                        string="Day"
+                        context="{'group_by': 'changed_at:day'}"
+                    />
+                    <filter
+                        name="group_company"
+                        string="Company"
+                        context="{'group_by': 'company_id'}"
+                        groups="base.group_multi_company"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ptm_sla_history" model="ir.actions.act_window">
+        <field name="name">SLA Revisions</field>
+        <field name="res_model">parcel.sla.revision</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ptm_sla_revision_search" />
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No SLA revisions recorded</p>
+            <p>Each manager-approved delivery deadline change is preserved here.</p>
+        </field>
+    </record>
+
+    <record id="view_ptm_route_correction_list" model="ir.ui.view">
+        <field name="name">parcel.route.correction.list</field>
+        <field name="model">parcel.route.correction</field>
+        <field name="arch" type="xml">
+            <list
+                class="o_ptm_native_view o_ptm_history_view"
+                string="Route Corrections"
+                create="false"
+                edit="false"
+                delete="false"
+                default_order="changed_at desc, id desc"
+                decoration-info="applied"
+                decoration-muted="not applied"
+            >
+                <field name="changed_at" />
+                <field name="shipment_id" />
+                <field name="applied" />
+                <field name="previous_origin_zone_id" optional="show" />
+                <field name="new_origin_zone_id" optional="show" />
+                <field name="previous_destination_zone_id" optional="show" />
+                <field name="new_destination_zone_id" optional="show" />
+                <field name="changed_by_id" />
+                <field name="reason" optional="show" />
+                <field name="company_id" groups="base.group_multi_company" optional="hide" />
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ptm_route_correction_form" model="ir.ui.view">
+        <field name="name">parcel.route.correction.form</field>
+        <field name="model">parcel.route.correction</field>
+        <field name="arch" type="xml">
+            <form
+                class="o_ptm_native_view o_ptm_history_view"
+                string="Route Correction"
+                create="false"
+                edit="false"
+                delete="false"
+                duplicate="false"
+            >
+                <sheet>
+                    <widget
+                        name="web_ribbon"
+                        title="AUDIT ONLY"
+                        bg_color="text-bg-secondary"
+                        invisible="applied"
+                    />
+                    <div class="oe_title">
+                        <span class="o_ptm_eyebrow">Append-only route record</span>
+                        <label for="shipment_id" />
+                        <h1>
+                            <field name="shipment_id" readonly="1" />
+                        </h1>
+                        <h2>
+                            <field name="changed_at" readonly="1" />
+                        </h2>
+                    </div>
+                    <group>
+                        <group string="Pickup Zone">
+                            <field name="previous_origin_zone_id" readonly="1" />
+                            <field name="new_origin_zone_id" readonly="1" />
+                        </group>
+                        <group string="Delivery Zone">
+                            <field name="previous_destination_zone_id" readonly="1" />
+                            <field name="new_destination_zone_id" readonly="1" />
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Audit">
+                            <field name="applied" readonly="1" />
+                            <field name="changed_by_id" readonly="1" />
+                            <field name="changed_at" readonly="1" />
+                            <field
+                                name="company_id"
+                                readonly="1"
+                                groups="base.group_multi_company"
+                            />
+                        </group>
+                        <group string="Reason">
+                            <field name="reason" nolabel="1" readonly="1" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Previous Snapshot" name="previous_snapshot">
+                            <field name="previous_values" nolabel="1" readonly="1" />
+                        </page>
+                        <page string="Corrected Snapshot" name="corrected_snapshot">
+                            <field name="new_values" nolabel="1" readonly="1" />
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ptm_route_correction_search" model="ir.ui.view">
+        <field name="name">parcel.route.correction.search</field>
+        <field name="model">parcel.route.correction</field>
+        <field name="arch" type="xml">
+            <search string="Search Route Corrections">
+                <field name="shipment_id" />
+                <field name="changed_by_id" />
+                <filter name="applied" string="Applied" domain="[('applied', '=', True)]" />
+                <filter name="audit_only" string="Audit Only" domain="[('applied', '=', False)]" />
+                <filter name="changed_at" string="Correction Date" date="changed_at" />
+                <group name="group_by">
+                    <filter
+                        name="group_shipment"
+                        string="Shipment"
+                        context="{'group_by': 'shipment_id'}"
+                    />
+                    <filter
+                        name="group_applied"
+                        string="Applied"
+                        context="{'group_by': 'applied'}"
+                    />
+                    <filter
+                        name="group_changed_by"
+                        string="Changed By"
+                        context="{'group_by': 'changed_by_id'}"
+                    />
+                    <filter
+                        name="group_day"
+                        string="Day"
+                        context="{'group_by': 'changed_at:day'}"
+                    />
+                    <filter
+                        name="group_company"
+                        string="Company"
+                        context="{'group_by': 'company_id'}"
+                        groups="base.group_multi_company"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ptm_route_history" model="ir.actions.act_window">
+        <field name="name">Route Corrections</field>
+        <field name="res_model">parcel.route.correction</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ptm_route_correction_search" />
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No route corrections recorded</p>
+            <p
+            >Every route snapshot correction is preserved, including audit-only changes to terminal shipments.</p>
+        </field>
+    </record>
+
+    <record id="view_ptm_courier_reassignment_list" model="ir.ui.view">
+        <field name="name">parcel.courier.reassignment.list</field>
+        <field name="model">parcel.courier.reassignment</field>
+        <field name="arch" type="xml">
+            <list
+                class="o_ptm_native_view o_ptm_history_view"
+                string="Courier Reassignments"
+                create="false"
+                edit="false"
+                delete="false"
+                default_order="occurred_at desc, id desc"
+            >
+                <field name="occurred_at" />
+                <field name="shipment_id" />
+                <field name="previous_courier_id" />
+                <field name="new_courier_id" />
+                <field name="changed_by_id" />
+                <field name="reason" optional="show" />
+                <field name="company_id" groups="base.group_multi_company" optional="hide" />
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ptm_courier_reassignment_form" model="ir.ui.view">
+        <field name="name">parcel.courier.reassignment.form</field>
+        <field name="model">parcel.courier.reassignment</field>
+        <field name="arch" type="xml">
+            <form
+                class="o_ptm_native_view o_ptm_history_view"
+                string="Courier Reassignment"
+                create="false"
+                edit="false"
+                delete="false"
+                duplicate="false"
+            >
+                <sheet>
+                    <div class="oe_title">
+                        <span class="o_ptm_eyebrow">Append-only courier record</span>
+                        <label for="shipment_id" />
+                        <h1>
+                            <field name="shipment_id" readonly="1" />
+                        </h1>
+                        <h2>
+                            <field name="occurred_at" readonly="1" />
+                        </h2>
+                    </div>
+                    <group>
+                        <group string="Courier Change">
+                            <field name="previous_courier_id" readonly="1" />
+                            <field name="new_courier_id" readonly="1" />
+                        </group>
+                        <group string="Audit">
+                            <field name="changed_by_id" readonly="1" />
+                            <field name="occurred_at" readonly="1" />
+                            <field
+                                name="company_id"
+                                readonly="1"
+                                groups="base.group_multi_company"
+                            />
+                        </group>
+                    </group>
+                    <group string="Reason">
+                        <field name="reason" nolabel="1" readonly="1" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ptm_courier_reassignment_search" model="ir.ui.view">
+        <field name="name">parcel.courier.reassignment.search</field>
+        <field name="model">parcel.courier.reassignment</field>
+        <field name="arch" type="xml">
+            <search string="Search Courier Reassignments">
+                <field name="shipment_id" />
+                <field name="previous_courier_id" />
+                <field name="new_courier_id" />
+                <field name="changed_by_id" />
+                <filter name="occurred_at" string="Reassignment Date" date="occurred_at" />
+                <group name="group_by">
+                    <filter
+                        name="group_shipment"
+                        string="Shipment"
+                        context="{'group_by': 'shipment_id'}"
+                    />
+                    <filter
+                        name="group_new_courier"
+                        string="New Courier"
+                        context="{'group_by': 'new_courier_id'}"
+                    />
+                    <filter
+                        name="group_changed_by"
+                        string="Changed By"
+                        context="{'group_by': 'changed_by_id'}"
+                    />
+                    <filter
+                        name="group_day"
+                        string="Day"
+                        context="{'group_by': 'occurred_at:day'}"
+                    />
+                    <filter
+                        name="group_company"
+                        string="Company"
+                        context="{'group_by': 'company_id'}"
+                        groups="base.group_multi_company"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ptm_courier_reassignment_history" model="ir.actions.act_window">
+        <field name="name">Courier Reassignments</field>
+        <field name="res_model">parcel.courier.reassignment</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ptm_courier_reassignment_search" />
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No courier reassignments recorded</p>
+            <p>Each actual courier change is preserved with its actor, timestamp, and reason.</p>
+        </field>
+    </record>
+</odoo>

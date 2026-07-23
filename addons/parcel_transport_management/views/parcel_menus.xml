@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <menuitem
+        id="menu_ptm_root"
+        name="Parcel Ops"
+        sequence="25"
+        web_icon="parcel_transport_management,static/description/icon.png"
+        groups="parcel_transport_management.group_ptm_courier,parcel_transport_management.group_ptm_operator,base.group_system"
+    />
+
+    <menuitem
+        id="menu_ptm_dashboard"
+        name="Command Center"
+        parent="menu_ptm_root"
+        action="action_ptm_dashboard"
+        sequence="10"
+        groups="parcel_transport_management.group_ptm_courier,parcel_transport_management.group_ptm_operator"
+    />
+
+    <menuitem
+        id="menu_ptm_operations"
+        name="Operations"
+        parent="menu_ptm_root"
+        sequence="20"
+        groups="parcel_transport_management.group_ptm_courier,parcel_transport_management.group_ptm_operator"
+    />
+    <menuitem
+        id="menu_ptm_shipments"
+        name="Shipments"
+        parent="menu_ptm_operations"
+        action="action_ptm_shipment"
+        sequence="10"
+    />
+    <menuitem
+        id="menu_ptm_packages"
+        name="Packages"
+        parent="menu_ptm_operations"
+        action="action_ptm_package"
+        sequence="20"
+    />
+    <menuitem
+        id="menu_ptm_couriers"
+        name="Couriers"
+        parent="menu_ptm_operations"
+        action="action_ptm_courier"
+        sequence="30"
+    />
+
+    <menuitem id="menu_ptm_history" name="History" parent="menu_ptm_operations" sequence="50" />
+    <menuitem
+        id="menu_ptm_pickup_history"
+        name="Pickup Events"
+        parent="menu_ptm_history"
+        action="action_ptm_pickup_history"
+        sequence="10"
+    />
+    <menuitem
+        id="menu_ptm_delivery_history"
+        name="Delivery Events"
+        parent="menu_ptm_history"
+        action="action_ptm_delivery_history"
+        sequence="20"
+    />
+    <menuitem
+        id="menu_ptm_sla_history"
+        name="SLA Revisions"
+        parent="menu_ptm_history"
+        action="action_ptm_sla_history"
+        sequence="30"
+    />
+    <menuitem
+        id="menu_ptm_route_history"
+        name="Route Corrections"
+        parent="menu_ptm_history"
+        action="action_ptm_route_history"
+        sequence="40"
+    />
+
+    <menuitem
+        id="menu_ptm_configuration"
+        name="Configuration"
+        parent="menu_ptm_root"
+        sequence="30"
+        groups="base.group_system"
+    />
+    <menuitem
+        id="menu_ptm_zones"
+        name="Delivery Zones"
+        parent="menu_ptm_operations"
+        action="action_ptm_zone"
+        sequence="40"
+        groups="parcel_transport_management.group_ptm_courier,parcel_transport_management.group_ptm_operator"
+    />
+    <menuitem
+        id="menu_ptm_settings"
+        name="Settings"
+        parent="menu_ptm_configuration"
+        action="action_ptm_settings"
+        sequence="20"
+        groups="base.group_system"
+    />
+</odoo>

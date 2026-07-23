@@ -1,0 +1,541 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_ptm_shipment_list" model="ir.ui.view">
+        <field name="name">parcel.shipment.list</field>
+        <field name="model">parcel.shipment</field>
+        <field name="arch" type="xml">
+            <list
+                class="o_ptm_native_view o_ptm_shipment_view"
+                string="Shipments"
+                default_order="id desc"
+                decoration-danger="delay_hours &gt; 0 and state not in ['delivered', 'cancelled']"
+                decoration-warning="state in ['partially_picked_up', 'partially_delivered']"
+                decoration-info="state == 'in_transit'"
+                decoration-success="state == 'delivered'"
+                decoration-muted="state == 'cancelled'"
+            >
+                <field name="reference" />
+                <field name="sender_id" />
+                <field name="recipient_id" />
+                <field name="courier_id" />
+                <field name="origin_zone_id" optional="show" />
+                <field name="destination_zone_id" optional="show" />
+                <field name="total_weight_kg" optional="show" />
+                <field name="expected_delivery_at" optional="show" />
+                <field name="delay_hours" string="Delay (h)" optional="hide" />
+                <field
+                    name="state"
+                    widget="badge"
+                    decoration-info="state in ['assigned', 'in_transit']"
+                    decoration-warning="state in ['partially_picked_up', 'picked_up', 'partially_delivered']"
+                    decoration-success="state == 'delivered'"
+                    decoration-danger="state == 'cancelled'"
+                    decoration-muted="state == 'draft'"
+                />
+                <field name="company_id" groups="base.group_multi_company" optional="hide" />
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ptm_shipment_kanban" model="ir.ui.view">
+        <field name="name">parcel.shipment.kanban</field>
+        <field name="model">parcel.shipment</field>
+        <field name="arch" type="xml">
+            <kanban
+                class="o_ptm_native_view o_ptm_shipment_view"
+                string="Shipments"
+                default_group_by="state"
+                quick_create="false"
+                records_draggable="false"
+            >
+                <field name="reference" />
+                <field name="sender_id" />
+                <field name="recipient_id" />
+                <field name="courier_id" />
+                <field name="origin_zone_id" />
+                <field name="destination_zone_id" />
+                <field name="total_weight_kg" />
+                <field name="expected_delivery_at" />
+                <field name="delay_hours" />
+                <field name="coverage_warning" />
+                <field name="state" />
+                <templates>
+                    <t t-name="card">
+                        <div
+                            class="o_ptm_kanban_card_header d-flex justify-content-between align-items-start gap-2"
+                        >
+                            <div>
+                                <span class="o_ptm_eyebrow">Shipment</span>
+                                <strong class="d-block fs-5">
+                                    <field name="reference" />
+                                </strong>
+                            </div>
+                            <field
+                                name="state"
+                                widget="badge"
+                                decoration-info="state in ['assigned', 'in_transit']"
+                                decoration-warning="state in ['partially_picked_up', 'picked_up', 'partially_delivered']"
+                                decoration-success="state == 'delivered'"
+                                decoration-danger="state == 'cancelled'"
+                                decoration-muted="state == 'draft'"
+                            />
+                        </div>
+                        <div class="o_ptm_route_line">
+                            <div>
+                                <span>Pickup</span>
+                                <strong>
+                                    <field name="sender_id" />
+                                </strong>
+                                <small>
+                                    <field name="origin_zone_id" />
+                                </small>
+                            </div>
+                            <t t-if="record.origin_zone_id.raw_value">
+                                <i
+                                    t-if="record.destination_zone_id.raw_value"
+                                    class="fa fa-long-arrow-right"
+                                    title="Route direction"
+                                    aria-hidden="true"
+                                />
+                            </t>
+                            <div>
+                                <span>Delivery</span>
+                                <strong>
+                                    <field name="recipient_id" />
+                                </strong>
+                                <small>
+                                    <field name="destination_zone_id" />
+                                </small>
+                            </div>
+                        </div>
+                        <div
+                            t-if="record.coverage_warning.raw_value"
+                            class="o_ptm_inline_alert"
+                            role="status"
+                        >
+                            <i
+                                class="fa fa-exclamation-triangle"
+                                title="Coverage warning"
+                                aria-hidden="true"
+                            />
+                            <span>Coverage review required</span>
+                        </div>
+                        <footer>
+                            <span t-if="record.courier_id.raw_value">
+                                <i class="fa fa-user" title="Assigned courier" aria-hidden="true" />
+                                <field name="courier_id" />
+                            </span>
+                            <span t-else="" class="o_ptm_unassigned">Unassigned</span>
+                            <span class="ms-auto"><field name="total_weight_kg" /> kg</span>
+                        </footer>
+                        <div class="o_ptm_card_deadline">
+                            <span>Target</span>
+                            <field name="expected_delivery_at" />
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_ptm_shipment_form" model="ir.ui.view">
+        <field name="name">parcel.shipment.form</field>
+        <field name="model">parcel.shipment</field>
+        <field name="arch" type="xml">
+            <form class="o_ptm_native_view o_ptm_shipment_view" string="Shipment">
+                <header>
+                    <button
+                        name="%(action_ptm_assignment_wizard)d"
+                        type="action"
+                        string="Assign Courier"
+                        class="oe_highlight"
+                        groups="parcel_transport_management.group_ptm_operator"
+                        invisible="state != 'draft'"
+                    />
+                    <button
+                        name="%(action_ptm_assignment_wizard)d"
+                        type="action"
+                        string="Reassign Courier"
+                        groups="parcel_transport_management.group_ptm_operator"
+                        invisible="state != 'assigned'"
+                    />
+                    <button
+                        name="%(action_ptm_assignment_wizard)d"
+                        type="action"
+                        string="Reassign Courier"
+                        groups="parcel_transport_management.group_ptm_manager"
+                        invisible="state not in ['partially_picked_up', 'picked_up', 'in_transit', 'partially_delivered']"
+                    />
+                    <button
+                        name="%(action_ptm_pickup_wizard)d"
+                        type="action"
+                        string="Record Pickup"
+                        class="oe_highlight"
+                        groups="parcel_transport_management.group_ptm_courier,parcel_transport_management.group_ptm_operator"
+                        invisible="state not in ['assigned', 'partially_picked_up']"
+                    />
+                    <button
+                        name="action_start_transit"
+                        type="object"
+                        string="Start Transit"
+                        class="oe_highlight"
+                        groups="parcel_transport_management.group_ptm_courier,parcel_transport_management.group_ptm_operator"
+                        invisible="state != 'picked_up'"
+                    />
+                    <button
+                        name="%(action_ptm_delivery_wizard)d"
+                        type="action"
+                        string="Record Delivery"
+                        class="oe_highlight"
+                        groups="parcel_transport_management.group_ptm_courier,parcel_transport_management.group_ptm_operator"
+                        invisible="state not in ['in_transit', 'partially_delivered']"
+                    />
+                    <button
+                        name="%(action_ptm_sla_wizard)d"
+                        type="action"
+                        string="Revise SLA"
+                        groups="parcel_transport_management.group_ptm_manager"
+                        invisible="state in ['delivered', 'cancelled'] or not expected_delivery_at"
+                    />
+                    <button
+                        name="%(action_ptm_route_wizard)d"
+                        type="action"
+                        string="Correct Route"
+                        groups="parcel_transport_management.group_ptm_manager"
+                        invisible="state in ['delivered', 'cancelled']"
+                    />
+                    <button
+                        name="%(action_ptm_route_wizard)d"
+                        type="action"
+                        string="Record Route Audit"
+                        groups="parcel_transport_management.group_ptm_manager"
+                        invisible="state not in ['delivered', 'cancelled']"
+                    />
+                    <button
+                        name="%(action_ptm_cancel_wizard)d"
+                        type="action"
+                        string="Cancel Shipment"
+                        class="btn-danger"
+                        groups="parcel_transport_management.group_ptm_manager"
+                        invisible="state in ['partially_delivered', 'delivered', 'cancelled']"
+                    />
+                    <field
+                        name="state"
+                        widget="statusbar"
+                        statusbar_visible="draft,assigned,picked_up,in_transit,delivered"
+                        readonly="1"
+                    />
+                </header>
+                <sheet>
+                    <widget
+                        name="web_ribbon"
+                        title="DELIVERED"
+                        bg_color="text-bg-success"
+                        invisible="state != 'delivered'"
+                    />
+                    <widget
+                        name="web_ribbon"
+                        title="CANCELLED"
+                        bg_color="text-bg-danger"
+                        invisible="state != 'cancelled'"
+                    />
+                    <div class="oe_title">
+                        <span class="o_ptm_eyebrow">Parcel operation</span>
+                        <label for="reference" />
+                        <h1>
+                            <field name="reference" readonly="1" />
+                        </h1>
+                        <div class="o_ptm_title_meta">
+                            <span><field name="total_weight_kg" /> kg</span>
+                            <span invisible="not origin_zone_id">
+                                <field name="origin_zone_id" />
+                            </span>
+                            <i
+                                class="fa fa-long-arrow-right"
+                                invisible="not origin_zone_id or not destination_zone_id"
+                                title="Route direction"
+                                aria-hidden="true"
+                            />
+                            <span invisible="not destination_zone_id">
+                                <field name="destination_zone_id" />
+                            </span>
+                        </div>
+                    </div>
+
+                    <div
+                        class="o_ptm_inline_alert o_ptm_inline_alert_warning"
+                        role="alert"
+                        invisible="not coverage_warning"
+                    >
+                        <i
+                            class="fa fa-exclamation-triangle"
+                            title="Coverage warning"
+                            aria-hidden="true"
+                        />
+                        <field name="coverage_warning" nolabel="1" readonly="1" />
+                    </div>
+
+                    <group>
+                        <group string="Parties">
+                            <field
+                                name="company_id"
+                                groups="base.group_multi_company"
+                                readonly="1"
+                            />
+                            <field
+                                name="sender_id"
+                                readonly="state != 'draft'"
+                                options="{'no_create': True}"
+                            />
+                            <field
+                                name="recipient_id"
+                                readonly="state != 'draft'"
+                                options="{'no_create': True}"
+                            />
+                            <field name="courier_id" readonly="1" />
+                        </group>
+                        <group string="Service Level">
+                            <field name="expected_delivery_at" readonly="1" />
+                            <field name="original_expected_delivery_at" readonly="1" />
+                            <field name="delay_hours" string="Delay (h)" readonly="1" />
+                            <field
+                                name="original_delay_hours"
+                                string="Original Delay (h)"
+                                readonly="1"
+                            />
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Packages" name="packages">
+                            <field name="package_ids" readonly="state != 'draft'">
+                                <list
+                                    editable="bottom"
+                                    decoration-success="delivery_event_id"
+                                    decoration-info="pickup_event_id and not delivery_event_id"
+                                >
+                                    <field name="tracking_code" readonly="1" />
+                                    <field name="weight" />
+                                    <field
+                                        name="weight_uom_id"
+                                        options="{'no_create': True, 'no_open': True}"
+                                    />
+                                    <field name="weight_kg" readonly="1" optional="show" />
+                                    <field name="pickup_event_id" readonly="1" optional="show" />
+                                    <field name="delivery_event_id" readonly="1" optional="show" />
+                                </list>
+                                <form string="Package">
+                                    <group>
+                                        <field name="tracking_code" readonly="1" />
+                                        <field name="weight" />
+                                        <field
+                                            name="weight_uom_id"
+                                            options="{'no_create': True, 'no_open': True}"
+                                        />
+                                        <field name="weight_kg" readonly="1" />
+                                        <field name="pickup_event_id" readonly="1" />
+                                        <field name="delivery_event_id" readonly="1" />
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                        <page string="Route Snapshot" name="route">
+                            <group>
+                                <group string="Pickup">
+                                    <field name="pickup_name" readonly="1" />
+                                    <field name="pickup_street" readonly="1" />
+                                    <field name="pickup_street2" readonly="1" />
+                                    <field name="pickup_city" readonly="1" />
+                                    <field name="pickup_zip" readonly="1" />
+                                    <field name="pickup_country_id" readonly="1" />
+                                    <field name="origin_zone_id" readonly="1" />
+                                </group>
+                                <group string="Delivery">
+                                    <field name="delivery_name" readonly="1" />
+                                    <field name="delivery_street" readonly="1" />
+                                    <field name="delivery_street2" readonly="1" />
+                                    <field name="delivery_city" readonly="1" />
+                                    <field name="delivery_zip" readonly="1" />
+                                    <field name="delivery_country_id" readonly="1" />
+                                    <field name="destination_zone_id" readonly="1" />
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Timeline" name="timeline">
+                            <group>
+                                <group string="Operational Milestones">
+                                    <field name="first_picked_up_at" readonly="1" />
+                                    <field name="transit_started_at" readonly="1" />
+                                    <field name="delivered_at" readonly="1" />
+                                    <field name="cancelled_at" readonly="1" />
+                                </group>
+                                <group string="Delivery Commitment">
+                                    <field name="original_expected_delivery_at" readonly="1" />
+                                    <field name="expected_delivery_at" readonly="1" />
+                                    <field
+                                        name="original_delay_hours"
+                                        string="Original Delay (h)"
+                                        readonly="1"
+                                    />
+                                    <field name="delay_hours" string="Delay (h)" readonly="1" />
+                                </group>
+                            </group>
+                        </page>
+                        <page string="History &amp; Audit" name="history_audit">
+                            <separator string="SLA Revisions" />
+                            <field name="sla_revision_ids" readonly="1">
+                                <list
+                                    create="false"
+                                    edit="false"
+                                    delete="false"
+                                    default_order="changed_at desc"
+                                >
+                                    <field name="changed_at" />
+                                    <field name="previous_expected_delivery_at" />
+                                    <field name="new_expected_delivery_at" />
+                                    <field name="changed_by_id" />
+                                    <field name="reason" optional="show" />
+                                </list>
+                            </field>
+                            <separator string="Route Corrections" />
+                            <field name="route_correction_ids" readonly="1">
+                                <list
+                                    create="false"
+                                    edit="false"
+                                    delete="false"
+                                    default_order="changed_at desc"
+                                >
+                                    <field name="changed_at" />
+                                    <field name="applied" widget="boolean_toggle" />
+                                    <field name="previous_origin_zone_id" optional="show" />
+                                    <field name="new_origin_zone_id" optional="show" />
+                                    <field name="previous_destination_zone_id" optional="show" />
+                                    <field name="new_destination_zone_id" optional="show" />
+                                    <field name="changed_by_id" />
+                                    <field name="reason" optional="show" />
+                                </list>
+                            </field>
+                            <separator string="Courier Reassignments" />
+                            <field name="courier_reassignment_ids" readonly="1">
+                                <list
+                                    create="false"
+                                    edit="false"
+                                    delete="false"
+                                    default_order="occurred_at desc"
+                                >
+                                    <field name="occurred_at" />
+                                    <field name="previous_courier_id" />
+                                    <field name="new_courier_id" />
+                                    <field name="changed_by_id" />
+                                    <field name="reason" optional="show" />
+                                </list>
+                            </field>
+                        </page>
+                        <page
+                            string="Cancellation"
+                            name="cancellation"
+                            invisible="state != 'cancelled'"
+                        >
+                            <group>
+                                <field name="cancelled_at" readonly="1" />
+                                <field name="cancellation_reason" readonly="1" />
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter />
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ptm_shipment_search" model="ir.ui.view">
+        <field name="name">parcel.shipment.search</field>
+        <field name="model">parcel.shipment</field>
+        <field name="arch" type="xml">
+            <search string="Search Shipments">
+                <field name="reference" />
+                <field name="sender_id" />
+                <field name="recipient_id" />
+                <field name="courier_id" />
+                <field name="origin_zone_id" />
+                <field name="destination_zone_id" />
+                <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]" />
+                <filter name="assigned" string="Assigned" domain="[('state', '=', 'assigned')]" />
+                <filter
+                    name="pickup_in_progress"
+                    string="Pickup in Progress"
+                    domain="[('state', 'in', ['partially_picked_up', 'picked_up'])]"
+                />
+                <filter
+                    name="in_transit"
+                    string="In Transit"
+                    domain="[('state', 'in', ['in_transit', 'partially_delivered'])]"
+                />
+                <filter
+                    name="delivered"
+                    string="Delivered"
+                    domain="[('state', '=', 'delivered')]"
+                />
+                <filter
+                    name="cancelled"
+                    string="Cancelled"
+                    domain="[('state', '=', 'cancelled')]"
+                />
+                <separator />
+                <filter
+                    name="unassigned"
+                    string="Unassigned"
+                    domain="[('courier_id', '=', False)]"
+                />
+                <filter
+                    name="coverage_warning"
+                    string="Coverage Review"
+                    domain="[('coverage_warning', '!=', False)]"
+                />
+                <filter name="delayed" string="Delayed" domain="[('delay_hours', '&gt;', 0)]" />
+                <filter
+                    name="expected_delivery_at"
+                    string="Delivery Date"
+                    date="expected_delivery_at"
+                />
+                <group name="group_by">
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}" />
+                    <filter
+                        name="group_courier"
+                        string="Courier"
+                        context="{'group_by': 'courier_id'}"
+                    />
+                    <filter
+                        name="group_origin_zone"
+                        string="Pickup Zone"
+                        context="{'group_by': 'origin_zone_id'}"
+                    />
+                    <filter
+                        name="group_destination_zone"
+                        string="Delivery Zone"
+                        context="{'group_by': 'destination_zone_id'}"
+                    />
+                    <filter
+                        name="group_company"
+                        string="Company"
+                        context="{'group_by': 'company_id'}"
+                        groups="base.group_multi_company"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ptm_shipment" model="ir.actions.act_window">
+        <field name="name">Shipments</field>
+        <field name="res_model">parcel.shipment</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_ptm_shipment_search" />
+        <field name="context">{'search_default_in_transit': 0}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create the first parcel shipment</p>
+            <p
+            >Add every package while the shipment is in draft, then assign a courier to begin the operational flow.</p>
+        </field>
+    </record>
+</odoo>
