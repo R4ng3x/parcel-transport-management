@@ -396,3 +396,61 @@ class TestPublicTracking(HttpCase):
         for marker in self.pii_markers:
             self.assertNotIn(marker, serialized)
         self.assertNotIn(self.package_b.tracking_code, serialized)
+
+    def test_failure_and_retry_are_publicly_generic_without_internal_reason(self):
+        shipment = self.package_b.shipment_id
+        courier_name = "PII-RETRY-COURIER-1H7N"
+        failure_reason = "SECRET-FAILED-REASON-6Q4Z"
+        retry_reason = "SECRET-RETRY-REASON-8M2P"
+        courier = self.env["parcel.courier"].create(
+            {
+                "name": courier_name,
+                "company_id": self.company.id,
+                "availability": "available",
+                "max_concurrent_shipments": 1,
+                "max_concurrent_weight": 10.0,
+                "max_weight_uom_id": self.kg_uom.id,
+            }
+        )
+        shipment.action_assign(courier.id)
+        shipment.action_record_pickup(shipment.package_ids.ids)
+        shipment.action_start_transit()
+        shipment.action_record_delivery_failure(failure_reason)
+        shipment.action_retry_delivery(courier.id, retry_reason)
+
+        data = self.package_b.get_public_tracking_data()
+
+        self.assertEqual(set(data), self.PUBLIC_DTO_KEYS)
+        self.assertEqual(data["current_status"], "in_transit")
+        statuses = [item["status"] for item in data["timeline"]]
+        failure_index = max(
+            index
+            for index, status in enumerate(statuses)
+            if status == "delivery_failed"
+        )
+        self.assertTrue(
+            any(status == "in_transit" for status in statuses[failure_index + 1 :])
+        )
+        for item in data["timeline"]:
+            self.assertEqual(set(item), self.TIMELINE_ITEM_KEYS)
+        serialized = json.dumps(data, sort_keys=True)
+        for private_value in (
+            failure_reason,
+            retry_reason,
+            courier_name,
+            self.package_a.tracking_code,
+        ):
+            self.assertNotIn(private_value, serialized)
+
+        response = self.url_open(
+            f"{self.TRACKING_ROUTE}/{self.package_b.tracking_code}"
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self._assert_private_indexing_headers(response)
+        visible_text = self._visible_main_text(response).lower()
+        self.assertIn("delivery failed", visible_text)
+        self.assertIn("in transit", visible_text)
+        for private_value in (failure_reason, retry_reason, courier_name):
+            self.assertNotIn(private_value, response.text)
+        self.assertNotIn(self.package_a.tracking_code, response.text)

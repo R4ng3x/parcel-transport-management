@@ -11,9 +11,14 @@ Flujo de estados:
 ```text
 draft -> assigned -> partially_picked_up -> picked_up -> in_transit
                                                     -> partially_delivered -> delivered
+                                                           |
+in_transit ---------------- failure ------------------------+-> delivery_failed
+partially_delivered -------- failure -----------------------+
+delivery_failed ------------ retry -------------------------> in_transit
+delivery_failed ------------ retry -------------------------> partially_delivered
 ```
 
-La cancelación solo se permite antes de la primera entrega. Los estados parciales se derivan de eventos inmutables por paquete; nunca se eligen manualmente.
+La cancelación solo se permite antes de la primera entrega. Los estados parciales se derivan de eventos inmutables por paquete; nunca se eligen manualmente. Un fallo toma todos los paquetes recogidos que todavía no tienen entrega, libera al repartidor y sale de la reserva de capacidad. El reintento vuelve a `in_transit` o `partially_delivered` según exista ya alguna entrega, sin deshacerla.
 
 Contratos principales:
 
@@ -21,12 +26,13 @@ Contratos principales:
 - todos los paquetes deben estar recogidos antes de pasar a tránsito;
 - un paquete solo puede recogerse y entregarse una vez;
 - el peso es positivo, usa unidades de peso compatibles y respeta el máximo por paquete;
-- la capacidad del repartidor se limita simultáneamente por número de envíos y peso;
-- asignación, reasignación, recogida, entrega y cancelación bloquean filas en PostgreSQL;
+- la capacidad del repartidor se limita simultáneamente por número de envíos y peso; `delivery_failed` no reserva capacidad y el reintento valida de nuevo ambos límites;
+- asignación, reasignación, recogida, entrega, fallo, reintento y cancelación bloquean filas en PostgreSQL en el orden envío → paquete → repartidor;
 - las direcciones y zonas se congelan en el envío para conservar su historial;
-- los cambios de SLA, ruta y repartidor activo quedan auditados con autor, fecha y motivo;
+- los cambios de SLA, ruta y repartidor activo, además de cada intento fallido y su único reintento, quedan auditados con actor, fecha y motivo;
+- los hechos `parcel.delivery.attempt` y `parcel.delivery.retry` son append-only, se crean solo desde acciones de dominio y no aceptan edición ni borrado;
 - las escrituras directas de estado, repartidor, eventos y marcas temporales están bloqueadas;
-- el tracking público expone una lista blanca mínima y no devuelve remitente, destinatario, direcciones ni repartidor.
+- el tracking público mantiene las mismas claves y solo añade hitos genéricos de fallo y vuelta a tránsito: nunca devuelve motivos, notas, identidades, IDs, direcciones ni paquetes hermanos.
 
 ## Arquitectura
 
@@ -35,6 +41,8 @@ parcel.shipment
 ├── parcel.package (1..N, tracking público)
 ├── parcel.pickup.event (append-only)
 ├── parcel.delivery.event (append-only)
+├── parcel.delivery.attempt (fallo append-only, paquetes pendientes)
+├── parcel.delivery.retry (0..1 por intento, despacho append-only)
 ├── parcel.sla.revision (histórico)
 ├── parcel.route.correction (histórico)
 └── parcel.courier.reassignment (histórico)
@@ -47,6 +55,7 @@ La lógica reside en modelos Python. Las vistas, asistentes y el Command Center 
 - **Interfaz nativa:** listas, formularios, kanban no arrastrable, configuración y asistentes de operación.
 - **Command Center OWL:** red/panel operativo abstracto con cola de hasta 50 envíos, hasta 8 carriles origen-destino, hasta 8 zonas de presión destino, 50 repartidores y 8 actividades; refresco secuencial cada 60 segundos y conservación de la última instantánea válida ante errores.
 - **Tracking público:** búsqueda por código globalmente único, controlador sin ACL ORM pública, DTO explícito, respuesta genérica para códigos inválidos y cabeceras `no-store`/`noindex`.
+- **Documentos operativos:** manifiesto A4 del envío y etiqueta térmica de 100 × 150 mm por paquete con código de barras Code128; ambos respetan ACL y reglas multiempresa antes de renderizar.
 - **Multiempresa:** reglas por compañías permitidas, relaciones validadas y límites configurables por empresa.
 
 ## Estrategia TDD
@@ -59,10 +68,13 @@ Se escribieron primero contratos observables para la lógica con riesgo real:
 - peso, unidades, fechas, direcciones y resolución de zonas;
 - capacidad dual y carreras por el último hueco o kilogramo;
 - recogidas y entregas parciales, duplicadas o concurrentes;
+- fallo total o tras entrega parcial, liberación de capacidad y restauración derivada al reintentar;
+- rechazo atómico de motivos vacíos, estados inválidos y repartidores sin capacidad;
+- dos envíos fallidos que compiten por el último hueco de reintento;
 - cancelación frente a entrega concurrente;
 - revisiones de SLA, correcciones de ruta y reasignación activa;
-- permisos, aislamiento multiempresa y contextos RPC falsificados;
-- contrato exacto del dashboard y privacidad HTTP del tracking.
+- permisos, aislamiento multiempresa, históricos append-only y contextos RPC falsificados;
+- contrato exacto e inalterado del dashboard y privacidad HTTP del tracking, incluidos los hitos genéricos de fallo/reintento.
 
 No se duplican con tests de bajo valor las garantías declarativas de Odoo: posición exacta de campos, colores, iconos, XML puramente visual ni CRUD básico. Esos aspectos se verifican instalando el módulo y recorriendo los escenarios de escritorio y móvil en navegador.
 
@@ -132,17 +144,32 @@ podman compose up -d odoo
 
 ## Datos de demostración
 
-La instalación con demo crea zonas ficticias con nombres de ejemplo de Madrid y Barcelona, reglas postales por prefijo más específico, repartidores con capacidades distintas y envíos en estados representativos. Los nombres no representan geografía del Command Center:
+La instalación con demo crea 8 envíos y 12 paquetes, además de zonas ficticias con nombres de ejemplo de Madrid y Barcelona, reglas postales por prefijo más específico y repartidores con capacidades distintas. Los nombres no representan geografía del Command Center. Los estados representativos son:
 
 - borrador sin asignar;
 - asignado a un repartidor posteriormente no disponible;
 - recogida parcial;
 - en tránsito;
 - entrega parcial;
+- entrega fallida, sin repartidor asignado y fuera de la capacidad reservada;
 - SLA vencido;
 - dirección sin cobertura.
 
-Todas las transiciones demo pasan por `action_*`; no se precargan estados ni enlaces a eventos directamente.
+Todas las transiciones demo pasan por `action_*`; no se precargan estados, enlaces ni históricos directamente.
+
+Recorrido nativo: abre el envío fallido y señala statusbar, cinta **DELIVERY FAILED**, aviso e intento de solo lectura. Pulsa **Retry Delivery**, elige un repartidor —también puede volver a elegirse el anterior—, introduce un motivo y confirma; `parcel.assignment.wizard` llama a `action_retry_delivery`, restaura el estado derivado y vuelve a reservar capacidad. Audita el resultado en **Operations → History → Delivery Failure Events** y **Retry Audits**.
+
+Para crear otro caso, parte de un envío en tránsito, pulsa **Record Delivery Failure** y revisa todos los paquetes pendientes calculados y de solo lectura en `parcel.delivery.failure.wizard`; tras confirmar el motivo, `action_record_delivery_failure` registra el hecho, libera al repartidor y deja el envío fuera de capacidad.
+
+## Documentos operativos
+
+Las acciones nativas de impresión completan el recorrido entre la planificación digital y la operación física:
+
+- desde un envío, **Imprimir → Shipment Manifest** genera un manifiesto A4 con snapshots de recogida y entrega, repartidor, zonas, SLA, bultos, pesos y espacios de firma;
+- desde uno o varios paquetes, **Imprimir → Package Label** genera una página térmica de 100 × 150 mm por bulto con tracking legible y Code128, referencia, peso y zona destino;
+- la etiqueta omite nombres y direcciones para reducir exposición de datos cuando queda adherida al bulto.
+
+Los modelos QWeb llaman a `check_access("read")` sobre los registros solicitados antes de entregar el contexto. El motor puede elevar la lectura de la configuración global de `ir.actions.report`, pero nunca renderiza envíos o paquetes fuera de las ACL y reglas de compañía del usuario.
 
 ## Pruebas
 
@@ -158,7 +185,7 @@ podman compose run --rm odoo \
   --log-level=test
 ```
 
-Los tests están etiquetados `post_install` y `-at_install`. Incluyen transacciones independientes y barreras de hilos para comprobar las carreras de capacidad y entrega contra PostgreSQL real.
+Los tests están etiquetados `post_install` y `-at_install`. Incluyen transacciones independientes y barreras de hilos para comprobar contra PostgreSQL real las carreras de capacidad, entrega y dos envíos fallidos que compiten por un único hueco de reintento.
 
 ## Calidad del código
 

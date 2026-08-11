@@ -29,11 +29,19 @@ access_ptm_manager_postcode_rule,PTM manager postcode rule,model_parcel_zone_pos
 access_ptm_manager_sla_revision,PTM manager SLA revision,model_parcel_sla_revision,group_ptm_manager,1,0,1,0
 access_ptm_manager_route_correction,PTM manager route correction,model_parcel_route_correction,group_ptm_manager,1,0,1,0
 access_ptm_manager_reassignment,PTM manager reassignment,model_parcel_courier_reassignment,group_ptm_manager,1,0,1,0
+access_ptm_courier_delivery_attempt,PTM courier delivery attempt,model_parcel_delivery_attempt,group_ptm_courier,1,0,1,0
+access_ptm_operator_delivery_attempt,PTM operator delivery attempt,model_parcel_delivery_attempt,group_ptm_operator,1,0,1,0
+access_ptm_manager_delivery_attempt,PTM manager delivery attempt,model_parcel_delivery_attempt,group_ptm_manager,1,0,1,0
+access_ptm_courier_delivery_retry,PTM courier delivery retry,model_parcel_delivery_retry,group_ptm_courier,1,0,0,0
+access_ptm_operator_delivery_retry,PTM operator delivery retry,model_parcel_delivery_retry,group_ptm_operator,1,0,1,0
+access_ptm_manager_delivery_retry,PTM manager delivery retry,model_parcel_delivery_retry,group_ptm_manager,1,0,1,0
 access_ptm_operator_assignment_wizard,PTM operator assignment wizard,model_parcel_assignment_wizard,group_ptm_operator,1,1,1,1
 access_ptm_courier_pickup_wizard,PTM courier pickup wizard,model_parcel_pickup_wizard,group_ptm_courier,1,1,1,1
 access_ptm_operator_pickup_wizard,PTM operator pickup wizard,model_parcel_pickup_wizard,group_ptm_operator,1,1,1,1
 access_ptm_courier_delivery_wizard,PTM courier delivery wizard,model_parcel_delivery_wizard,group_ptm_courier,1,1,1,1
 access_ptm_operator_delivery_wizard,PTM operator delivery wizard,model_parcel_delivery_wizard,group_ptm_operator,1,1,1,1
+access_ptm_courier_delivery_failure_wizard,PTM courier delivery failure wizard,model_parcel_delivery_failure_wizard,group_ptm_courier,1,1,1,1
+access_ptm_operator_delivery_failure_wizard,PTM operator delivery failure wizard,model_parcel_delivery_failure_wizard,group_ptm_operator,1,1,1,1
 access_ptm_manager_cancel_wizard,PTM manager cancel wizard,model_parcel_cancel_wizard,group_ptm_manager,1,1,1,1
 access_ptm_manager_sla_wizard,PTM manager SLA wizard,model_parcel_sla_wizard,group_ptm_manager,1,1,1,1
 access_ptm_manager_route_wizard,PTM manager route wizard,model_parcel_route_wizard,group_ptm_manager,1,1,1,1

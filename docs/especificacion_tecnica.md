@@ -40,16 +40,18 @@ El sistema MUST proporcionar:
 3. asignación, desasignación y reasignación de repartidores;
 4. capacidad simultánea por número de envíos y por peso convertido;
 5. recogidas y entregas totales o parciales por paquete;
-6. estados derivados de operaciones válidas, no editables manualmente;
-7. zonas por empresa y país, resueltas mediante prefijos postales;
-8. SLA inicial por zona, revisión auditada y cálculo de retraso;
-9. snapshots históricos de direcciones y correcciones de ruta auditadas;
-10. eventos y revisiones append-only;
-11. aislamiento multiempresa y permisos por rol;
-12. tracking público HTML con una lista blanca mínima de datos;
-13. un dashboard operativo de solo lectura y con resultados acotados;
-14. vistas nativas, asistentes, traducción española y datos demo reproducibles;
-15. despliegue local mediante contenedores con imágenes fijadas por digest.
+6. registro auditable de entrega fallida y despacho de un único reintento;
+7. estados derivados de operaciones válidas, no editables manualmente;
+8. zonas por empresa y país, resueltas mediante prefijos postales;
+9. SLA inicial por zona, revisión auditada y cálculo de retraso;
+10. snapshots históricos de direcciones y correcciones de ruta auditadas;
+11. eventos, intentos, reintentos y revisiones append-only;
+12. aislamiento multiempresa y permisos por rol;
+13. tracking público HTML con una lista blanca mínima de datos;
+14. un dashboard operativo de solo lectura y con resultados acotados;
+15. vistas nativas, asistentes, traducción española y datos demo reproducibles;
+16. manifiesto A4 de envío y etiqueta térmica Code128 por paquete;
+17. despliegue local mediante contenedores con imágenes fijadas por digest.
 
 ### 2.2 No alcance y no objetivos
 
@@ -59,8 +61,8 @@ Los siguientes elementos NO forman parte del contrato:
   distancias, mapas geográficos o cálculo y optimización de rutas. El Command
   Center es una red operativa abstracta: cola, carriles agregados origen-destino,
   presión de zonas destino, repartidores y actividad;
-- integración con transportistas externos, etiquetas, aduanas, tarifas,
-  facturación, pagos, inventario o firma electrónica;
+- integración con transportistas externos, aduanas, tarifas, facturación,
+  pagos, inventario o firma electrónica;
 - aplicación móvil nativa u operación sin conexión;
 - notificaciones SMS, correo o webhooks como resultado de las transiciones;
 - API pública JSON. El tracking público es una página HTTP renderizada;
@@ -111,13 +113,13 @@ Dependencias declaradas: `base`, `mail`, `uom`, `web` y `website`; véase el
 
 ### 4.1 Actores
 
-| Actor                 | Identidad                                             | Responsabilidad                                                                                    |
-| --------------------- | ----------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| Visitante público     | Usuario público de `website`                          | Consultar un paquete por código de tracking                                                        |
-| Courier               | `group_ptm_courier` y perfil `parcel.courier.user_id` | Operar únicamente sus envíos asignados                                                             |
-| Operator              | `group_ptm_operator`                                  | Preparar envíos, repartidores, asignaciones y operaciones de cualquier envío visible de la empresa |
-| Manager               | `group_ptm_manager`, que implica Operator             | Cancelar, revisar SLA, corregir ruta, reasignar en vivo y administrar zonas                        |
-| Administrador técnico | `base.group_system`                                   | Configuración de empresa, instalación y actualización                                              |
+| Actor                 | Identidad                                             | Responsabilidad                                                                                |
+| --------------------- | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Visitante público     | Usuario público de `website`                          | Consultar un paquete por código de tracking                                                    |
+| Courier               | `group_ptm_courier` y perfil `parcel.courier.user_id` | Operar únicamente sus envíos asignados y registrar su fallo de entrega                         |
+| Operator              | `group_ptm_operator`                                  | Preparar envíos, asignar, operar, registrar fallos y despachar reintentos dentro de la empresa |
+| Manager               | `group_ptm_manager`, que implica Operator             | Incluye Operator; cancela, revisa SLA, corrige ruta, reasigna en vivo y administra zonas       |
+| Administrador técnico | `base.group_system`                                   | Configuración de empresa, instalación y actualización                                          |
 
 Los grupos se definen en
 [`security/parcel_security.xml`](../addons/parcel_transport_management/security/parcel_security.xml)
@@ -138,11 +140,14 @@ y los permisos CRUD en
 | Reasignar tras iniciar operaciones |      No |                            No |                      No |               Sí, con motivo |      Según ACL de Odoo |
 | Registrar recogida/entrega         |      No |        Solo asignados propios |                      Sí |                           Sí |      Según ACL de Odoo |
 | Iniciar tránsito                   |      No |        Solo asignados propios |                      Sí |                           Sí |      Según ACL de Odoo |
+| Registrar fallo de entrega         |      No |        Solo asignados propios |                      Sí |                           Sí |      Según ACL de Odoo |
+| Despachar reintento                |      No |                            No |                      Sí |                           Sí |      Según ACL de Odoo |
 | Cancelar                           |      No |                            No |                      No | Sí, antes de primera entrega |      Según ACL de Odoo |
 | Revisar SLA/corregir ruta          |      No |                            No |                      No |                           Sí |      Según ACL de Odoo |
 | Administrar repartidores           |      No | Perfil propio de solo lectura | Crear/editar, no borrar |                         CRUD |      Según ACL de Odoo |
 | Administrar zonas/reglas postales  |      No |                       Lectura |                 Lectura |                         CRUD |      Según ACL de Odoo |
 | Leer histórico                     |      No |     Solo el de envíos propios |       Empresa permitida |            Empresa permitida |      Según ACL de Odoo |
+| Imprimir manifiesto o etiqueta     |      No |                  Solo propios |       Empresa permitida |            Empresa permitida |      Según ACL de Odoo |
 | Modificar/eliminar histórico       |      No |                            No |                      No |                           No | No mediante ORM normal |
 
 La concesión CRUD por ACL no autoriza por sí sola una transición. Los métodos
@@ -150,8 +155,8 @@ La concesión CRUD por ACL no autoriza por sí sola una transición. Los método
 `_require_manager_access` de
 [`models/shipment.py`](../addons/parcel_transport_management/models/shipment.py)
 MUST aplicar la autorización contextual. En particular, la creación declarativa
-de eventos o reasignaciones no permite falsificar actor, fecha, paquetes ni
-estado.
+de eventos, intentos, reintentos o reasignaciones no permite falsificar actor,
+fecha, paquetes, empresa ni estado.
 
 ### 4.3 Reglas de registro
 
@@ -182,28 +187,34 @@ erDiagram
     PARCEL_SHIPMENT ||--o{ PARCEL_COURIER_REASSIGNMENT : audita
     PARCEL_PICKUP_EVENT ||--o{ PARCEL_PACKAGE : recoge
     PARCEL_DELIVERY_EVENT ||--o{ PARCEL_PACKAGE : entrega
+    PARCEL_SHIPMENT ||--o{ PARCEL_DELIVERY_ATTEMPT : falla
+    PARCEL_DELIVERY_ATTEMPT }o--o{ PARCEL_PACKAGE : deja_pendiente
+    PARCEL_DELIVERY_ATTEMPT ||--o| PARCEL_DELIVERY_RETRY : reintenta
+    PARCEL_COURIER ||--o{ PARCEL_DELIVERY_RETRY : recibe
 ```
 
 ### 5.1 Entidades y campos críticos
 
-| Modelo                        | Campos críticos                                                                                                                     | Restricciones y finalidad                                           |
-| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `parcel.shipment`             | `reference`, `company_id`, `sender_id`, `recipient_id`, `courier_id`, `package_ids`, `state`                                        | Referencia única de servidor; empresa inmutable; agregado operativo |
-| `parcel.shipment`             | `pickup_*`, `delivery_*`, `origin_zone_id`, `destination_zone_id`, `coverage_warning`                                               | Snapshot de ruta y cobertura                                        |
-| `parcel.shipment`             | `expected_delivery_at`, `original_expected_delivery_at`, `first_picked_up_at`, `transit_started_at`, `delivered_at`, `cancelled_at` | SLA y marcas temporales controladas                                 |
-| `parcel.shipment`             | `delay_hours`, `original_delay_hours`, `total_weight_kg`                                                                            | Valores calculados                                                  |
-| `parcel.package`              | `shipment_id`, `company_id`, `tracking_code`, `weight`, `weight_uom_id`, `weight_kg`                                                | Código global único; peso positivo y convertible                    |
-| `parcel.package`              | `pickup_event_id`, `delivery_event_id`                                                                                              | Máximo un enlace de cada tipo por paquete                           |
-| `parcel.courier`              | `company_id`, `user_id`, `availability`, `active`, `zone_ids`                                                                       | Perfil y disponibilidad; usuario único por empresa                  |
-| `parcel.courier`              | `max_concurrent_shipments`, `max_concurrent_weight`, `max_weight_uom_id`                                                            | Capacidad dual estrictamente positiva                               |
-| `parcel.delivery.zone`        | `name`, `active`, `code`, `default_sla_hours`                                                                                       | Cobertura lógica, presión operativa y SLA positivo                  |
-| `parcel.zone.postcode.rule`   | `zone_id`, `country_id`, `postcode_prefix`                                                                                          | Prefijo normalizado y único por empresa/país                        |
-| `parcel.pickup.event`         | envío, repartidor, actor, fecha, nota, paquetes                                                                                     | Hecho de recogida append-only                                       |
-| `parcel.delivery.event`       | envío, repartidor, actor, fecha, receptor, nota, paquetes                                                                           | Hecho de entrega append-only                                        |
-| `parcel.sla.revision`         | SLA anterior/nuevo, motivo, actor, fecha                                                                                            | Revisión append-only                                                |
-| `parcel.route.correction`     | valores anteriores/nuevos, zonas anteriores/nuevas, `applied`, motivo, actor, fecha                                                 | Corrección aplicada o anotación terminal                            |
-| `parcel.courier.reassignment` | repartidor anterior/nuevo, motivo, actor, fecha                                                                                     | Historial exacto de cambio de repartidor                            |
-| `res.company`                 | máximos de paquete y valores predeterminados de capacidad y unidades                                                                | Configuración aislada por empresa                                   |
+| Modelo                        | Campos críticos                                                                                                                     | Restricciones y finalidad                                                  |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `parcel.shipment`             | `reference`, `company_id`, `sender_id`, `recipient_id`, `courier_id`, `package_ids`, `state`                                        | Referencia única de servidor; empresa inmutable; agregado operativo        |
+| `parcel.shipment`             | `pickup_*`, `delivery_*`, `origin_zone_id`, `destination_zone_id`, `coverage_warning`                                               | Snapshot de ruta y cobertura                                               |
+| `parcel.shipment`             | `expected_delivery_at`, `original_expected_delivery_at`, `first_picked_up_at`, `transit_started_at`, `delivered_at`, `cancelled_at` | SLA y marcas temporales controladas                                        |
+| `parcel.shipment`             | `delay_hours`, `original_delay_hours`, `total_weight_kg`                                                                            | Valores calculados                                                         |
+| `parcel.package`              | `shipment_id`, `company_id`, `tracking_code`, `weight`, `weight_uom_id`, `weight_kg`                                                | Código global único; peso positivo y convertible                           |
+| `parcel.package`              | `pickup_event_id`, `delivery_event_id`, `delivery_attempt_ids`                                                                      | Eventos únicos de recogida/entrega; relación de intentos protegida         |
+| `parcel.courier`              | `company_id`, `user_id`, `availability`, `active`, `zone_ids`                                                                       | Perfil y disponibilidad; usuario único por empresa                         |
+| `parcel.courier`              | `max_concurrent_shipments`, `max_concurrent_weight`, `max_weight_uom_id`                                                            | Capacidad dual estrictamente positiva                                      |
+| `parcel.delivery.zone`        | `name`, `active`, `code`, `default_sla_hours`                                                                                       | Cobertura lógica, presión operativa y SLA positivo                         |
+| `parcel.zone.postcode.rule`   | `zone_id`, `country_id`, `postcode_prefix`                                                                                          | Prefijo normalizado y único por empresa/país                               |
+| `parcel.pickup.event`         | envío, repartidor, actor, fecha, nota, paquetes                                                                                     | Hecho de recogida append-only                                              |
+| `parcel.delivery.event`       | envío, repartidor, actor, fecha, receptor, nota, paquetes                                                                           | Hecho de entrega append-only                                               |
+| `parcel.delivery.attempt`     | `shipment_id`, `company_id`, `courier_id`, `confirmed_by_id`, `occurred_at`, `reason`, `package_ids`, `retry_ids`                   | Hecho append-only de fallo; todos los paquetes recogidos aún no entregados |
+| `parcel.delivery.retry`       | `attempt_id`, `shipment_id`, `company_id`, `previous_courier_id`, `new_courier_id`, `dispatched_by_id`, `occurred_at`, `reason`     | Despacho append-only; máximo uno por intento                               |
+| `parcel.sla.revision`         | SLA anterior/nuevo, motivo, actor, fecha                                                                                            | Revisión append-only                                                       |
+| `parcel.route.correction`     | valores anteriores/nuevos, zonas anteriores/nuevas, `applied`, motivo, actor, fecha                                                 | Corrección aplicada o anotación terminal                                   |
+| `parcel.courier.reassignment` | repartidor anterior/nuevo, motivo, actor, fecha                                                                                     | Historial exacto de cambio de repartidor                                   |
+| `res.company`                 | máximos de paquete y valores predeterminados de capacidad y unidades                                                                | Configuración aislada por empresa                                          |
 
 Definiciones: [`shipment.py`](../addons/parcel_transport_management/models/shipment.py),
 [`package.py`](../addons/parcel_transport_management/models/package.py),
@@ -230,6 +241,10 @@ stateDiagram-v2
     in_transit --> delivered: entrega de todos
     partially_delivered --> partially_delivered: otra entrega parcial
     partially_delivered --> delivered: última entrega
+    in_transit --> delivery_failed: action_record_delivery_failure
+    partially_delivered --> delivery_failed: action_record_delivery_failure
+    delivery_failed --> in_transit: action_retry_delivery sin entregas
+    delivery_failed --> partially_delivered: action_retry_delivery con entregas previas
     draft --> cancelled: action_cancel
     assigned --> cancelled: action_cancel
     partially_picked_up --> cancelled: action_cancel
@@ -237,24 +252,29 @@ stateDiagram-v2
     in_transit --> cancelled: action_cancel antes de primera entrega
     delivered --> [*]
     cancelled --> [*]
+    delivery_failed: sin reserva y sin repartidor
 ```
 
 ### 6.1 Transiciones obligatorias
 
-| Operación                | Precondiciones MUST                                                                                                  | Resultado MUST                                                         |
-| ------------------------ | -------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| `action_assign`          | Estado `draft`; al menos un paquete; Courier válido, activo, disponible, de la misma empresa y con ambas capacidades | `assigned`; repartidor fijado; SLA inicial comprometido cuando proceda |
-| `action_unassign`        | Estado `assigned`; Operator o Manager                                                                                | `draft`; repartidor liberado                                           |
-| `action_reassign`        | Estado reservado; nuevo Courier válido, disponible y con capacidad                                                   | Cambia repartidor y crea historial si existe cambio real               |
-| `action_record_pickup`   | Estado `assigned` o `partially_picked_up`; paquetes del envío, aún no recogidos; actor autorizado                    | Evento único y estado parcial o `picked_up`                            |
-| `action_start_transit`   | Estado `picked_up`; todos los paquetes recogidos; repartidor asignado                                                | `in_transit` y `transit_started_at` de servidor                        |
-| `action_record_delivery` | Estado `in_transit` o `partially_delivered`; paquetes recogidos y no entregados; receptor no vacío                   | Evento único y estado parcial o `delivered`                            |
-| `action_cancel`          | Manager; motivo; no `delivered`, no `cancelled` y ningún paquete entregado                                           | `cancelled`, motivo y fecha de servidor                                |
-| `action_revise_sla`      | Manager; envío no terminal; SLA existente; fecha válida y diferente; motivo                                          | Cambia SLA actual y añade revisión                                     |
-| `action_correct_route`   | Manager; campos de snapshot permitidos y motivo                                                                      | Recalcula zonas; aplica si no terminal y siempre añade auditoría       |
+| Operación                        | Precondiciones MUST                                                                                                                                                                     | Resultado MUST                                                                                                          |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `action_assign`                  | Estado `draft`; al menos un paquete; Courier válido, activo, disponible, de la misma empresa y con ambas capacidades                                                                    | `assigned`; repartidor fijado; SLA inicial comprometido cuando proceda                                                  |
+| `action_unassign`                | Estado `assigned`; Operator o Manager                                                                                                                                                   | `draft`; repartidor liberado                                                                                            |
+| `action_reassign`                | Estado reservado; nuevo Courier válido, disponible y con capacidad                                                                                                                      | Cambia repartidor y crea historial si existe cambio real                                                                |
+| `action_record_pickup`           | Estado `assigned` o `partially_picked_up`; paquetes del envío, aún no recogidos; actor autorizado                                                                                       | Evento único y estado parcial o `picked_up`                                                                             |
+| `action_start_transit`           | Estado `picked_up`; todos los paquetes recogidos; repartidor asignado                                                                                                                   | `in_transit` y `transit_started_at` de servidor                                                                         |
+| `action_record_delivery`         | Estado `in_transit` o `partially_delivered`; paquetes recogidos y no entregados; receptor no vacío                                                                                      | Evento único y estado parcial o `delivered`                                                                             |
+| `action_record_delivery_failure` | Un registro; Courier asignado u Operator/Manager; estado `in_transit` o `partially_delivered`; motivo no vacío; repartidor; al menos un paquete recogido no entregado                   | Deriva todos los paquetes pendientes, añade `parcel.delivery.attempt`, libera repartidor y deja `delivery_failed`       |
+| `action_retry_delivery`          | Un registro; Operator/Manager; `delivery_failed` sin repartidor; motivo no vacío; último intento sin reintento; nuevo Courier activo, disponible, misma empresa y con ambas capacidades | Añade `parcel.delivery.retry`, asigna Courier y restaura `in_transit` o `partially_delivered` según entregas existentes |
+| `action_cancel`                  | Manager; motivo; no `delivered`, no `cancelled` y ningún paquete entregado                                                                                                              | `cancelled`, motivo y fecha de servidor                                                                                 |
+| `action_revise_sla`              | Manager; envío no terminal; SLA existente; fecha válida y diferente; motivo                                                                                                             | Cambia SLA actual y añade revisión                                                                                      |
+| `action_correct_route`           | Manager; campos de snapshot permitidos y motivo                                                                                                                                         | Recalcula zonas; aplica si no terminal y siempre añade auditoría                                                        |
 
-Los estados parciales MUST derivarse del conjunto de enlaces de evento de los
-paquetes. La UI MUST NOT ofrecer escritura manual ni drag-and-drop de estados.
+Los estados parciales y el estado restaurado tras reintento MUST derivarse del
+conjunto de enlaces de entrega de los paquetes. El fallo MUST derivar todos los
+paquetes recogidos aún no entregados; la UI no puede elegir un subconjunto. La
+UI MUST NOT ofrecer escritura manual ni drag-and-drop de estados.
 Los kanban de envíos, paquetes, repartidores y zonas usan
 `records_draggable="false"`; véanse
 [`parcel_shipment_views.xml`](../addons/parcel_transport_management/views/parcel_shipment_views.xml),
@@ -278,8 +298,8 @@ y
    aceptado desde el cliente.
 6. El formato canónico MUST ser `PTM-XXXX-XXXX-XXXX-XXXX`, con 16 símbolos del
    alfabeto `23456789ABCDEFGHJKLMNPQRSTUVWXYZ`.
-7. `shipment_id`, `company_id`, `pickup_event_id` y `delivery_event_id` MUST NOT
-   modificarse por escritura directa.
+7. `shipment_id`, `company_id`, `pickup_event_id`, `delivery_event_id` y
+   `delivery_attempt_ids` MUST NOT modificarse por escritura directa.
 8. Cada paquete MUST vincular como máximo un evento de recogida y uno de entrega.
 9. Un paquete MUST NOT entregarse antes de haber sido recogido.
 
@@ -289,8 +309,8 @@ Implementación: `ParcelPackage` en
 ### 7.2 Peso y doble capacidad
 
 Los envíos en `assigned`, `partially_picked_up`, `picked_up`, `in_transit` y
-`partially_delivered` MUST reservar capacidad. `delivered`, `cancelled` y
-`draft` no reservan capacidad.
+`partially_delivered` MUST reservar capacidad. `delivery_failed`, `delivered`,
+`cancelled` y `draft` no reservan capacidad.
 
 Para un repartidor y un conjunto candidato, la asignación MUST satisfacer a la
 vez:
@@ -314,6 +334,11 @@ vez:
   final.
 - La reasignación MUST comprobar la capacidad del nuevo repartidor y, si falla,
   MUST conservar asignación e histórico previos por rollback transaccional.
+- Registrar un fallo MUST liberar las reservas de hueco y peso al borrar
+  `courier_id`; el intento conserva quién llevaba el envío.
+- Reintentar MUST comprobar de nuevo disponibilidad, compañía, huecos y peso. Si
+  falla cualquier validación, envío, intento, reintentos y capacidad MUST
+  conservarse sin cambios por rollback transaccional.
 
 Implementación: `_check_courier_capacity` y `_shipment_weight_in_uom` en
 [`shipment.py`](../addons/parcel_transport_management/models/shipment.py), y
@@ -322,7 +347,7 @@ Implementación: `_check_courier_capacity` y `_shipment_weight_in_uom` en
 
 ### 7.3 Fechas y SLA
 
-1. Actor y fecha de eventos, revisiones y reasignaciones MUST ser de servidor.
+1. Actor y fecha de eventos, intentos, reintentos, revisiones y reasignaciones MUST ser de servidor.
 2. `first_picked_up_at` MUST fijarse una sola vez con el primer evento de
    recogida.
 3. `transit_started_at` MUST fijarse al iniciar tránsito.
@@ -369,17 +394,22 @@ Implementación: `_snapshot_values`, `action_correct_route` y
 
 ## 8. Eventos, revisiones e historial append-only
 
-| Modelo                        | Creación válida                                | Campos controlados por servidor  | Mutación posterior          |
-| ----------------------------- | ---------------------------------------------- | -------------------------------- | --------------------------- |
-| `parcel.pickup.event`         | Operación sobre envío asignado                 | Empresa, actor, fecha y paquetes | `write`/`unlink` prohibidos |
-| `parcel.delivery.event`       | Operación sobre envío en tránsito              | Empresa, actor, fecha y paquetes | `write`/`unlink` prohibidos |
-| `parcel.sla.revision`         | Manager mediante revisión con motivo           | Empresa, actor y fecha           | `write`/`unlink` prohibidos |
-| `parcel.route.correction`     | Manager mediante corrección con motivo         | Empresa, actor y fecha           | `write`/`unlink` prohibidos |
-| `parcel.courier.reassignment` | Exclusivamente `action_reassign` y cambio real | Empresa, actor y fecha           | `write`/`unlink` prohibidos |
+| Modelo                        | Creación válida                                | Campos controlados por servidor      | Mutación posterior          |
+| ----------------------------- | ---------------------------------------------- | ------------------------------------ | --------------------------- |
+| `parcel.pickup.event`         | Operación sobre envío asignado                 | Empresa, actor, fecha y paquetes     | `write`/`unlink` prohibidos |
+| `parcel.delivery.event`       | Operación sobre envío en tránsito              | Empresa, actor, fecha y paquetes     | `write`/`unlink` prohibidos |
+| `parcel.delivery.attempt`     | `action_record_delivery_failure`               | Empresa, actor, fecha y paquetes     | `write`/`unlink` prohibidos |
+| `parcel.delivery.retry`       | `action_retry_delivery`, uno por intento       | Empresa, actor, fecha y repartidores | `write`/`unlink` prohibidos |
+| `parcel.sla.revision`         | Manager mediante revisión con motivo           | Empresa, actor y fecha               | `write`/`unlink` prohibidos |
+| `parcel.route.correction`     | Manager mediante corrección con motivo         | Empresa, actor y fecha               | `write`/`unlink` prohibidos |
+| `parcel.courier.reassignment` | Exclusivamente `action_reassign` y cambio real | Empresa, actor y fecha               | `write`/`unlink` prohibidos |
 
-`write()` y `unlink()` MUST lanzar `AccessError` incluso para Manager. La
-reasignación, además, MUST exigir el token interno no falsificable
-`REASSIGNMENT_CREATE_TOKEN`; un contexto RPC con el mismo nombre no basta.
+`write()` y `unlink()` MUST lanzar `AccessError` incluso para Manager. `create()`
+de `parcel.delivery.attempt`, `parcel.delivery.retry` y
+`parcel.courier.reassignment` MUST ser `@api.private` y exigir, respectivamente,
+los tokens de identidad `DELIVERY_ATTEMPT_CREATE_TOKEN`,
+`DELIVERY_RETRY_CREATE_TOKEN` y `REASSIGNMENT_CREATE_TOKEN`; conocer o falsificar
+el nombre de la clave de contexto no basta.
 
 Los históricos SHOULD mostrarse mediante vistas sin crear, editar, borrar ni
 duplicar, como se declara en
@@ -407,6 +437,7 @@ Las operaciones MUST usar:
 
 - `action_assign`, `action_unassign`, `action_reassign`;
 - `action_record_pickup`, `action_start_transit`, `action_record_delivery`;
+- `action_record_delivery_failure`, `action_retry_delivery`;
 - `action_cancel`, `action_revise_sla`, `action_correct_route`.
 
 Un flag de contexto como `ptm_internal_write=True` MUST NOT eludir las guardas.
@@ -415,10 +446,13 @@ bloqueos y validaciones. Los asistentes
 [`assignment.py`](../addons/parcel_transport_management/wizards/assignment.py),
 [`pickup.py`](../addons/parcel_transport_management/wizards/pickup.py),
 [`delivery.py`](../addons/parcel_transport_management/wizards/delivery.py),
+[`delivery_failure.py`](../addons/parcel_transport_management/wizards/delivery_failure.py),
 [`cancel.py`](../addons/parcel_transport_management/wizards/cancel.py),
 [`sla.py`](../addons/parcel_transport_management/wizards/sla.py) y
 [`route.py`](../addons/parcel_transport_management/wizards/route.py) MUST
-limitarse a recopilar datos y llamar esos métodos.
+limitarse a recopilar datos y llamar esos métodos. El reintento MUST reutilizar
+`parcel.assignment.wizard`: en `delivery_failed` exige motivo, permite volver a
+elegir al repartidor anterior y llama a `action_retry_delivery`.
 
 ## 10. Locking PostgreSQL, orden total y atomicidad
 
@@ -444,8 +478,10 @@ orden total:
 shipment(s) por id -> package(s) por id -> courier(s) por id
 ```
 
-La operación MUST NOT invertir esta jerarquía. En una reasignación, repartidor
-anterior y nuevo se bloquean juntos y por ID.
+La operación MUST NOT invertir esta jerarquía. En una reasignación se bloquean
+juntos el repartidor anterior y el nuevo; en un fallo se bloquea el repartidor
+actual antes de liberarlo; en un reintento se bloquea el candidato. Los IDs de
+cada conjunto se ordenan y `_lock_couriers()` conserva su `UPDATE` neutro.
 
 ### 10.3 Semántica transaccional
 
@@ -463,6 +499,10 @@ anterior y nuevo se bloquean juntos y por ID.
 - Cancelación y primera entrega concurrentes MUST confirmar como máximo una.
 - Dos entregas concurrentes del mismo paquete MUST dejar exactamente un evento
   persistido.
+- Dos envíos `delivery_failed` que compiten por el único hueco de reintento MUST
+  confirmar exactamente uno: queda un `parcel.delivery.retry`, un envío vuelve a
+  tránsito y el otro conserva intento sin resolver, estado fallido y sin
+  repartidor.
 
 La prueba de concurrencia usa transacciones reales, hilos, `threading.Barrier`,
 `lock_timeout` y `statement_timeout` en
@@ -476,7 +516,7 @@ La prueba de concurrencia usa transacciones reales, hilos, `threading.Barrier`,
    `check_company=True` cuando corresponda.
 3. La creación MUST rechazar una empresa fuera de `env.companies`.
 4. Empresa de envío, repartidor y zona MUST ser inmutable después de crear.
-5. Asignación y reasignación MUST exigir misma empresa para envío y repartidor.
+5. Asignación, reasignación y reintento MUST exigir misma empresa para envío y repartidor.
 6. Configuración de pesos y capacidades MUST obtenerse de la empresa del
    registro, no de una global.
 7. El tracking público MUST resolver por igualdad exacta del código globalmente
@@ -529,21 +569,24 @@ y
 ```json
 {
     "tracking_code": "PTM-XXXX-XXXX-XXXX-XXXX",
-    "current_status": "draft|assigned|picked_up|in_transit|delivered|cancelled",
+    "current_status": "draft|assigned|picked_up|in_transit|delivery_failed|delivered|cancelled",
     "expected_delivery_at": "YYYY-MM-DD HH:MM:SS|null",
     "last_updated_at": "YYYY-MM-DD HH:MM:SS|null",
     "timeline": [
         {
-            "status": "draft|assigned|picked_up|in_transit|delivered|cancelled",
+            "status": "draft|assigned|picked_up|in_transit|delivery_failed|delivered|cancelled",
             "occurred_at": "YYYY-MM-DD HH:MM:SS"
         }
     ]
 }
 ```
 
-El DTO MUST NOT incluir remitente, destinatario, direcciones, repartidor, notas,
-IDs internos, empresa, pesos ni paquetes hermanos. `current_status` se calcula
-para el paquete consultado, no copia ciegamente el estado agregado del envío.
+El DTO MUST NOT incluir remitente, destinatario, direcciones, repartidor,
+identidad de Courier o usuario, motivos, notas, IDs internos, empresa, pesos ni
+paquetes hermanos. `current_status` se calcula para el paquete consultado, no
+copia ciegamente el estado agregado del envío. El fallo se representa solo por
+el hito genérico `delivery_failed`; el despacho posterior añade otro hito
+genérico `in_transit`, sin exponer ninguno de los dos motivos internos.
 
 ### 12.4 Privacidad y localización HTTP
 
@@ -566,20 +609,20 @@ MUST NOT revelar si un código pertenece a otra compañía web.
 [`models/dashboard.py`](../addons/parcel_transport_management/models/dashboard.py)
 MUST devolver estas claves raíz y ninguna dependencia de escrituras frontend:
 
-| Clave                                            | Contrato                                                                                                                        |
-| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
-| `stats`                                          | Totales de envíos, reservados, tránsito, retrasados, parciales, entregados hoy, paquetes, paquetes entregados y avisos          |
-| `shipments`                                      | Cola operativa de hasta 50 elementos                                                                                            |
-| `queue_total`, `queue_truncated`                 | Cardinalidad y señal explícita de truncado                                                                                      |
-| `lanes`                                          | Hasta 8 carriles agregados origen-destino de envíos abiertos, con recuentos de envíos, paquetes, retrasos y avisos de cobertura |
-| `lane_total`, `lanes_truncated`                  | Cardinalidad total de carriles y señal explícita de truncado                                                                    |
-| `zone_pressure`                                  | Hasta 8 zonas destino con presión operativa, envíos activos, paquetes, retrasos, avisos y estado archivado                      |
-| `zone_pressure_total`, `zone_pressure_truncated` | Cardinalidad total de zonas de presión y señal explícita de truncado                                                            |
-| `couriers`                                       | Hasta 50 repartidores con carga y capacidad                                                                                     |
-| `courier_total`, `couriers_truncated`            | Cardinalidad y señal de truncado                                                                                                |
-| `activity`                                       | Hasta 8 eventos recientes de recogida o entrega                                                                                 |
-| `permissions`                                    | `can_create_shipments`, `can_create_couriers`, `can_manage_zones`                                                               |
-| `generated_at`                                   | Fecha de generación del snapshot                                                                                                |
+| Clave                                            | Contrato                                                                                                                                                              |
+| ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `stats`                                          | Las mismas claves: totales de envíos, reservados, tránsito, retrasados, parciales, entregados hoy, paquetes, paquetes entregados y avisos; ningún KPI nuevo por fallo |
+| `shipments`                                      | Cola operativa de hasta 50 elementos; incluye `delivery_failed` sin alterar las claves de cada elemento                                                               |
+| `queue_total`, `queue_truncated`                 | Cardinalidad y señal explícita de truncado                                                                                                                            |
+| `lanes`                                          | Hasta 8 carriles agregados origen-destino de envíos abiertos, con recuentos de envíos, paquetes, retrasos y avisos de cobertura                                       |
+| `lane_total`, `lanes_truncated`                  | Cardinalidad total de carriles y señal explícita de truncado                                                                                                          |
+| `zone_pressure`                                  | Hasta 8 zonas destino con presión operativa, envíos activos, paquetes, retrasos, avisos y estado archivado                                                            |
+| `zone_pressure_total`, `zone_pressure_truncated` | Cardinalidad total de zonas de presión y señal explícita de truncado                                                                                                  |
+| `couriers`                                       | Hasta 50 repartidores con carga y capacidad                                                                                                                           |
+| `courier_total`, `couriers_truncated`            | Cardinalidad y señal de truncado                                                                                                                                      |
+| `activity`                                       | Hasta 8 eventos recientes de recogida o entrega                                                                                                                       |
+| `permissions`                                    | `can_create_shipments`, `can_create_couriers`, `can_manage_zones`                                                                                                     |
+| `generated_at`                                   | Fecha de generación del snapshot                                                                                                                                      |
 
 `shipments` MUST contener exactamente el contrato probado: `id`, `reference`,
 `state`, `state_label`, `expected_delivery_at`, ambos retrasos,
@@ -589,6 +632,11 @@ recuentos de envíos, paquetes, retrasos y avisos de cobertura. `zone_pressure`
 MUST exponer `id`, `name`, `code`, `active_shipments`, `delayed_shipments`,
 `package_count`, `coverage_warnings` y `archived`; los repartidores MUST indicar
 disponibilidad, `workload_state`, carga, límites y unidad.
+
+`delivery_failed` MUST permanecer en el universo de envíos abiertos y en la
+cola, pero MUST quedar fuera de `reserved_shipments` y de la carga de Courier.
+La raíz, `stats` y cada elemento de `shipments` conservan exactamente sus claves.
+El cliente MAY destacar la fila con una clase CSS de fallo, sin crear un KPI.
 
 ### 13.2 Priorización y visibilidad
 
@@ -636,6 +684,16 @@ paquetes, repartidores y zonas, además de asistentes para cada operación. Los
 históricos MUST ser de solo lectura. Los botones SHOULD respetar grupo y estado,
 pero la seguridad MUST volver a comprobarse en Python.
 
+El formulario de envío MUST ofrecer **Record Delivery Failure** en
+`in_transit`/`partially_delivered` y **Retry Delivery** en `delivery_failed`, un
+statusbar con **Delivery Failed**, cinta roja **DELIVERY FAILED** y un aviso de
+despacho pendiente. `parcel.delivery.failure.wizard` MUST mostrar todos los
+paquetes pendientes derivados como solo lectura y exigir motivo. El reintento
+usa `parcel.assignment.wizard`, que en estado fallido exige motivo y permite el
+repartidor anterior. Los intentos y reintentos MUST aparecer en pestañas de
+historial de solo lectura y en acciones/menús independientes **Delivery Failure
+Events** y **Retry Audits** bajo **Operations → History**.
+
 Las acciones y menús se declaran en
 [`views/parcel_menus.xml`](../addons/parcel_transport_management/views/parcel_menus.xml),
 y la acción OWL en
@@ -675,6 +733,24 @@ y
 [`views/public_tracking_templates.xml`](../addons/parcel_transport_management/views/public_tracking_templates.xml).
 No se exige equivalencia pixel-perfect; sí se exige operación por teclado y
 semántica comprensible con tecnologías de asistencia.
+
+### 14.4 Documentos operativos QWeb
+
+[`views/parcel_report_views.xml`](../addons/parcel_transport_management/views/parcel_report_views.xml)
+MUST registrar dos acciones `ir.actions.report` con `report_type="qweb-pdf"`:
+
+- **Shipment Manifest**, ligado a `parcel.shipment`, usa A4 y MUST mostrar los
+  snapshots de recogida y entrega, estado, repartidor, zonas, compromiso SLA,
+  paquetes, pesos y espacios de firma;
+- **Package Label**, ligado a `parcel.package`, usa papel de 100 × 150 mm y MUST
+  mostrar tracking legible y Code128, referencia del envío, peso y zona destino.
+  MUST NOT incluir nombres ni direcciones para reducir PII visible en el bulto.
+
+Los `AbstractModel` de
+[`models/reports.py`](../addons/parcel_transport_management/models/reports.py)
+MUST llamar `docs.check_access("read")` antes de entregar registros al contexto
+QWeb. No se permite `sudo()` sobre envíos o paquetes: Courier imprime solo sus
+asignados y Operator/Manager solo registros de compañías permitidas.
 
 ## 15. Configuración, despliegue y actualización
 
@@ -737,7 +813,8 @@ El procedimiento operativo ampliado está en
 ## 16. Datos de demostración
 
 [`demo/parcel_demo.xml`](../addons/parcel_transport_management/demo/parcel_demo.xml)
-MUST ser autoconsistente y usar contactos ficticios. Con `--with-demo` crea:
+MUST ser autoconsistente, usar contactos ficticios y definir exactamente 8
+envíos y 12 paquetes. Con `--with-demo` crea:
 
 - zonas ficticias con nombres de ejemplo de Madrid y Barcelona, sin representar
   geografía del dashboard;
@@ -748,19 +825,30 @@ MUST ser autoconsistente y usar contactos ficticios. Con `--with-demo` crea:
 - una recogida parcial;
 - un envío en tránsito;
 - una entrega parcial;
+- un envío `delivery_failed`, sin repartidor y con un
+  `parcel.delivery.attempt` pendiente;
 - un envío asignado con SLA dinámicamente vencido;
 - un borrador sin cobertura.
 
-La instalación limpia observada con
-`--with-demo --load-language=en_US,es_ES` cargó el XML sin errores y dejó 7 envíos, 11
-paquetes, 4 repartidores y 4 zonas. La distribución fue: `assigned`: 2,
-`draft`: 2, `in_transit`: 1, `partially_delivered`: 1 y
-`partially_picked_up`: 1.
+Estas cifras describen el contrato del conjunto demo actual; no se presentan
+como resultado de una instalación medida en esta revisión. Antes de una
+entrevista deben comprobarse en una instalación limpia.
 
 Las escenas operativas MUST alcanzar su estado mediante `action_assign`,
-`action_record_pickup`, `action_start_transit` y `action_record_delivery`; no
-MUST precargar `state` ni enlaces de eventos. Los datos demo MAY omitirse en
-producción sin alterar el esquema ni los contratos.
+`action_record_pickup`, `action_start_transit`, `action_record_delivery` y
+`action_record_delivery_failure`; no MUST precargar `state`, enlaces de eventos
+ni históricos. Los datos demo MAY omitirse en producción sin alterar el esquema
+ni los contratos.
+
+Recorrido nativo recomendado: abrir el envío fallido y señalar statusbar, cinta,
+aviso y el intento de solo lectura; entrar también en **Operations → History →
+Delivery Failure Events**. Pulsar **Retry Delivery**, elegir un Courier
+disponible —el anterior vuelve a ser elegible—, escribir el motivo y confirmar.
+El `parcel.assignment.wizard` llama a `action_retry_delivery`, reserva capacidad
+y restaura el estado derivado; el resultado queda en **Retry Audits**. Para crear
+otro caso, abrir un envío en tránsito, pulsar **Record Delivery Failure**, revisar
+todos los paquetes pendientes calculados y de solo lectura, introducir el motivo
+y confirmar.
 
 ## 17. Trazabilidad de requisitos a pruebas
 
@@ -776,15 +864,21 @@ Todas las clases están etiquetadas `post_install` y `-at_install`.
 | Recogida, tránsito y entrega parcial                    | [`shipment.py`](../addons/parcel_transport_management/models/shipment.py)                                                                                                         | [`test_workflow.py::test_partial_pickup_records_only_selected_package`](../addons/parcel_transport_management/tests/test_workflow.py), `test_transit_rejects_incomplete_pickup`, `test_full_pickup_allows_transit`, `test_partial_then_final_delivery`                                                                                                                                                                          |
 | Eventos únicos, temporales e inmutables                 | [`events.py`](../addons/parcel_transport_management/models/events.py)                                                                                                             | [`test_events.py::test_event_timestamps_are_server_generated_and_actor_is_calling_user`](../addons/parcel_transport_management/tests/test_events.py), `test_pickup_event_cannot_be_written_or_unlinked_even_by_manager`, `test_duplicate_delivery_is_rejected_without_creating_another_event`, `test_delivery_without_pickup_is_rejected_without_an_event`                                                                      |
 | Capacidad retenida hasta entrega total                  | [`shipment.py`](../addons/parcel_transport_management/models/shipment.py)                                                                                                         | [`test_events.py::test_capacity_remains_reserved_until_final_delivery`](../addons/parcel_transport_management/tests/test_events.py)                                                                                                                                                                                                                                                                                             |
+| Fallo y reintento con estado/capacidad derivados        | [`shipment.py`](../addons/parcel_transport_management/models/shipment.py), [`events.py`](../addons/parcel_transport_management/models/events.py)                                  | [`test_workflow.py::test_in_transit_failure_releases_capacity_and_retry_restores_transit`](../addons/parcel_transport_management/tests/test_workflow.py), `test_partial_delivery_failure_preserves_delivery_and_retry_state`, `test_failure_rejects_blank_reason_and_invalid_state_atomically`, `test_retry_rejects_full_courier_atomically`                                                                                    |
+| Hechos de fallo/reintento, permisos y multiempresa      | [`events.py`](../addons/parcel_transport_management/models/events.py), [`parcel_security.xml`](../addons/parcel_transport_management/security/parcel_security.xml)                | [`test_security.py::test_delivery_attempt_and_retry_are_append_only_and_create_guarded`](../addons/parcel_transport_management/tests/test_security.py), `test_assigned_courier_can_fail_only_own_shipment_and_operator_can_retry`, `test_delivery_attempts_and_retries_are_isolated_by_company`                                                                                                                                 |
 | Snapshots y resolución por prefijo                      | [`zone.py`](../addons/parcel_transport_management/models/zone.py), [`shipment.py`](../addons/parcel_transport_management/models/shipment.py)                                      | [`test_zones.py::test_most_specific_postcode_prefix_wins`](../addons/parcel_transport_management/tests/test_zones.py), `test_address_and_zone_values_are_snapshotted_on_creation`, `test_origin_and_destination_zones_are_resolved_independently`                                                                                                                                                                               |
 | SLA zonal y aviso no bloqueante                         | [`zone.py`](../addons/parcel_transport_management/models/zone.py), [`shipment.py`](../addons/parcel_transport_management/models/shipment.py)                                      | [`test_zones.py::test_destination_zone_default_sla_is_committed_on_assignment`](../addons/parcel_transport_management/tests/test_zones.py), `test_missing_zone_coverage_warns_without_blocking_creation`, `test_assignment_coverage_warning_is_logged_in_chatter`                                                                                                                                                               |
 | Revisión SLA, corrección y reasignación                 | [`revisions.py`](../addons/parcel_transport_management/models/revisions.py), [`reassignment.py`](../addons/parcel_transport_management/models/reassignment.py)                    | [`test_revisions.py::test_manager_revision_requires_reason_and_preserves_history`](../addons/parcel_transport_management/tests/test_revisions.py), `test_active_route_corrections_recompute_zones_and_warning`, `test_terminal_route_correction_is_annotation_only`, `test_reassignment_history_is_exact_append_only_and_skips_noop`                                                                                            |
 | Cancelación y escritura protegida                       | [`shipment.py`](../addons/parcel_transport_management/models/shipment.py)                                                                                                         | [`test_security.py::test_manager_can_cancel_but_operator_cannot`](../addons/parcel_transport_management/tests/test_security.py), `test_delivered_shipment_cannot_be_cancelled_by_manager`, `test_operational_fields_cannot_be_written_directly`, `test_forged_context_cannot_bypass_operational_write_guards`                                                                                                                   |
 | Propiedad de Courier y multiempresa                     | [`parcel_security.xml`](../addons/parcel_transport_management/security/parcel_security.xml)                                                                                       | [`test_security.py::test_courier_can_operate_only_assigned_shipments`](../addons/parcel_transport_management/tests/test_security.py), `test_company_rules_hide_shipments_outside_allowed_companies`, `test_cross_company_courier_assignment_is_rejected`, `test_mixed_courier_operator_role_keeps_operator_visibility`                                                                                                          |
 | Carreras de capacidad y operaciones                     | [`shipment.py::_lock_shipments`](../addons/parcel_transport_management/models/shipment.py)                                                                                        | [`test_concurrency.py::test_two_assignments_competing_for_last_slot_accept_exactly_one`](../addons/parcel_transport_management/tests/test_concurrency.py), `test_two_assignments_competing_for_last_kg_accept_exactly_one`, `test_cancellation_and_first_delivery_cannot_both_commit`, `test_two_deliveries_of_same_package_create_one_event`                                                                                   |
+| Carrera por único hueco de reintento                    | [`shipment.py::_lock_couriers`](../addons/parcel_transport_management/models/shipment.py)                                                                                         | [`test_concurrency.py::test_two_failed_shipments_competing_for_retry_slot_commit_exactly_one`](../addons/parcel_transport_management/tests/test_concurrency.py)                                                                                                                                                                                                                                                                 |
 | Privacidad y DTO público                                | [`tracking.py`](../addons/parcel_transport_management/controllers/tracking.py), [`package.py::get_public_tracking_data`](../addons/parcel_transport_management/models/package.py) | [`test_public_tracking.py::test_tracking_page_uses_bcp47_request_language_and_stays_private`](../addons/parcel_transport_management/tests/test_public_tracking.py), `test_globally_unique_tracking_resolves_across_website_company`, `test_invalid_and_unknown_tokens_have_same_safe_generic_response`, `test_public_user_has_no_direct_package_access`, `test_public_tracking_dto_has_only_allowlisted_json_data_if_available` |
+| Privacidad pública de fallo y reintento                 | [`package.py::get_public_tracking_data`](../addons/parcel_transport_management/models/package.py)                                                                                 | [`test_public_tracking.py::test_failure_and_retry_are_publicly_generic_without_internal_reason`](../addons/parcel_transport_management/tests/test_public_tracking.py)                                                                                                                                                                                                                                                           |
 | Dashboard exacto, acotado y aislado                     | [`dashboard.py`](../addons/parcel_transport_management/models/dashboard.py)                                                                                                       | [`test_dashboard.py::test_dashboard_contract_counts_delays_deliveries_and_warnings`](../addons/parcel_transport_management/tests/test_dashboard.py), `test_operational_queue_is_bounded_and_prioritizes_exceptions`, `test_activity_is_limited_to_eight_most_recent_events`, `test_zones_and_couriers_are_bounded_with_archived_queue_endpoints`, `test_dashboard_is_strictly_isolated_by_current_company`                      |
+| Fallo en cola sin cambiar esquema/KPI                   | [`dashboard.py`](../addons/parcel_transport_management/models/dashboard.py)                                                                                                       | [`test_dashboard.py::test_failed_shipment_stays_in_queue_without_changing_dashboard_contract`](../addons/parcel_transport_management/tests/test_dashboard.py)                                                                                                                                                                                                                                                                   |
 | Idioma, zona horaria y permisos del dashboard           | [`dashboard.py`](../addons/parcel_transport_management/models/dashboard.py)                                                                                                       | [`test_dashboard.py::test_delivered_today_uses_user_local_day_utc_boundaries`](../addons/parcel_transport_management/tests/test_dashboard.py), `test_state_labels_use_the_request_language`, `test_permissions_match_courier_operator_and_manager_access`, `test_courier_aggregates_do_not_reveal_other_couriers_load`                                                                                                          |
+| Manifiesto y etiqueta QWeb seguros                      | [`reports.py`](../addons/parcel_transport_management/models/reports.py), [`parcel_report_views.xml`](../addons/parcel_transport_management/views/parcel_report_views.xml)         | [`test_reports.py::test_report_actions_render_operational_documents`](../addons/parcel_transport_management/tests/test_reports.py), `test_report_rendering_enforces_company_isolation`                                                                                                                                                                                                                                          |
 
 No se asigna una prueba pixel-perfect a estilos o posiciones visuales porque es
 un no objetivo explícito. Instalación, assets, XML e i18n se validan además
@@ -819,8 +913,8 @@ Como línea base observada para esta entrega: `npm run quality` finalizó
 correctamente; una instalación limpia con
 `--with-demo --load-language=en_US,es_ES` cargó `demo/parcel_demo.xml` sin
 errores; y el reporte de la suite completa informó
-`parcel_transport_management: 111 tests` y
-`0 failed, 0 error(s) of 93 tests`. Se conservan literalmente ambos contadores
+`parcel_transport_management: 125 tests` y
+`0 failed, 0 error(s) of 105 tests`. Se conservan literalmente ambos contadores
 del reporte; estos datos son evidencia de una ejecución concreta, no un
 porcentaje de cobertura.
 
@@ -838,32 +932,49 @@ La entrega se acepta únicamente si todos los criterios siguientes se cumplen:
    unidad sin redondeo.
 5. **MUST** derivar estados parciales de paquetes y rechazar tránsito sin
    recogida completa, entrega previa a recogida y eventos duplicados.
-6. **MUST** impedir cancelación tras la primera entrega y exigir motivo y rol
+6. **MUST** registrar un fallo solo en tránsito o entrega parcial, con motivo,
+   repartidor y paquetes recogidos pendientes derivados íntegramente; MUST
+   liberar repartidor y capacidad.
+7. **MUST** reintentar solo el último intento sin resolver, con Operator/Manager,
+   motivo y Courier válido con capacidad dual; MUST restaurar el estado según
+   las entregas ya existentes.
+8. **MUST** preservar `parcel.delivery.attempt` y `parcel.delivery.retry` como
+   hechos append-only, aislados por empresa, con actor y fecha de servidor y
+   creación protegida por token de identidad.
+9. **MUST** impedir cancelación tras la primera entrega y exigir motivo y rol
    Manager.
-7. **MUST** congelar direcciones y zonas, resolver el prefijo activo más
-   específico y registrar correcciones posteriores.
-8. **MUST** conservar SLA original, revisar el actual con auditoría y calcular
-   ambos retrasos respecto a la entrega.
-9. **MUST** mantener eventos, revisiones, correcciones y reasignaciones como
-   append-only, con actor y fecha de servidor.
-10. **MUST** rechazar escrituras directas de campos operativos y contextos RPC
+10. **MUST** congelar direcciones y zonas, resolver el prefijo activo más
+    específico y registrar correcciones posteriores.
+11. **MUST** conservar SLA original, revisar el actual con auditoría y calcular
+    ambos retrasos respecto a la entrega.
+12. **MUST** mantener eventos, revisiones, correcciones y reasignaciones como
+    append-only, con actor y fecha de servidor.
+13. **MUST** rechazar escrituras directas de campos operativos y contextos RPC
     falsificados.
-11. **MUST** bloquear filas en el orden envío-paquete-repartidor y mantener los
-    invariantes bajo las cuatro carreras cubiertas por la suite.
-12. **MUST** aislar registros, configuración, dashboard y tracking por empresa.
-13. **MUST** limitar al Courier a sus envíos y permitir a Operator/Manager la
-    visibilidad correspondiente dentro de empresas permitidas.
-14. **MUST** devolver en tracking únicamente el DTO permitido, con respuesta
-    genérica, escaping, `no-store`, `noindex` y lenguaje BCP 47.
-15. **MUST** devolver el contrato exacto y acotado del dashboard, con cardinales,
-    truncado, permisos, visibilidad y zona horaria correctos.
-16. **MUST** serializar refrescos OWL, conservar la última instantánea válida y
+14. **MUST** bloquear filas en el orden envío-paquete-repartidor y mantener los
+    invariantes en todas las carreras cubiertas por la suite, incluido el único
+    hueco de reintento.
+15. **MUST** aislar registros, históricos, configuración, dashboard y tracking
+    por empresa.
+16. **MUST** permitir al Courier fallar solo su envío asignado, reservar el
+    reintento a Operator/Manager y conservar la visibilidad correspondiente
+    dentro de empresas permitidas.
+17. **MUST** devolver en tracking únicamente el DTO permitido, con hitos
+    genéricos de fallo/reintento pero sin motivo, identidad o IDs; además de
+    respuesta genérica, escaping, `no-store`, `noindex` y lenguaje BCP 47.
+18. **MUST** conservar las claves exactas del dashboard y sus estadísticas;
+    `delivery_failed` permanece en cola, fuera de reservas y sin KPI nuevo.
+19. **MUST** serializar refrescos OWL, conservar la última instantánea válida y
     no realizar escrituras de dominio desde el dashboard.
-17. **MUST** cargar vistas, seguridad, catálogos y assets sin errores durante la
-    instalación o actualización.
-18. **SHOULD** ser navegable mediante componentes nativos, teclado y semántica
+20. **MUST** ofrecer el flujo nativo de fallo/reintento, con paquetes pendientes
+    de solo lectura, motivo requerido, cinta/aviso e históricos independientes.
+21. **MUST** renderizar manifiestos A4 y etiquetas térmicas Code128 aplicando
+    ACL y reglas multiempresa; la etiqueta MUST omitir nombres y direcciones.
+22. **MUST** cargar vistas, seguridad, reportes, catálogos y assets sin errores
+    durante la instalación o actualización.
+23. **SHOULD** ser navegable mediante componentes nativos, teclado y semántica
     accesible, sin depender solo del color.
-19. **MUST** ejecutar sin fallos `npm run quality` y la suite del módulo antes de
+24. **MUST** ejecutar sin fallos `npm run quality` y la suite del módulo antes de
     entregar.
-20. **MUST NOT** interpretar el número de pruebas como cobertura porcentual ni
+25. **MUST NOT** interpretar el número de pruebas como cobertura porcentual ni
     ampliar el alcance a GIS, optimización de rutas o validación pixel-perfect.

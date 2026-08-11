@@ -650,4 +650,263 @@
             <p>Each actual courier change is preserved with its actor, timestamp, and reason.</p>
         </field>
     </record>
+
+    <record id="view_ptm_delivery_attempt_list" model="ir.ui.view">
+        <field name="name">parcel.delivery.attempt.list</field>
+        <field name="model">parcel.delivery.attempt</field>
+        <field name="arch" type="xml">
+            <list
+                class="o_ptm_native_view o_ptm_history_view"
+                string="Delivery Attempts"
+                create="false"
+                edit="false"
+                delete="false"
+                default_order="occurred_at desc, id desc"
+            >
+                <field name="occurred_at" />
+                <field name="shipment_id" />
+                <field name="courier_id" />
+                <field name="confirmed_by_id" />
+                <field name="package_ids" widget="many2many_tags" optional="show" />
+                <field name="reason" optional="show" />
+                <field name="company_id" groups="base.group_multi_company" optional="hide" />
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ptm_delivery_attempt_form" model="ir.ui.view">
+        <field name="name">parcel.delivery.attempt.form</field>
+        <field name="model">parcel.delivery.attempt</field>
+        <field name="arch" type="xml">
+            <form
+                class="o_ptm_native_view o_ptm_history_view"
+                string="Delivery Attempt"
+                create="false"
+                edit="false"
+                delete="false"
+                duplicate="false"
+            >
+                <sheet>
+                    <div class="oe_title">
+                        <span class="o_ptm_eyebrow">Append-only delivery attempt</span>
+                        <label for="shipment_id" />
+                        <h1>
+                            <field name="shipment_id" readonly="1" />
+                        </h1>
+                        <h2>
+                            <field name="occurred_at" readonly="1" />
+                        </h2>
+                    </div>
+                    <group>
+                        <group string="Attempt">
+                            <field name="courier_id" readonly="1" />
+                            <field name="package_ids" widget="many2many_tags" readonly="1" />
+                        </group>
+                        <group string="Audit">
+                            <field name="confirmed_by_id" readonly="1" />
+                            <field name="occurred_at" readonly="1" />
+                            <field
+                                name="company_id"
+                                readonly="1"
+                                groups="base.group_multi_company"
+                            />
+                        </group>
+                    </group>
+                    <group string="Reason">
+                        <field name="reason" nolabel="1" readonly="1" />
+                    </group>
+                    <separator string="Retry" />
+                    <field name="retry_ids" readonly="1">
+                        <list
+                            create="false"
+                            edit="false"
+                            delete="false"
+                            default_order="occurred_at desc, id desc"
+                        >
+                            <field name="occurred_at" />
+                            <field name="previous_courier_id" />
+                            <field name="new_courier_id" />
+                            <field name="dispatched_by_id" />
+                            <field name="reason" optional="show" />
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ptm_delivery_attempt_search" model="ir.ui.view">
+        <field name="name">parcel.delivery.attempt.search</field>
+        <field name="model">parcel.delivery.attempt</field>
+        <field name="arch" type="xml">
+            <search string="Search Delivery Attempts">
+                <field name="shipment_id" />
+                <field name="courier_id" />
+                <field name="confirmed_by_id" />
+                <filter name="occurred_at" string="Attempt Date" date="occurred_at" />
+                <group name="group_by">
+                    <filter
+                        name="group_shipment"
+                        string="Shipment"
+                        context="{'group_by': 'shipment_id'}"
+                    />
+                    <filter
+                        name="group_courier"
+                        string="Courier"
+                        context="{'group_by': 'courier_id'}"
+                    />
+                    <filter
+                        name="group_confirmed_by"
+                        string="Confirmed By"
+                        context="{'group_by': 'confirmed_by_id'}"
+                    />
+                    <filter
+                        name="group_day"
+                        string="Day"
+                        context="{'group_by': 'occurred_at:day'}"
+                    />
+                    <filter
+                        name="group_company"
+                        string="Company"
+                        context="{'group_by': 'company_id'}"
+                        groups="base.group_multi_company"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ptm_delivery_attempt_history" model="ir.actions.act_window">
+        <field name="name">Delivery Attempts</field>
+        <field name="res_model">parcel.delivery.attempt</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ptm_delivery_attempt_search" />
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No failed delivery attempts recorded</p>
+            <p>Each failed attempt is preserved with its packages, courier, actor, and reason.</p>
+        </field>
+    </record>
+
+    <record id="view_ptm_delivery_retry_list" model="ir.ui.view">
+        <field name="name">parcel.delivery.retry.list</field>
+        <field name="model">parcel.delivery.retry</field>
+        <field name="arch" type="xml">
+            <list
+                class="o_ptm_native_view o_ptm_history_view"
+                string="Delivery Retries"
+                create="false"
+                edit="false"
+                delete="false"
+                default_order="occurred_at desc, id desc"
+            >
+                <field name="occurred_at" />
+                <field name="shipment_id" />
+                <field name="previous_courier_id" />
+                <field name="new_courier_id" />
+                <field name="dispatched_by_id" />
+                <field name="reason" optional="show" />
+                <field name="company_id" groups="base.group_multi_company" optional="hide" />
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ptm_delivery_retry_form" model="ir.ui.view">
+        <field name="name">parcel.delivery.retry.form</field>
+        <field name="model">parcel.delivery.retry</field>
+        <field name="arch" type="xml">
+            <form
+                class="o_ptm_native_view o_ptm_history_view"
+                string="Delivery Retry"
+                create="false"
+                edit="false"
+                delete="false"
+                duplicate="false"
+            >
+                <sheet>
+                    <div class="oe_title">
+                        <span class="o_ptm_eyebrow">Append-only retry dispatch</span>
+                        <label for="shipment_id" />
+                        <h1>
+                            <field name="shipment_id" readonly="1" />
+                        </h1>
+                        <h2>
+                            <field name="occurred_at" readonly="1" />
+                        </h2>
+                    </div>
+                    <group>
+                        <group string="Dispatch">
+                            <field name="attempt_id" readonly="1" />
+                            <field name="previous_courier_id" readonly="1" />
+                            <field name="new_courier_id" readonly="1" />
+                        </group>
+                        <group string="Audit">
+                            <field name="dispatched_by_id" readonly="1" />
+                            <field name="occurred_at" readonly="1" />
+                            <field
+                                name="company_id"
+                                readonly="1"
+                                groups="base.group_multi_company"
+                            />
+                        </group>
+                    </group>
+                    <group string="Reason">
+                        <field name="reason" nolabel="1" readonly="1" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ptm_delivery_retry_search" model="ir.ui.view">
+        <field name="name">parcel.delivery.retry.search</field>
+        <field name="model">parcel.delivery.retry</field>
+        <field name="arch" type="xml">
+            <search string="Search Delivery Retries">
+                <field name="shipment_id" />
+                <field name="previous_courier_id" />
+                <field name="new_courier_id" />
+                <field name="dispatched_by_id" />
+                <filter name="occurred_at" string="Retry Date" date="occurred_at" />
+                <group name="group_by">
+                    <filter
+                        name="group_shipment"
+                        string="Shipment"
+                        context="{'group_by': 'shipment_id'}"
+                    />
+                    <filter
+                        name="group_new_courier"
+                        string="New Courier"
+                        context="{'group_by': 'new_courier_id'}"
+                    />
+                    <filter
+                        name="group_dispatched_by"
+                        string="Dispatched By"
+                        context="{'group_by': 'dispatched_by_id'}"
+                    />
+                    <filter
+                        name="group_day"
+                        string="Day"
+                        context="{'group_by': 'occurred_at:day'}"
+                    />
+                    <filter
+                        name="group_company"
+                        string="Company"
+                        context="{'group_by': 'company_id'}"
+                        groups="base.group_multi_company"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ptm_delivery_retry_history" model="ir.actions.act_window">
+        <field name="name">Delivery Retries</field>
+        <field name="res_model">parcel.delivery.retry</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ptm_delivery_retry_search" />
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No delivery retries dispatched</p>
+            <p>Each retry preserves the previous courier, new courier, dispatcher, and reason.</p>
+        </field>
+    </record>
 </odoo>

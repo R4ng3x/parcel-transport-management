@@ -8,7 +8,7 @@
                 class="o_ptm_native_view o_ptm_shipment_view"
                 string="Shipments"
                 default_order="id desc"
-                decoration-danger="delay_hours &gt; 0 and state not in ['delivered', 'cancelled']"
+                decoration-danger="state == 'delivery_failed' or (delay_hours &gt; 0 and state not in ['delivered', 'cancelled'])"
                 decoration-warning="state in ['partially_picked_up', 'partially_delivered']"
                 decoration-info="state == 'in_transit'"
                 decoration-success="state == 'delivered'"
@@ -29,7 +29,7 @@
                     decoration-info="state in ['assigned', 'in_transit']"
                     decoration-warning="state in ['partially_picked_up', 'picked_up', 'partially_delivered']"
                     decoration-success="state == 'delivered'"
-                    decoration-danger="state == 'cancelled'"
+                    decoration-danger="state in ['delivery_failed', 'cancelled']"
                     decoration-muted="state == 'draft'"
                 />
                 <field name="company_id" groups="base.group_multi_company" optional="hide" />
@@ -76,7 +76,7 @@
                                 decoration-info="state in ['assigned', 'in_transit']"
                                 decoration-warning="state in ['partially_picked_up', 'picked_up', 'partially_delivered']"
                                 decoration-success="state == 'delivered'"
-                                decoration-danger="state == 'cancelled'"
+                                decoration-danger="state in ['delivery_failed', 'cancelled']"
                                 decoration-muted="state == 'draft'"
                             />
                         </div>
@@ -191,6 +191,22 @@
                         invisible="state not in ['in_transit', 'partially_delivered']"
                     />
                     <button
+                        name="%(action_ptm_delivery_failure_wizard)d"
+                        type="action"
+                        string="Record Delivery Failure"
+                        class="btn-outline-danger"
+                        groups="parcel_transport_management.group_ptm_courier,parcel_transport_management.group_ptm_operator"
+                        invisible="state not in ['in_transit', 'partially_delivered']"
+                    />
+                    <button
+                        name="%(action_ptm_assignment_wizard)d"
+                        type="action"
+                        string="Retry Delivery"
+                        class="oe_highlight"
+                        groups="parcel_transport_management.group_ptm_operator"
+                        invisible="state != 'delivery_failed'"
+                    />
+                    <button
                         name="%(action_ptm_sla_wizard)d"
                         type="action"
                         string="Revise SLA"
@@ -217,12 +233,13 @@
                         string="Cancel Shipment"
                         class="btn-danger"
                         groups="parcel_transport_management.group_ptm_manager"
-                        invisible="state in ['partially_delivered', 'delivered', 'cancelled']"
+                        invisible="has_delivered_packages or state in ['delivered', 'cancelled']"
                     />
+                    <field name="has_delivered_packages" invisible="1" />
                     <field
                         name="state"
                         widget="statusbar"
-                        statusbar_visible="draft,assigned,picked_up,in_transit,delivered"
+                        statusbar_visible="draft,assigned,picked_up,in_transit,delivery_failed,delivered"
                         readonly="1"
                     />
                 </header>
@@ -238,6 +255,12 @@
                         title="CANCELLED"
                         bg_color="text-bg-danger"
                         invisible="state != 'cancelled'"
+                    />
+                    <widget
+                        name="web_ribbon"
+                        title="DELIVERY FAILED"
+                        bg_color="text-bg-danger"
+                        invisible="state != 'delivery_failed'"
                     />
                     <div class="oe_title">
                         <span class="o_ptm_eyebrow">Parcel operation</span>
@@ -273,6 +296,22 @@
                             aria-hidden="true"
                         />
                         <field name="coverage_warning" nolabel="1" readonly="1" />
+                    </div>
+
+                    <div
+                        class="o_ptm_inline_alert o_ptm_inline_alert_warning"
+                        role="alert"
+                        invisible="state != 'delivery_failed'"
+                    >
+                        <i
+                            class="fa fa-exclamation-triangle"
+                            title="Delivery failed"
+                            aria-hidden="true"
+                        />
+                        <span>
+                            Delivery could not be completed. Assign an available courier to retry
+                            the undelivered packages.
+                        </span>
                     </div>
 
                     <group>
@@ -430,6 +469,36 @@
                                     <field name="reason" optional="show" />
                                 </list>
                             </field>
+                            <separator string="Delivery Attempts" />
+                            <field name="delivery_attempt_ids" readonly="1">
+                                <list
+                                    create="false"
+                                    edit="false"
+                                    delete="false"
+                                    default_order="occurred_at desc, id desc"
+                                >
+                                    <field name="occurred_at" />
+                                    <field name="courier_id" />
+                                    <field name="confirmed_by_id" />
+                                    <field name="package_ids" widget="many2many_tags" />
+                                    <field name="reason" optional="show" />
+                                </list>
+                            </field>
+                            <separator string="Delivery Retries" />
+                            <field name="delivery_retry_ids" readonly="1">
+                                <list
+                                    create="false"
+                                    edit="false"
+                                    delete="false"
+                                    default_order="occurred_at desc, id desc"
+                                >
+                                    <field name="occurred_at" />
+                                    <field name="previous_courier_id" />
+                                    <field name="new_courier_id" />
+                                    <field name="dispatched_by_id" />
+                                    <field name="reason" optional="show" />
+                                </list>
+                            </field>
                         </page>
                         <page
                             string="Cancellation"
@@ -470,6 +539,11 @@
                     name="in_transit"
                     string="In Transit"
                     domain="[('state', 'in', ['in_transit', 'partially_delivered'])]"
+                />
+                <filter
+                    name="delivery_failed"
+                    string="Delivery Failed"
+                    domain="[('state', '=', 'delivery_failed')]"
                 />
                 <filter
                     name="delivered"

@@ -82,6 +82,11 @@ class TestParcelSecurity(ParcelTestCase):
             recipient_name="Receiving Clerk",
         )
 
+    def _start_transit(self, shipment, courier):
+        shipment.action_assign(courier.id)
+        shipment.action_record_pickup(shipment.package_ids.ids)
+        shipment.action_start_transit()
+
     def test_delivery_zones_are_operational_navigation_for_workers(self):
         zone_menu = self.env.ref("parcel_transport_management.menu_ptm_zones")
         operations_menu = self.env.ref(
@@ -395,3 +400,166 @@ class TestParcelSecurity(ParcelTestCase):
 
         self.assertFalse(shipment.courier_id)
         self.assertEqual(shipment.state, "draft")
+
+    def test_delivery_attempt_and_retry_are_append_only_and_create_guarded(self):
+        courier = self.create_courier()
+        shipment = self.create_shipment()
+        self._start_transit(shipment, courier)
+        attempt = shipment.action_record_delivery_failure("Legitimate delivery failure")
+        retry = shipment.with_user(self.operator_user).action_retry_delivery(
+            courier.id,
+            "Legitimate retry dispatch",
+        )
+        attempt_values = {
+            "shipment_id": shipment.id,
+            "courier_id": courier.id,
+            "confirmed_by_id": self.manager_user.id,
+            "occurred_at": fields.Datetime.now(),
+            "reason": "Forged attempt",
+            "package_ids": [Command.set(shipment.package_ids.ids)],
+        }
+        retry_values = {
+            "attempt_id": attempt.id,
+            "previous_courier_id": courier.id,
+            "new_courier_id": courier.id,
+            "dispatched_by_id": self.manager_user.id,
+            "occurred_at": fields.Datetime.now(),
+            "reason": "Forged retry",
+        }
+
+        with self.assertRaises(AccessError):
+            (
+                self.env["parcel.delivery.attempt"]
+                .with_user(self.manager_user)
+                .create(attempt_values)
+            )
+        with self.assertRaises(AccessError):
+            (
+                self.env["parcel.delivery.retry"]
+                .with_user(self.manager_user)
+                .create(retry_values)
+            )
+        with self.assertRaises(AccessError):
+            attempt.with_user(self.manager_user).write({"reason": "Rewritten"})
+        with self.assertRaises(AccessError):
+            retry.with_user(self.manager_user).write({"reason": "Rewritten"})
+        with self.assertRaises(AccessError):
+            attempt.with_user(self.manager_user).unlink()
+        with self.assertRaises(AccessError):
+            retry.with_user(self.manager_user).unlink()
+        with self.assertRaises(AccessError):
+            shipment.package_ids.with_user(self.manager_user).write(
+                {"delivery_attempt_ids": [Command.clear()]}
+            )
+
+        self.assertEqual(attempt.reason, "Legitimate delivery failure")
+        self.assertEqual(retry.reason, "Legitimate retry dispatch")
+        self.assertTrue(attempt.exists())
+        self.assertTrue(retry.exists())
+        self.assertEqual(shipment.package_ids.delivery_attempt_ids, attempt)
+
+    def test_assigned_courier_can_fail_only_own_shipment_and_operator_can_retry(self):
+        own_courier = self._courier_for_courier_user()
+        other_courier = self.create_courier()
+        retry_courier = self.create_courier(name="Operator Retry Courier")
+        own_shipment = self.create_shipment()
+        other_shipment = self.create_shipment()
+        self._start_transit(own_shipment, own_courier)
+        self._start_transit(other_shipment, other_courier)
+
+        attempt = own_shipment.with_user(
+            self.courier_user
+        ).action_record_delivery_failure("Recipient site was inaccessible")
+
+        self.assertEqual(attempt.confirmed_by_id, self.courier_user)
+        self.assertEqual(attempt.courier_id, own_courier)
+        self.assertEqual(own_shipment.state, "delivery_failed")
+        self.assertFalse(own_shipment.courier_id)
+
+        with self.assertRaises(AccessError):
+            other_shipment.with_user(self.courier_user).action_record_delivery_failure(
+                "Attempt against another route"
+            )
+
+        self.assertEqual(other_shipment.state, "in_transit")
+        self.assertEqual(other_shipment.courier_id, other_courier)
+        self.assertFalse(other_shipment.delivery_attempt_ids)
+
+        retry = own_shipment.with_user(self.operator_user).action_retry_delivery(
+            retry_courier.id,
+            "Operator dispatched a new route",
+        )
+
+        self.assertEqual(retry.dispatched_by_id, self.operator_user)
+        self.assertEqual(retry.attempt_id, attempt)
+        self.assertEqual(own_shipment.state, "in_transit")
+        self.assertEqual(own_shipment.courier_id, retry_courier)
+
+    def test_delivery_attempts_and_retries_are_isolated_by_company(self):
+        local_shipment = self.create_shipment()
+        local_courier = self.create_courier()
+        self._start_transit(local_shipment, local_courier)
+        local_attempt = local_shipment.action_record_delivery_failure("Local failure")
+        local_retry = local_shipment.action_retry_delivery(
+            local_courier.id,
+            "Local retry",
+        )
+
+        other_shipment = self.create_shipment(
+            company=self.other_company,
+            sender=self.other_sender,
+            recipient=self.other_recipient,
+        )
+        other_courier = self.create_courier(company=self.other_company)
+        self._start_transit(other_shipment, other_courier)
+        other_attempt = other_shipment.action_record_delivery_failure(
+            "Other-company failure"
+        )
+        other_retry = other_shipment.action_retry_delivery(
+            other_courier.id,
+            "Other-company retry",
+        )
+
+        attempts = local_attempt | other_attempt
+        retries = local_retry | other_retry
+        operator_attempts = (
+            self.env["parcel.delivery.attempt"]
+            .with_user(self.operator_user)
+            .with_context(allowed_company_ids=self.company.ids)
+            .search([("id", "in", attempts.ids)])
+        )
+        operator_retries = (
+            self.env["parcel.delivery.retry"]
+            .with_user(self.operator_user)
+            .with_context(allowed_company_ids=self.company.ids)
+            .search([("id", "in", retries.ids)])
+        )
+        manager_attempts = (
+            self.env["parcel.delivery.attempt"]
+            .with_user(self.manager_user)
+            .with_context(allowed_company_ids=(self.company | self.other_company).ids)
+            .search([("id", "in", attempts.ids)])
+        )
+        manager_retries = (
+            self.env["parcel.delivery.retry"]
+            .with_user(self.manager_user)
+            .with_context(allowed_company_ids=(self.company | self.other_company).ids)
+            .search([("id", "in", retries.ids)])
+        )
+
+        self.assertEqual(set(operator_attempts.ids), set(local_attempt.ids))
+        self.assertEqual(set(operator_retries.ids), set(local_retry.ids))
+        self.assertEqual(set(manager_attempts.ids), set(attempts.ids))
+        self.assertEqual(set(manager_retries.ids), set(retries.ids))
+        self.assertEqual(local_attempt.company_id, self.company)
+        self.assertEqual(local_retry.company_id, self.company)
+        self.assertEqual(other_attempt.company_id, self.other_company)
+        self.assertEqual(other_retry.company_id, self.other_company)
+        self.assertEqual(
+            local_shipment.package_ids.delivery_attempt_ids,
+            local_attempt,
+        )
+        self.assertEqual(
+            other_shipment.package_ids.delivery_attempt_ids,
+            other_attempt,
+        )

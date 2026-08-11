@@ -282,6 +282,7 @@ export class ParcelCommandCenter extends Component {
                 picked_up: "o_ptm_shipment--picked",
                 in_transit: "o_ptm_shipment--transit",
                 partially_delivered: "o_ptm_shipment--partial",
+                delivery_failed: "o_ptm_shipment--failed",
                 delivered: "o_ptm_shipment--delivered",
                 cancelled: "o_ptm_shipment--cancelled",
             }[shipment.state] || "o_ptm_shipment--draft",

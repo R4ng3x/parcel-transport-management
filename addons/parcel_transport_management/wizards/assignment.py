@@ -38,7 +38,7 @@ class ParcelAssignmentWizard(models.TransientModel):
         ondelete="restrict",
         check_company=True,
     )
-    reason = fields.Text(string="Reassignment Reason")
+    reason = fields.Text(string="Reason")
 
     @api.model
     def default_get(self, field_names):
@@ -51,6 +51,8 @@ class ParcelAssignmentWizard(models.TransientModel):
         self.ensure_one()
         if self.shipment_id.state == "draft":
             self.shipment_id.action_assign(self.courier_id.id)
+        elif self.shipment_id.state == "delivery_failed":
+            self.shipment_id.action_retry_delivery(self.courier_id.id, self.reason)
         else:
             self.shipment_id.action_reassign(self.courier_id.id, self.reason)
         return CLOSE_WIZARD_ACTION

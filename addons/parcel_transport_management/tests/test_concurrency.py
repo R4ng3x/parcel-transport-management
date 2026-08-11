@@ -132,6 +132,14 @@ class TestParcelConcurrency(ParcelTestCase):
                 cr, scenario["company_id"], scenario["registry"]
             )
             cr.execute(
+                "DELETE FROM parcel_delivery_retry WHERE shipment_id IN %s",
+                [scenario["shipment_ids"]],
+            )
+            cr.execute(
+                "DELETE FROM parcel_delivery_attempt WHERE shipment_id IN %s",
+                [scenario["shipment_ids"]],
+            )
+            cr.execute(
                 "DELETE FROM parcel_package WHERE shipment_id IN %s",
                 [scenario["shipment_ids"]],
             )
@@ -263,6 +271,41 @@ class TestParcelConcurrency(ParcelTestCase):
             shipment.action_record_pickup(shipment.package_ids.ids)
             shipment.action_start_transit()
             cr.commit()
+
+    def _prepare_failed_delivery(self, scenario, shipment_id):
+        with scenario["registry"].cursor() as cr:
+            env = self._independent_env(
+                cr, scenario["company_id"], scenario["registry"]
+            )
+            shipment = env["parcel.shipment"].browse(shipment_id)
+            shipment.action_assign(scenario["courier_id"])
+            shipment.action_record_pickup(shipment.package_ids.ids)
+            shipment.action_start_transit()
+            shipment.action_record_delivery_failure("Concurrent failure setup")
+            cr.commit()
+
+    def _read_retry_state(self, scenario):
+        with scenario["registry"].cursor() as cr:
+            env = self._independent_env(
+                cr, scenario["company_id"], scenario["registry"]
+            )
+            shipments = env["parcel.shipment"].browse(scenario["shipment_ids"])
+            attempts = env["parcel.delivery.attempt"].search(
+                [("shipment_id", "in", scenario["shipment_ids"])]
+            )
+            retries = env["parcel.delivery.retry"].search(
+                [("shipment_id", "in", scenario["shipment_ids"])]
+            )
+            return {
+                "assignments": tuple(
+                    (shipment.state, shipment.courier_id.id) for shipment in shipments
+                ),
+                "attempt_count": len(attempts),
+                "retry_count": len(retries),
+                "unresolved_attempt_count": len(
+                    attempts.filtered(lambda attempt: not attempt.retry_ids)
+                ),
+            }
 
     def _read_delivery_state(self, scenario, shipment_id, package_ids):
         with scenario["registry"].cursor() as cr:
@@ -436,3 +479,55 @@ class TestParcelConcurrency(ParcelTestCase):
         self.assertEqual(result["state"], "delivered")
         self.assertEqual(len(result["delivery_event_ids"]), 1)
         self.assertEqual(result["delivery_event_count"], 1)
+
+    def test_two_failed_shipments_competing_for_retry_slot_commit_exactly_one(self):
+        scenario = self._create_scenario(
+            ((1.0,), (1.0,)),
+            max_concurrent_shipments=1,
+            max_concurrent_weight=100.0,
+        )
+        first_id, second_id = scenario["shipment_ids"]
+        self._prepare_failed_delivery(scenario, first_id)
+        self._prepare_failed_delivery(scenario, second_id)
+
+        self._run_race(
+            scenario,
+            (
+                lambda env: (
+                    env["parcel.shipment"]
+                    .browse(first_id)
+                    .action_retry_delivery(
+                        scenario["courier_id"],
+                        "Concurrent retry dispatch",
+                    )
+                ),
+                lambda env: (
+                    env["parcel.shipment"]
+                    .browse(second_id)
+                    .action_retry_delivery(
+                        scenario["courier_id"],
+                        "Concurrent retry dispatch",
+                    )
+                ),
+            ),
+            expected_successes=1,
+        )
+
+        result = self._read_retry_state(scenario)
+        self.assertEqual(result["attempt_count"], 2)
+        self.assertEqual(result["retry_count"], 1)
+        self.assertEqual(result["unresolved_attempt_count"], 1)
+        self.assertEqual(
+            sum(
+                state == "in_transit" and courier_id == scenario["courier_id"]
+                for state, courier_id in result["assignments"]
+            ),
+            1,
+        )
+        self.assertEqual(
+            sum(
+                state == "delivery_failed" and not courier_id
+                for state, courier_id in result["assignments"]
+            ),
+            1,
+        )

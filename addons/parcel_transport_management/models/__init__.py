@@ -6,4 +6,5 @@ from . import package
 from . import reassignment
 from . import shipment
 from . import revisions
+from . import reports
 from . import dashboard

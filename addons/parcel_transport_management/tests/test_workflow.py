@@ -206,3 +206,128 @@ class TestParcelWorkflow(ParcelTestCase):
 
         self.assertEqual(shipment.state, "delivered")
         self.assertTrue(all(shipment.package_ids.mapped("delivery_event_id")))
+
+    def test_in_transit_failure_releases_capacity_and_retry_restores_transit(self):
+        courier = self.create_courier(
+            max_concurrent_shipments=1,
+            max_concurrent_weight=1.0,
+            max_weight_uom_id=self.kg_uom.id,
+        )
+        shipment = self._shipment_with_weights(1.0)
+        self._start_transit(shipment, courier=courier)
+
+        self.assertEqual(courier.current_shipment_count, 1)
+        self.assertEqual(courier.current_weight, 1.0)
+
+        attempt = shipment.action_record_delivery_failure(
+            "Vehicle could not complete the route"
+        )
+
+        self.assertEqual(shipment.state, "delivery_failed")
+        self.assertFalse(shipment.courier_id)
+        self.assertEqual(courier.current_shipment_count, 0)
+        self.assertEqual(courier.current_weight, 0.0)
+        self.assertEqual(attempt.shipment_id, shipment)
+        self.assertEqual(attempt.company_id, shipment.company_id)
+        self.assertEqual(attempt.courier_id, courier)
+        self.assertEqual(attempt.confirmed_by_id, self.env.user)
+        self.assertEqual(attempt.package_ids, shipment.package_ids)
+        self.assertTrue(attempt.occurred_at)
+
+        retry = shipment.action_retry_delivery(
+            courier.id,
+            "Vehicle is available after inspection",
+        )
+
+        self.assertEqual(shipment.state, "in_transit")
+        self.assertEqual(shipment.courier_id, courier)
+        self.assertEqual(courier.current_shipment_count, 1)
+        self.assertEqual(courier.current_weight, 1.0)
+        self.assertEqual(retry.attempt_id, attempt)
+        self.assertEqual(retry.shipment_id, shipment)
+        self.assertEqual(retry.previous_courier_id, courier)
+        self.assertEqual(retry.new_courier_id, courier)
+        self.assertEqual(retry.dispatched_by_id, self.env.user)
+        self.assertTrue(retry.occurred_at)
+
+    def test_partial_delivery_failure_preserves_delivery_and_retry_state(self):
+        original_courier = self.create_courier()
+        retry_courier = self.create_courier(name="Retry Courier")
+        shipment = self._shipment_with_weights(1.0, 2.0)
+        self._start_transit(shipment, courier=original_courier)
+        delivered_package, pending_package = shipment.package_ids.sorted("id")
+        delivery = shipment.action_record_delivery(
+            delivered_package.ids,
+            recipient_name="Receiving Clerk",
+        )
+
+        attempt = shipment.action_record_delivery_failure(
+            "The remaining parcel could not be delivered"
+        )
+
+        self.assertEqual(shipment.state, "delivery_failed")
+        self.assertEqual(delivered_package.delivery_event_id, delivery)
+        self.assertFalse(pending_package.delivery_event_id)
+        self.assertEqual(attempt.package_ids, pending_package)
+
+        retry = shipment.action_retry_delivery(
+            retry_courier.id,
+            "Recipient confirmed a new delivery window",
+        )
+
+        self.assertEqual(shipment.state, "partially_delivered")
+        self.assertEqual(shipment.courier_id, retry_courier)
+        self.assertEqual(delivered_package.delivery_event_id, delivery)
+        self.assertFalse(pending_package.delivery_event_id)
+        self.assertEqual(retry.attempt_id, attempt)
+        self.assertEqual(retry.previous_courier_id, original_courier)
+        self.assertEqual(retry.new_courier_id, retry_courier)
+
+    def test_failure_rejects_blank_reason_and_invalid_state_atomically(self):
+        in_transit = self._shipment_with_weights(1.0)
+        in_transit_courier = self._start_transit(in_transit)
+
+        with self.assertRaises(UserError):
+            in_transit.action_record_delivery_failure(" \t ")
+
+        self.assertEqual(in_transit.state, "in_transit")
+        self.assertEqual(in_transit.courier_id, in_transit_courier)
+        self.assertFalse(in_transit.delivery_attempt_ids)
+
+        assigned = self._shipment_with_weights(1.0)
+        assigned_courier = self.create_courier()
+        assigned.action_assign(assigned_courier.id)
+
+        with self.assertRaises(UserError):
+            assigned.action_record_delivery_failure(
+                "Failure cannot be recorded before transit"
+            )
+
+        self.assertEqual(assigned.state, "assigned")
+        self.assertEqual(assigned.courier_id, assigned_courier)
+        self.assertFalse(assigned.delivery_attempt_ids)
+
+    def test_retry_rejects_full_courier_atomically(self):
+        failed = self._shipment_with_weights(1.0)
+        self._start_transit(failed)
+        attempt = failed.action_record_delivery_failure("Access to recipient blocked")
+        full_courier = self.create_courier(
+            max_concurrent_shipments=1,
+            max_concurrent_weight=1.0,
+            max_weight_uom_id=self.kg_uom.id,
+        )
+        occupying = self._shipment_with_weights(1.0)
+        occupying.action_assign(full_courier.id)
+
+        with self.assertRaises(UserError):
+            failed.action_retry_delivery(
+                full_courier.id,
+                "Dispatch to another courier",
+            )
+
+        self.assertEqual(failed.state, "delivery_failed")
+        self.assertFalse(failed.courier_id)
+        self.assertFalse(attempt.retry_ids)
+        self.assertFalse(failed.delivery_retry_ids)
+        self.assertEqual(occupying.courier_id, full_courier)
+        self.assertEqual(full_courier.current_shipment_count, 1)

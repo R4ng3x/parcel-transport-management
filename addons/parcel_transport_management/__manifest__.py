@@ -20,6 +20,7 @@
         "views/parcel_settings_views.xml",
         "views/parcel_dashboard_action.xml",
         "views/parcel_menus.xml",
+        "views/parcel_report_views.xml",
     ],
     "demo": ["demo/parcel_demo.xml"],
     "assets": {

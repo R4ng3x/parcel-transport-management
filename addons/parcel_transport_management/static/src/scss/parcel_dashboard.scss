@@ -1366,6 +1366,7 @@ $o-ptm-phone: 30rem;
             background: var(--o-ptm-color-route-soft);
         }
 
+        &--failed:hover,
         &--late:hover,
         &--coverage:hover {
             background: var(--o-ptm-color-signal-soft);
@@ -1387,6 +1388,15 @@ $o-ptm-phone: 30rem;
 
     .o_ptm_shipment--partial .o_ptm_shipment_edge {
         background: var(--o-ptm-color-warning);
+    }
+
+    .o_ptm_shipment--failed {
+        background: var(--o-ptm-color-signal-soft);
+
+        .o_ptm_shipment_edge {
+            width: var(--o-ptm-space-2);
+            background: var(--o-ptm-color-signal);
+        }
     }
 
     .o_ptm_shipment--delivered .o_ptm_shipment_edge {

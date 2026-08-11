@@ -4,6 +4,12 @@ from odoo import _, api, fields, models
 from odoo.exceptions import AccessError, UserError, ValidationError
 from odoo.tools import SQL
 
+from .events import (
+    DELIVERY_ATTEMPT_CREATE_CONTEXT,
+    DELIVERY_ATTEMPT_CREATE_TOKEN,
+    DELIVERY_RETRY_CREATE_CONTEXT,
+    DELIVERY_RETRY_CREATE_TOKEN,
+)
 from .reassignment import REASSIGNMENT_CREATE_CONTEXT, REASSIGNMENT_CREATE_TOKEN
 
 RESERVED_STATES = (
@@ -91,6 +97,7 @@ class ParcelShipment(models.Model):
             ("picked_up", "Picked Up"),
             ("in_transit", "In Transit"),
             ("partially_delivered", "Partially Delivered"),
+            ("delivery_failed", "Delivery Failed"),
             ("delivered", "Delivered"),
             ("cancelled", "Cancelled"),
         ],
@@ -141,6 +148,12 @@ class ParcelShipment(models.Model):
     first_picked_up_at = fields.Datetime(readonly=True, copy=False)
     transit_started_at = fields.Datetime(readonly=True, copy=False)
     delivered_at = fields.Datetime(readonly=True, copy=False)
+    has_delivered_packages = fields.Boolean(
+        compute="_compute_has_delivered_packages",
+        store=True,
+        readonly=True,
+        copy=False,
+    )
     sla_revision_ids = fields.One2many(
         "parcel.sla.revision",
         "shipment_id",
@@ -157,6 +170,18 @@ class ParcelShipment(models.Model):
         "parcel.courier.reassignment",
         "shipment_id",
         string="Courier Reassignments",
+        readonly=True,
+    )
+    delivery_attempt_ids = fields.One2many(
+        "parcel.delivery.attempt",
+        "shipment_id",
+        string="Delivery Attempts",
+        readonly=True,
+    )
+    delivery_retry_ids = fields.One2many(
+        "parcel.delivery.retry",
+        "shipment_id",
+        string="Delivery Retries",
         readonly=True,
     )
     delay_hours = fields.Float(
@@ -187,6 +212,13 @@ class ParcelShipment(models.Model):
     def _compute_total_weight_kg(self):
         for shipment in self:
             shipment.total_weight_kg = sum(shipment.package_ids.mapped("weight_kg"))
+
+    @api.depends("package_ids.delivery_event_id")
+    def _compute_has_delivered_packages(self):
+        for shipment in self:
+            shipment.has_delivered_packages = any(
+                shipment.package_ids.mapped("delivery_event_id")
+            )
 
     @api.depends(
         "delivered_at",
@@ -413,6 +445,7 @@ class ParcelShipment(models.Model):
                 "state",
                 "courier_id",
                 "package_ids",
+                "delivery_attempt_ids",
                 "expected_delivery_at",
                 "original_expected_delivery_at",
                 "first_picked_up_at",
@@ -906,6 +939,112 @@ class ParcelShipment(models.Model):
             delivery_values["delivered_at"] = event.occurred_at
         super(ParcelShipment, shipment).write(delivery_values)
         return event
+
+    def action_record_delivery_failure(self, reason):
+        self.ensure_one()
+        shipment = self._lock_shipments()
+        packages = shipment._lock_packages()
+        courier = shipment.courier_id
+        shipment._lock_couriers(courier)
+        shipment._require_operational_access()
+        if shipment.state not in ("in_transit", "partially_delivered"):
+            raise UserError(
+                _("A delivery failure can only be recorded while in transit.")
+            )
+        if not reason or not reason.strip():
+            raise UserError(_("A delivery failure reason is required."))
+        if not courier:
+            raise UserError(_("A delivery failure requires an assigned courier."))
+        undelivered = packages.filtered(lambda package: not package.delivery_event_id)
+        if not undelivered or any(
+            not package.pickup_event_id for package in undelivered
+        ):
+            raise UserError(
+                _(
+                    "A failed delivery requires at least one undelivered picked-up package."
+                )
+            )
+
+        attempt = (
+            self.env["parcel.delivery.attempt"]
+            .with_context(
+                {
+                    DELIVERY_ATTEMPT_CREATE_CONTEXT: DELIVERY_ATTEMPT_CREATE_TOKEN,
+                }
+            )
+            .create(
+                {
+                    "shipment_id": shipment.id,
+                    "courier_id": courier.id,
+                    "reason": reason.strip(),
+                }
+            )
+        )
+        super(ParcelShipment, shipment).write(
+            {
+                "courier_id": False,
+                "state": "delivery_failed",
+                "coverage_warning": shipment._coverage_warning_for(),
+            }
+        )
+        return attempt
+
+    def action_retry_delivery(self, courier_id, reason):
+        self.ensure_one()
+        self._require_dispatch_access()
+        shipment = self._lock_shipments()
+        packages = shipment._lock_packages()
+        new_courier = self.env["parcel.courier"].browse(courier_id).exists()
+        latest_attempt = self.env["parcel.delivery.attempt"].search(
+            [("shipment_id", "=", shipment.id)],
+            order="occurred_at desc, id desc",
+            limit=1,
+        )
+        couriers = shipment.courier_id | latest_attempt.courier_id | new_courier
+        shipment._lock_couriers(couriers)
+        if shipment.state != "delivery_failed" or shipment.courier_id:
+            raise UserError(_("Only a failed, unassigned shipment can be retried."))
+        if not reason or not reason.strip():
+            raise UserError(_("A delivery retry reason is required."))
+        if not latest_attempt or latest_attempt.retry_ids:
+            raise UserError(_("The latest delivery attempt has already been resolved."))
+        if not new_courier:
+            raise UserError(_("A valid courier is required."))
+        if shipment.company_id != new_courier.company_id:
+            raise UserError(
+                _("The courier and shipment must belong to the same company.")
+            )
+        self._check_courier_capacity(new_courier, shipment)
+
+        retry = (
+            self.env["parcel.delivery.retry"]
+            .with_context(
+                {
+                    DELIVERY_RETRY_CREATE_CONTEXT: DELIVERY_RETRY_CREATE_TOKEN,
+                }
+            )
+            .create(
+                {
+                    "attempt_id": latest_attempt.id,
+                    "new_courier_id": new_courier.id,
+                    "reason": reason.strip(),
+                }
+            )
+        )
+        target_state = (
+            "partially_delivered"
+            if any(package.delivery_event_id for package in packages)
+            else "in_transit"
+        )
+        super(ParcelShipment, shipment).write(
+            {
+                "courier_id": new_courier.id,
+                "state": target_state,
+                "coverage_warning": shipment._coverage_warning_for(new_courier),
+            }
+        )
+        shipment._post_coverage_warning()
+        return retry
 
     def action_cancel(self, reason):
         if not self.env.su and not self.env.user.has_group(

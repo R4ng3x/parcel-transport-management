@@ -7,7 +7,7 @@ from odoo.tools import SQL
 
 from .shipment import RESERVED_STATES
 
-OPEN_STATES = ("draft", *RESERVED_STATES)
+OPEN_STATES = ("draft", "delivery_failed", *RESERVED_STATES)
 ON_ROUTE_STATES = (
     "partially_picked_up",
     "picked_up",

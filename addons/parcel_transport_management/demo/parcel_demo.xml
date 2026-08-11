@@ -241,6 +241,38 @@
             eval="([ref('shipment_in_transit')],)"
         />
 
+        <!-- Failed delivery with its courier released by the domain action. -->
+        <record id="shipment_delivery_failed" model="parcel.shipment">
+            <field name="company_id" ref="base.main_company" />
+            <field name="sender_id" ref="partner_sender_madrid" />
+            <field name="recipient_id" ref="partner_recipient_barcelona" />
+        </record>
+        <record id="package_delivery_failed" model="parcel.package">
+            <field name="shipment_id" ref="shipment_delivery_failed" />
+            <field name="weight">7.0</field>
+            <field name="weight_uom_id" ref="uom.product_uom_kgm" />
+        </record>
+        <function
+            model="parcel.shipment"
+            name="action_assign"
+            eval="([ref('shipment_delivery_failed')], ref('courier_cross_city'))"
+        />
+        <function
+            model="parcel.shipment"
+            name="action_record_pickup"
+            eval="([ref('shipment_delivery_failed')], [ref('package_delivery_failed')], 'Collected for the failed-delivery scenario')"
+        />
+        <function
+            model="parcel.shipment"
+            name="action_start_transit"
+            eval="([ref('shipment_delivery_failed')],)"
+        />
+        <function
+            model="parcel.shipment"
+            name="action_record_delivery_failure"
+            eval="([ref('shipment_delivery_failed')], 'Recipient was unavailable at the delivery location')"
+        />
+
         <!-- Partial delivery / Entrega parcial -->
         <record id="shipment_partially_delivered" model="parcel.shipment">
             <field name="company_id" ref="base.main_company" />

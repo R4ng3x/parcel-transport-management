@@ -7,6 +7,7 @@
         <t t-elif="status_code == 'picked_up'">Picked up</t>
         <t t-elif="status_code == 'in_transit'">In transit</t>
         <t t-elif="status_code == 'partially_delivered'">Partially delivered</t>
+        <t t-elif="status_code == 'delivery_failed'">Delivery failed</t>
         <t t-elif="status_code == 'delivered'">Delivered</t>
         <t t-elif="status_code == 'cancelled'">Cancelled</t>
         <t t-else="">Status update</t>

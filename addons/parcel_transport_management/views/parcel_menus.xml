@@ -62,6 +62,22 @@
         sequence="20"
     />
     <menuitem
+        id="menu_ptm_delivery_attempt_history"
+        name="Delivery Attempts"
+        parent="menu_ptm_history"
+        action="action_ptm_delivery_attempt_history"
+        sequence="25"
+        groups="parcel_transport_management.group_ptm_operator"
+    />
+    <menuitem
+        id="menu_ptm_delivery_retry_history"
+        name="Delivery Retries"
+        parent="menu_ptm_history"
+        action="action_ptm_delivery_retry_history"
+        sequence="26"
+        groups="parcel_transport_management.group_ptm_operator"
+    />
+    <menuitem
         id="menu_ptm_sla_history"
         name="SLA Revisions"
         parent="menu_ptm_history"

@@ -4,7 +4,7 @@
         <field name="name">parcel.assignment.wizard.form</field>
         <field name="model">parcel.assignment.wizard</field>
         <field name="arch" type="xml">
-            <form string="Assign Courier" class="o_ptm_wizard">
+            <form string="Assign, Reassign, or Retry Courier" class="o_ptm_wizard">
                 <group>
                     <field name="company_id" invisible="1" />
                     <field name="shipment_state" invisible="1" />
@@ -24,7 +24,7 @@
                 <footer>
                     <button
                         name="action_confirm"
-                        string="Confirm Assignment"
+                        string="Confirm"
                         type="object"
                         class="btn-primary"
                     />
@@ -35,10 +35,47 @@
     </record>
 
     <record id="action_ptm_assignment_wizard" model="ir.actions.act_window">
-        <field name="name">Assign or Reassign Courier</field>
+        <field name="name">Assign, Reassign, or Retry Courier</field>
         <field name="res_model">parcel.assignment.wizard</field>
         <field name="view_mode">form</field>
         <field name="view_id" ref="view_ptm_assignment_wizard_form" />
+        <field name="target">new</field>
+    </record>
+
+    <record id="view_ptm_delivery_failure_wizard_form" model="ir.ui.view">
+        <field name="name">parcel.delivery.failure.wizard.form</field>
+        <field name="model">parcel.delivery.failure.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Record Delivery Failure" class="o_ptm_wizard">
+                <group>
+                    <field name="company_id" invisible="1" />
+                    <field name="shipment_id" readonly="1" />
+                    <field
+                        name="package_ids"
+                        widget="many2many_tags"
+                        readonly="1"
+                        options="{'no_create': True, 'no_open': True}"
+                    />
+                    <field name="reason" required="1" />
+                </group>
+                <footer>
+                    <button
+                        name="action_confirm"
+                        string="Record Failure"
+                        type="object"
+                        class="btn-danger"
+                    />
+                    <button string="Discard" special="cancel" class="btn-secondary" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_ptm_delivery_failure_wizard" model="ir.actions.act_window">
+        <field name="name">Record Delivery Failure</field>
+        <field name="res_model">parcel.delivery.failure.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_ptm_delivery_failure_wizard_form" />
         <field name="target">new</field>
     </record>
 

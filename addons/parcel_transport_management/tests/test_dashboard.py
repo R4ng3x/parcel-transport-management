@@ -820,3 +820,30 @@ class TestParcelDashboard(ParcelTestCase):
             },
             {(other_zone.id, other_zone.id)},
         )
+
+    def test_failed_shipment_stays_in_queue_without_changing_dashboard_contract(self):
+        courier = self.create_courier(name="Failed Delivery Courier")
+        shipment = self.create_shipment()
+        self._assign_at(shipment, courier, self.NOW)
+        shipment.action_record_pickup(shipment.package_ids.ids)
+        shipment.action_start_transit()
+        shipment.action_record_delivery_failure("Recipient location was inaccessible")
+
+        dashboard = self._dashboard()
+
+        json.dumps(dashboard)
+        self.assertEqual(set(dashboard), self.ROOT_KEYS)
+        self.assertEqual(set(dashboard["stats"]), self.STATS_KEYS)
+        self.assertEqual(dashboard["queue_total"], 1)
+        self.assertFalse(dashboard["queue_truncated"])
+        self.assertEqual(dashboard["stats"]["total_shipments"], 1)
+        self.assertEqual(dashboard["stats"]["reserved_shipments"], 0)
+        self.assertEqual(dashboard["stats"]["in_transit_shipments"], 0)
+        self.assertEqual(dashboard["stats"]["partial_shipments"], 0)
+        self.assertEqual(len(dashboard["shipments"]), 1)
+        failed_item = dashboard["shipments"][0]
+        self.assertEqual(set(failed_item), self.SHIPMENT_KEYS)
+        self.assertEqual(failed_item["id"], shipment.id)
+        self.assertEqual(failed_item["state"], "delivery_failed")
+        self.assertEqual(failed_item["state_label"], "Delivery Failed")
+        self.assertFalse(failed_item["courier"])

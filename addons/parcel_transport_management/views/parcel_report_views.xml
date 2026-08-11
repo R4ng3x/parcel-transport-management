@@ -1,0 +1,445 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="paperformat_shipment_manifest" model="report.paperformat">
+        <field name="name">Parcel Shipment Manifest A4</field>
+        <field name="default" eval="False" />
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">12</field>
+        <field name="margin_bottom">12</field>
+        <field name="margin_left">12</field>
+        <field name="margin_right">12</field>
+        <field name="header_line" eval="False" />
+        <field name="header_spacing">6</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="paperformat_package_label" model="report.paperformat">
+        <field name="name">Parcel Package Label 100 x 150 mm</field>
+        <field name="default" eval="False" />
+        <field name="format">custom</field>
+        <field name="page_height">150</field>
+        <field name="page_width">100</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">4</field>
+        <field name="margin_bottom">4</field>
+        <field name="margin_left">4</field>
+        <field name="margin_right">4</field>
+        <field name="header_line" eval="False" />
+        <field name="header_spacing">0</field>
+        <field name="dpi">90</field>
+        <field name="disable_shrinking" eval="True" />
+    </record>
+
+    <record id="action_report_shipment_manifest" model="ir.actions.report">
+        <field name="name">Shipment Manifest</field>
+        <field name="model">parcel.shipment</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name" eval="'parcel_transport_management.report_shipment_manifest'" />
+        <field name="report_file" eval="'parcel_transport_management.report_shipment_manifest'" />
+        <field name="print_report_name">'Shipment Manifest - %s' % object.reference</field>
+        <field name="binding_model_id" ref="model_parcel_shipment" />
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="paperformat_shipment_manifest" />
+    </record>
+
+    <record id="action_report_package_label" model="ir.actions.report">
+        <field name="name">Package Label</field>
+        <field name="model">parcel.package</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name" eval="'parcel_transport_management.report_package_label'" />
+        <field name="report_file" eval="'parcel_transport_management.report_package_label'" />
+        <field name="print_report_name">'Package Label - %s' % object.tracking_code</field>
+        <field name="binding_model_id" ref="model_parcel_package" />
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="paperformat_package_label" />
+    </record>
+
+    <template id="report_shipment_manifest">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="shipment">
+                <t t-call="parcel_transport_management.report_shipment_manifest_document" />
+            </t>
+        </t>
+    </template>
+
+    <template id="report_shipment_manifest_document">
+        <t t-call="web.external_layout">
+            <t t-set="o" t-value="shipment" />
+            <t t-set="company" t-value="shipment.company_id" />
+            <div class="page o_ptm_manifest">
+                <style>
+                    .o_ptm_manifest {
+                        color: #17222d;
+                        font-size: 11px;
+                    }
+                    .o_ptm_manifest_header {
+                        align-items: flex-end;
+                        border-bottom: 3px solid #d70032;
+                        display: flex;
+                        justify-content: space-between;
+                        margin-bottom: 18px;
+                        padding-bottom: 10px;
+                    }
+                    .o_ptm_manifest_header h1 {
+                        font-size: 25px;
+                        letter-spacing: 0.04em;
+                        margin: 0;
+                    }
+                    .o_ptm_manifest_reference {
+                        font-size: 15px;
+                        font-weight: 700;
+                    }
+                    .o_ptm_manifest_grid {
+                        display: table;
+                        margin-bottom: 14px;
+                        table-layout: fixed;
+                        width: 100%;
+                    }
+                    .o_ptm_manifest_cell {
+                        border: 1px solid #d8dee4;
+                        display: table-cell;
+                        padding: 10px;
+                        vertical-align: top;
+                        width: 50%;
+                    }
+                    .o_ptm_manifest_cell + .o_ptm_manifest_cell {
+                        border-left: 0;
+                    }
+                    .o_ptm_manifest_label {
+                        color: #5d6975;
+                        display: block;
+                        font-size: 9px;
+                        font-weight: 700;
+                        letter-spacing: 0.08em;
+                        margin-bottom: 4px;
+                        text-transform: uppercase;
+                    }
+                    .o_ptm_manifest_route {
+                        background: #f3f5f7;
+                        border-left: 4px solid #d70032;
+                        margin-bottom: 14px;
+                        padding: 10px 12px;
+                    }
+                    .o_ptm_manifest_table {
+                        border-collapse: collapse;
+                        margin-top: 8px;
+                        width: 100%;
+                    }
+                    .o_ptm_manifest_table th,
+                    .o_ptm_manifest_table td {
+                        border-bottom: 1px solid #d8dee4;
+                        padding: 7px 6px;
+                        text-align: left;
+                    }
+                    .o_ptm_manifest_table th {
+                        background: #17222d;
+                        color: #ffffff;
+                        font-size: 9px;
+                        letter-spacing: 0.06em;
+                        text-transform: uppercase;
+                    }
+                    .o_ptm_manifest_warning {
+                        background: #fff5d9;
+                        border: 1px solid #e4b64c;
+                        margin: 12px 0;
+                        padding: 9px 11px;
+                    }
+                    .o_ptm_manifest_signatures {
+                        display: table;
+                        margin-top: 34px;
+                        table-layout: fixed;
+                        width: 100%;
+                    }
+                    .o_ptm_manifest_signature {
+                        display: table-cell;
+                        padding-right: 24px;
+                        width: 50%;
+                    }
+                    .o_ptm_manifest_signature_line {
+                        border-bottom: 1px solid #17222d;
+                        height: 38px;
+                        margin-bottom: 5px;
+                    }
+                </style>
+
+                <div class="o_ptm_manifest_header">
+                    <div>
+                        <span class="o_ptm_manifest_label">
+                            Operational document
+                        </span>
+                        <h1>Shipment Manifest</h1>
+                    </div>
+                    <div class="o_ptm_manifest_reference">
+                        <span t-field="shipment.reference" />
+                    </div>
+                </div>
+
+                <div class="o_ptm_manifest_grid">
+                    <div class="o_ptm_manifest_cell">
+                        <span class="o_ptm_manifest_label">Pickup address</span>
+                        <strong t-out="shipment.pickup_name" />
+                        <div t-out="shipment.pickup_street" />
+                        <div t-if="shipment.pickup_street2" t-out="shipment.pickup_street2" />
+                        <div>
+                            <span t-out="shipment.pickup_zip" />
+                            <span t-out="shipment.pickup_city" />
+                        </div>
+                        <div t-if="shipment.pickup_country_id">
+                            <span t-field="shipment.pickup_country_id" />
+                        </div>
+                    </div>
+                    <div class="o_ptm_manifest_cell">
+                        <span class="o_ptm_manifest_label">Delivery address</span>
+                        <strong t-out="shipment.delivery_name" />
+                        <div t-out="shipment.delivery_street" />
+                        <div t-if="shipment.delivery_street2" t-out="shipment.delivery_street2" />
+                        <div>
+                            <span t-out="shipment.delivery_zip" />
+                            <span t-out="shipment.delivery_city" />
+                        </div>
+                        <div t-if="shipment.delivery_country_id">
+                            <span t-field="shipment.delivery_country_id" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="o_ptm_manifest_route">
+                    <div class="row">
+                        <div class="col-4">
+                            <span class="o_ptm_manifest_label">Status</span>
+                            <strong>
+                                <span t-field="shipment.state" />
+                            </strong>
+                        </div>
+                        <div class="col-4">
+                            <span class="o_ptm_manifest_label">Courier</span>
+                            <strong t-if="shipment.courier_id">
+                                <span t-field="shipment.courier_id" />
+                            </strong>
+                            <span t-else="">Unassigned</span>
+                        </div>
+                        <div class="col-4">
+                            <span class="o_ptm_manifest_label">
+                                Expected delivery
+                            </span>
+                            <strong t-if="shipment.expected_delivery_at">
+                                <span t-field="shipment.expected_delivery_at" />
+                            </strong>
+                            <span t-else="">Not committed</span>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-6">
+                            <span class="o_ptm_manifest_label">Origin zone</span>
+                            <span
+                                t-if="shipment.origin_zone_id"
+                                t-field="shipment.origin_zone_id"
+                            />
+                            <span t-else="">Unresolved</span>
+                        </div>
+                        <div class="col-6">
+                            <span class="o_ptm_manifest_label">
+                                Destination zone
+                            </span>
+                            <span
+                                t-if="shipment.destination_zone_id"
+                                t-field="shipment.destination_zone_id"
+                            />
+                            <span t-else="">Unresolved</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div t-if="shipment.coverage_warning" class="o_ptm_manifest_warning">
+                    <strong>Coverage review:</strong>
+                    <span t-field="shipment.coverage_warning" />
+                </div>
+
+                <h2>Packages</h2>
+                <table class="o_ptm_manifest_table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Tracking code</th>
+                            <th>Weight</th>
+                            <th>Pickup</th>
+                            <th>Delivery</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="shipment.package_ids" t-as="package">
+                            <td t-out="package_index + 1" />
+                            <td>
+                                <span t-field="package.tracking_code" />
+                            </td>
+                            <td>
+                                <span
+                                    t-field="package.weight"
+                                    t-options="{'widget': 'float', 'precision': 2}"
+                                />
+                                <span t-field="package.weight_uom_id" />
+                            </td>
+                            <td>
+                                <span t-if="package.pickup_event_id">Recorded</span>
+                                <span t-else="">Pending</span>
+                            </td>
+                            <td>
+                                <span t-if="package.delivery_event_id">Recorded</span>
+                                <span t-else="">Pending</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="text-end mt-2">
+                    <strong>Total:</strong>
+                    <span
+                    t-field="shipment.total_weight_kg"
+                    t-options="{'widget': 'float', 'precision': 2}"
+                /> kg
+                </div>
+
+                <div class="o_ptm_manifest_signatures">
+                    <div class="o_ptm_manifest_signature">
+                        <div class="o_ptm_manifest_signature_line" />
+                        <span>Pickup signature and time</span>
+                    </div>
+                    <div class="o_ptm_manifest_signature">
+                        <div class="o_ptm_manifest_signature_line" />
+                        <span>Delivery signature and time</span>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="report_package_label">
+        <t t-call="web.basic_layout">
+            <t t-foreach="docs" t-as="package">
+                <div class="page o_ptm_package_label">
+                    <style>
+                        .o_ptm_package_label {
+                            color: #101820;
+                            font-family: sans-serif;
+                            font-size: 12px;
+                            padding: 0;
+                        }
+                        .o_ptm_package_label_header {
+                            border-bottom: 3px solid #d70032;
+                            display: flex;
+                            justify-content: space-between;
+                            margin-bottom: 7mm;
+                            padding-bottom: 3mm;
+                        }
+                        .o_ptm_package_label_kicker {
+                            font-size: 10px;
+                            font-weight: 700;
+                            letter-spacing: 0.1em;
+                            text-transform: uppercase;
+                        }
+                        .o_ptm_package_label_reference {
+                            font-size: 14px;
+                            font-weight: 700;
+                        }
+                        .o_ptm_package_label_barcode_wrap {
+                            margin: 7mm 0 4mm;
+                            text-align: center;
+                        }
+                        .o_ptm_package_label_code {
+                            font-family: monospace;
+                            font-size: 18px;
+                            font-weight: 700;
+                            letter-spacing: 0.04em;
+                            text-align: center;
+                        }
+                        .o_ptm_package_label_grid {
+                            border: 1px solid #101820;
+                            display: table;
+                            margin-top: 8mm;
+                            table-layout: fixed;
+                            width: 100%;
+                        }
+                        .o_ptm_package_label_cell {
+                            display: table-cell;
+                            padding: 4mm;
+                            vertical-align: top;
+                            width: 50%;
+                        }
+                        .o_ptm_package_label_cell + .o_ptm_package_label_cell {
+                            border-left: 1px solid #101820;
+                        }
+                        .o_ptm_package_label_term {
+                            display: block;
+                            font-size: 9px;
+                            font-weight: 700;
+                            letter-spacing: 0.08em;
+                            margin-bottom: 2mm;
+                            text-transform: uppercase;
+                        }
+                        .o_ptm_package_label_value {
+                            font-size: 15px;
+                            font-weight: 700;
+                        }
+                    </style>
+
+                    <div class="o_ptm_package_label_header">
+                        <div>
+                            <div class="o_ptm_package_label_kicker">
+                                Parcel Transport
+                            </div>
+                            <div>Package label</div>
+                        </div>
+                        <div class="o_ptm_package_label_reference">
+                            <span t-field="package.shipment_id.reference" />
+                        </div>
+                    </div>
+
+                    <div class="o_ptm_package_label_barcode_wrap">
+                        <span
+                            t-field="package.tracking_code"
+                            t-options="{
+                                'widget': 'barcode',
+                                'symbology': 'Code128',
+                                'width': 800,
+                                'height': 180,
+                                'humanreadable': 0,
+                                'quiet': 1,
+                                'img_alt': 'Code128 barcode',
+                                'img_style': 'width: 100%; height: 30mm; object-fit: contain;'
+                            }"
+                        />
+                    </div>
+                    <div class="o_ptm_package_label_code">
+                        <span t-field="package.tracking_code" />
+                    </div>
+
+                    <div class="o_ptm_package_label_grid">
+                        <div class="o_ptm_package_label_cell">
+                            <span class="o_ptm_package_label_term">Weight</span>
+                            <span class="o_ptm_package_label_value">
+                                <span
+                                    t-field="package.weight"
+                                    t-options="{'widget': 'float', 'precision': 2}"
+                                />
+                                <span t-field="package.weight_uom_id" />
+                            </span>
+                        </div>
+                        <div class="o_ptm_package_label_cell">
+                            <span class="o_ptm_package_label_term">
+                                Destination zone
+                            </span>
+                            <span
+                                t-if="package.shipment_id.destination_zone_id"
+                                class="o_ptm_package_label_value"
+                                t-field="package.shipment_id.destination_zone_id"
+                            />
+                            <span t-else="" class="o_ptm_package_label_value">
+                                Review
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>
