@@ -1,21 +1,28 @@
 import threading
 import time
 import uuid
+from unittest.mock import patch
 
 from odoo import SUPERUSER_ID, Command, api
 from odoo.exceptions import UserError
 from odoo.orm.environments import Transaction
 from odoo.tests import tagged
+from odoo.tests.common import TransactionCase
 from psycopg2.errors import SerializationFailure
-
-from .common import ParcelTestCase
 
 
 @tagged("post_install", "-at_install")
-class TestParcelConcurrency(ParcelTestCase):
+class TestParcelConcurrency(TransactionCase):
     _BARRIER_TIMEOUT = 5.0
     _OVERLAP_TIMEOUT = 2.0
     _RACE_TIMEOUT = 10.0
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.company = cls.env.company
+        cls.country = cls.env.ref("base.es")
+        cls.kg_uom = cls.env.ref("uom.product_uom_kgm")
 
     def _independent_env(self, cr, company_id, registry):
         if cr.transaction is None:
@@ -531,3 +538,136 @@ class TestParcelConcurrency(ParcelTestCase):
             ),
             1,
         )
+
+
+@tagged("post_install", "-at_install")
+class TestParcelPackageLimitConcurrency(TransactionCase):
+    _WAIT_TIMEOUT = 5.0
+
+    def _independent_env(self, cr, company_id):
+        if cr.transaction is None:
+            cr.transaction = Transaction(self.env.registry)
+        return api.Environment(
+            cr,
+            SUPERUSER_ID,
+            {"allowed_company_ids": [company_id]},
+        )
+
+    def test_limit_reduction_and_package_creation_cannot_both_commit(self):
+        company_id = self.env.company.id
+        registry = self.env.registry
+        with registry.cursor() as cr:
+            env = self._independent_env(cr, company_id)
+            initial_limit = env.company.parcel_max_package_weight
+            country = env.ref("base.es")
+            sender = env["res.partner"].create(
+                {
+                    "name": "Concurrent Limit Sender",
+                    "company_id": company_id,
+                    "country_id": country.id,
+                }
+            )
+            recipient = env["res.partner"].create(
+                {
+                    "name": "Concurrent Limit Recipient",
+                    "company_id": company_id,
+                    "country_id": country.id,
+                }
+            )
+            shipment = env["parcel.shipment"].create(
+                {
+                    "company_id": company_id,
+                    "sender_id": sender.id,
+                    "recipient_id": recipient.id,
+                }
+            )
+            shipment_id = shipment.id
+            partner_ids = (sender.id, recipient.id)
+            kg_uom_id = env.ref("uom.product_uom_kgm").id
+            cr.commit()
+
+        def cleanup():
+            with registry.cursor() as cr:
+                env = self._independent_env(cr, company_id)
+                env["parcel.package"].search(
+                    [("shipment_id", "=", shipment_id)]
+                ).unlink()
+                env["parcel.shipment"].browse(shipment_id).exists().unlink()
+                env["res.partner"].browse(partner_ids).exists().unlink()
+                env["res.company"].browse(company_id).write(
+                    {"parcel_max_package_weight": initial_limit}
+                )
+                cr.commit()
+
+        self.addCleanup(cleanup)
+        config_ready = threading.Event()
+        package_snapshot_ready = threading.Event()
+        outcomes = [None, None]
+        original_lock_shipments = type(self.env["parcel.shipment"])._lock_shipments
+
+        def reduce_limit():
+            try:
+                with registry.cursor() as cr:
+                    env = self._independent_env(cr, company_id)
+                    company = env["res.company"].browse(company_id)
+                    company.write({"parcel_max_package_weight": 10.0})
+                    company.flush_recordset(["parcel_max_package_weight"])
+                    config_ready.set()
+                    package_snapshot_ready.wait(self._WAIT_TIMEOUT)
+                    cr.commit()
+                outcomes[0] = (True, None, None)
+            except BaseException as error:
+                config_ready.set()
+                outcomes[0] = (False, error, error.__traceback__)
+
+        def create_package():
+            try:
+                if not config_ready.wait(self._WAIT_TIMEOUT):
+                    raise TimeoutError("Limit update did not reach its commit boundary")
+                with registry.cursor() as cr:
+                    env = self._independent_env(cr, company_id)
+
+                    def signal_snapshot_then_lock(shipments):
+                        package_snapshot_ready.set()
+                        return original_lock_shipments(shipments)
+
+                    with patch.object(
+                        type(env["parcel.shipment"]),
+                        "_lock_shipments",
+                        signal_snapshot_then_lock,
+                    ):
+                        env["parcel.package"].create(
+                            {
+                                "shipment_id": shipment_id,
+                                "weight": 20.0,
+                                "weight_uom_id": kg_uom_id,
+                            }
+                        )
+                    cr.commit()
+                outcomes[1] = (True, None, None)
+            except BaseException as error:
+                outcomes[1] = (False, error, error.__traceback__)
+
+        threads = [
+            threading.Thread(target=reduce_limit, daemon=True),
+            threading.Thread(target=create_package, daemon=True),
+        ]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join(self._WAIT_TIMEOUT * 2)
+        self.assertFalse(any(thread.is_alive() for thread in threads))
+
+        for succeeded, error, traceback in outcomes:
+            if not succeeded and not isinstance(
+                error, (UserError, SerializationFailure)
+            ):
+                raise error.with_traceback(traceback)
+        self.assertEqual(sum(succeeded for succeeded, _error, _tb in outcomes), 1)
+
+        with registry.cursor() as cr:
+            env = self._independent_env(cr, company_id)
+            company = env["res.company"].browse(company_id)
+            packages = env["parcel.package"].search([("shipment_id", "=", shipment_id)])
+            self.assertEqual(company.parcel_max_package_weight, 10.0)
+            self.assertFalse(packages)

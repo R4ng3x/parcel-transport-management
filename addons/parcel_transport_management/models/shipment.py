@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from odoo import _, api, fields, models
+from odoo import Command, _, api, fields, models
 from odoo.exceptions import AccessError, UserError, ValidationError
 from odoo.tools import SQL
 
@@ -389,7 +389,34 @@ class ParcelShipment(models.Model):
             prepared.append(values)
         return super().create(prepared)
 
+    def _check_package_commands_access(self, commands):
+        packages = self.env["parcel.package"]
+        current_packages = self.mapped("package_ids")
+        for command in commands:
+            operation = command[0]
+            record_id = command[1] if len(command) > 1 else False
+            payload = command[2] if len(command) > 2 else False
+            if operation == Command.CREATE:
+                packages.check_access("create")
+            elif operation == Command.UPDATE:
+                packages.browse(record_id).check_access("write")
+            elif operation in (Command.DELETE, Command.UNLINK):
+                packages.browse(record_id).check_access("unlink")
+            elif operation == Command.LINK:
+                packages.browse(record_id).check_access("write")
+            elif operation == Command.CLEAR:
+                current_packages.check_access("unlink")
+            elif operation == Command.SET:
+                replacement_ids = set(payload or ())
+                current_packages.filtered(
+                    lambda package, replacement_ids=replacement_ids: (
+                        package.id not in replacement_ids
+                    )
+                ).check_access("unlink")
+                packages.browse(tuple(sorted(replacement_ids))).check_access("write")
+
     def write(self, vals):
+        self.check_access("write")
         protected = {
             "state",
             "courier_id",
@@ -435,6 +462,13 @@ class ParcelShipment(models.Model):
             "expected_delivery_at",
         }
         if mutable.intersection(vals):
+            if "package_ids" in vals:
+                self._check_package_commands_access(vals["package_ids"])
+            invalid = self.filtered(lambda shipment: shipment.state != "draft")
+            if invalid:
+                raise UserError(_("Shipment details can only be changed in draft."))
+            if "package_ids" in vals:
+                self.mapped("company_id")._lock_package_limits()
             self._lock_shipments()
             invalid = self.filtered(lambda shipment: shipment.state != "draft")
             if invalid:
@@ -549,6 +583,7 @@ class ParcelShipment(models.Model):
             raise AccessError(
                 _("Only parcel operators or managers can dispatch shipments.")
             )
+        self.check_access("write")
 
     def _require_operational_access(self):
         self.check_access("write")
@@ -563,6 +598,18 @@ class ParcelShipment(models.Model):
             "parcel_transport_management.group_ptm_manager"
         ):
             raise AccessError(_("Only parcel managers can perform this operation."))
+        self.check_access("write")
+
+    def _get_dispatch_courier(self, courier_id):
+        courier = self.env["parcel.courier"].browse(courier_id).exists()
+        if not courier:
+            raise UserError(_("A valid courier is required."))
+        courier.check_access("read")
+        if any(shipment.company_id != courier.company_id for shipment in self):
+            raise UserError(
+                _("The courier and shipment must belong to the same company.")
+            )
+        return courier
 
     def _base_coverage_warning(self):
         self.ensure_one()
@@ -646,21 +693,16 @@ class ParcelShipment(models.Model):
 
     def action_assign(self, courier_id):
         self._require_dispatch_access()
+        courier = self._get_dispatch_courier(courier_id)
+        self.mapped("company_id")._lock_package_limits()
         shipments = self._lock_shipments()
         packages = shipments._lock_packages()
-        courier = self.env["parcel.courier"].browse(courier_id).exists()
         shipments._lock_couriers(courier)
-        if not courier:
-            raise UserError(_("A valid courier is required."))
         invalid = shipments.filtered(lambda shipment: shipment.state != "draft")
         if invalid:
             raise UserError(_("Only draft shipments can be assigned."))
         if any(not shipment.package_ids for shipment in shipments):
             raise UserError(_("A shipment must contain at least one package."))
-        if any(shipment.company_id != courier.company_id for shipment in shipments):
-            raise UserError(
-                _("The courier and shipment must belong to the same company.")
-            )
         packages._check_weight_configuration()
         self._check_courier_capacity(courier, shipments)
 
@@ -710,13 +752,13 @@ class ParcelShipment(models.Model):
 
     def action_reassign(self, courier_id, reason=None):
         self._require_dispatch_access()
+        new_courier = self._get_dispatch_courier(courier_id)
+        if any(shipment.state != "assigned" for shipment in self):
+            self._require_manager_access()
         shipments = self._lock_shipments()
         shipments._lock_packages()
-        new_courier = self.env["parcel.courier"].browse(courier_id).exists()
         couriers = shipments.mapped("courier_id") | new_courier
         shipments._lock_couriers(couriers)
-        if not new_courier:
-            raise UserError(_("A valid courier is required."))
         invalid = shipments.filtered(
             lambda shipment: shipment.state not in RESERVED_STATES
         )
@@ -731,10 +773,6 @@ class ParcelShipment(models.Model):
                 raise UserError(
                     _("A reason is required to reassign a shipment after pickup.")
                 )
-        if any(shipment.company_id != new_courier.company_id for shipment in shipments):
-            raise UserError(
-                _("The courier and shipment must belong to the same company.")
-            )
         self._check_courier_capacity(new_courier, shipments)
         normalized_reason = reason.strip() if reason and reason.strip() else False
         for shipment in shipments:
@@ -1034,9 +1072,9 @@ class ParcelShipment(models.Model):
     def action_retry_delivery(self, courier_id, reason):
         self.ensure_one()
         self._require_dispatch_access()
+        new_courier = self._get_dispatch_courier(courier_id)
         shipment = self._lock_shipments()
         packages = shipment._lock_packages()
-        new_courier = self.env["parcel.courier"].browse(courier_id).exists()
         latest_attempt = self.env["parcel.delivery.attempt"].search(
             [("shipment_id", "=", shipment.id)],
             order="occurred_at desc, id desc",
@@ -1050,12 +1088,6 @@ class ParcelShipment(models.Model):
             raise UserError(_("A delivery retry reason is required."))
         if not latest_attempt or latest_attempt.retry_ids:
             raise UserError(_("The latest delivery attempt has already been resolved."))
-        if not new_courier:
-            raise UserError(_("A valid courier is required."))
-        if shipment.company_id != new_courier.company_id:
-            raise UserError(
-                _("The courier and shipment must belong to the same company.")
-            )
         self._check_courier_capacity(new_courier, shipment)
 
         retry = (
@@ -1093,6 +1125,7 @@ class ParcelShipment(models.Model):
             "parcel_transport_management.group_ptm_manager"
         ):
             raise AccessError(_("Only parcel managers can cancel shipments."))
+        self.check_access("write")
         shipments = self._lock_shipments()
         shipments._lock_packages()
         shipments._lock_couriers(shipments.mapped("courier_id"))

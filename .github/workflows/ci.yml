@@ -1,0 +1,102 @@
+name: CI
+
+on:
+    push:
+    pull_request:
+
+permissions:
+    contents: read
+
+jobs:
+    quality:
+        name: Quality (npm run quality)
+        runs-on: ubuntu-24.04
+        timeout-minutes: 15
+        steps:
+            - name: Check out repository
+              uses: actions/checkout@v4
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20.19.0
+                  cache: false
+
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.12"
+
+            - name: Install npm 11.16.0
+              run: npm install --global npm@11.16.0
+
+            - name: Install JavaScript dependencies
+              run: npm ci
+
+            - name: Install uv
+              uses: astral-sh/setup-uv@v6
+              with:
+                  version: 0.9.18
+                  enable-cache: false
+
+            - name: Run quality checks
+              run: npm run quality
+
+    odoo-tests:
+        name: Odoo backend and Command Center HOOT suites
+        runs-on: ubuntu-24.04
+        timeout-minutes: 40
+        steps:
+            - name: Check out repository
+              uses: actions/checkout@v4
+
+            - name: Create ephemeral CI credentials
+              shell: bash
+              run: |
+                  printf 'ODOO_MASTER_PASSWORD=%s\n' "$(openssl rand -hex 32)" >> "$GITHUB_ENV"
+                  printf 'ODOO_TEST_DATABASE=parcel_transport_ci_%s_%s\n' \
+                    "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" >> "$GITHUB_ENV"
+                  printf 'ODOO_HOOT_DATABASE=parcel_transport_hoot_%s_%s\n' \
+                    "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" >> "$GITHUB_ENV"
+
+            - name: Start PostgreSQL
+              run: docker compose up --detach db
+
+            - name: Run addon domain, security, and concurrency tests
+              run: |
+                  docker compose run --rm odoo \
+                    --database "$ODOO_TEST_DATABASE" \
+                    --init parcel_transport_management \
+                    --test-enable \
+                    --test-tags /parcel_transport_management \
+                    --stop-after-init \
+                    --log-level=test
+
+            - name: Run Command Center HOOT behavior tests
+              run: |
+                  docker compose run --rm \
+                    --user root \
+                    --entrypoint /bin/bash \
+                    --env "ODOO_HOOT_DATABASE=$ODOO_HOOT_DATABASE" \
+                    odoo -c '
+                      set -euo pipefail
+                      curl -fsSL \
+                        https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
+                        -o /tmp/google-chrome.deb
+                      apt-get update
+                      apt-get install -y --no-install-recommends \
+                        /tmp/google-chrome.deb \
+                        python3-websocket
+                      su -s /bin/sh odoo -c "/usr/local/bin/parcel-odoo-entrypoint odoo \
+                        --database \"$ODOO_HOOT_DATABASE\" \
+                        --init parcel_transport_management \
+                        --test-enable \
+                        --test-tags /web:WebSuite.test_unit_desktop[@parcel_transport_management/parcel_dashboard] \
+                        --stop-after-init \
+                        --log-level=test" 2>&1 | tee /tmp/hoot.log
+                      python3 -c "import re; from pathlib import Path; text = Path(\"/tmp/hoot.log\").read_text(); assert \"[HOOT] Test suite succeeded\" in text; assert re.search(r\"\[HOOT\] Passed [1-9][0-9]* tests\", text)"
+                    '
+
+            - name: Remove disposable services and volumes
+              if: always()
+              run: docker compose down --volumes --remove-orphans

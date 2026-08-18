@@ -265,6 +265,345 @@ class TestParcelSecurity(ParcelTestCase):
                 unauthorized.action_start_transit()
             lock_shipments.assert_not_called()
 
+    def test_dispatch_and_manager_calls_reject_cross_company_before_locking(self):
+        other_courier = self.create_courier(company=self.other_company)
+        other_reassignment_courier = self.create_courier(
+            company=self.other_company,
+            name="Other-company reassignment courier",
+        )
+        draft = self.create_shipment(
+            company=self.other_company,
+            sender=self.other_sender,
+            recipient=self.other_recipient,
+            expected_delivery_at=fields.Datetime.now() + timedelta(days=1),
+        )
+        assigned = self.create_shipment(
+            company=self.other_company,
+            sender=self.other_sender,
+            recipient=self.other_recipient,
+        )
+        assigned.action_assign(other_courier.id)
+        failed = self.create_shipment(
+            company=self.other_company,
+            sender=self.other_sender,
+            recipient=self.other_recipient,
+        )
+        self._start_transit(failed, other_courier)
+        failed.action_record_delivery_failure("Other-company delivery failure")
+
+        operator_context = {"allowed_company_ids": self.company.ids}
+        manager_context = {"allowed_company_ids": self.company.ids}
+        operations = (
+            (
+                "assign",
+                lambda: (
+                    draft.with_user(self.operator_user)
+                    .with_context(**operator_context)
+                    .action_assign(other_courier.id)
+                ),
+            ),
+            (
+                "unassign",
+                lambda: (
+                    assigned.with_user(self.operator_user)
+                    .with_context(**operator_context)
+                    .action_unassign()
+                ),
+            ),
+            (
+                "reassign",
+                lambda: (
+                    assigned.with_user(self.operator_user)
+                    .with_context(**operator_context)
+                    .action_reassign(other_reassignment_courier.id)
+                ),
+            ),
+            (
+                "retry",
+                lambda: (
+                    failed.with_user(self.operator_user)
+                    .with_context(**operator_context)
+                    .action_retry_delivery(
+                        other_reassignment_courier.id,
+                        "Unauthorized retry",
+                    )
+                ),
+            ),
+            (
+                "cancel",
+                lambda: (
+                    draft.with_user(self.manager_user)
+                    .with_context(**manager_context)
+                    .action_cancel("Unauthorized cancellation")
+                ),
+            ),
+            (
+                "revise_sla",
+                lambda: (
+                    draft.with_user(self.manager_user)
+                    .with_context(**manager_context)
+                    .action_revise_sla(
+                        fields.Datetime.now() + timedelta(days=2),
+                        "Unauthorized SLA revision",
+                    )
+                ),
+            ),
+            (
+                "correct_route",
+                lambda: (
+                    draft.with_user(self.manager_user)
+                    .with_context(**manager_context)
+                    .action_correct_route(
+                        {"pickup_zip": "28001"},
+                        "Unauthorized route correction",
+                    )
+                ),
+            ),
+        )
+
+        for operation_name, operation in operations:
+            with self.subTest(operation=operation_name):
+                with (
+                    patch.object(
+                        type(self.company),
+                        "_lock_package_limits",
+                        side_effect=AssertionError(
+                            "unauthorized call acquired a company row lock"
+                        ),
+                    ) as lock_package_limits,
+                    patch.object(
+                        type(draft),
+                        "_lock_shipments",
+                        side_effect=AssertionError(
+                            "unauthorized call acquired a shipment row lock"
+                        ),
+                    ) as lock_shipments,
+                ):
+                    with self.assertRaises(AccessError):
+                        operation()
+                    lock_package_limits.assert_not_called()
+                    lock_shipments.assert_not_called()
+
+    def test_untrusted_courier_ids_are_rejected_before_locking(self):
+        other_company_courier = self.create_courier(company=self.other_company)
+        local_courier = self.create_courier(name="Local assigned courier")
+        draft = self.create_shipment()
+        assigned = self.create_shipment()
+        assigned.action_assign(local_courier.id)
+        failed = self.create_shipment()
+        self._start_transit(failed, local_courier)
+        failed.action_record_delivery_failure("Local delivery failure")
+        restricted_context = {"allowed_company_ids": self.company.ids}
+        restricted_draft = draft.with_user(self.manager_user).with_context(
+            **restricted_context
+        )
+        restricted_assigned = assigned.with_user(self.manager_user).with_context(
+            **restricted_context
+        )
+        restricted_failed = failed.with_user(self.manager_user).with_context(
+            **restricted_context
+        )
+        operations = (
+            (
+                "assign",
+                lambda: restricted_draft.action_assign(other_company_courier.id),
+            ),
+            (
+                "reassign",
+                lambda: restricted_assigned.action_reassign(other_company_courier.id),
+            ),
+            (
+                "retry",
+                lambda: restricted_failed.action_retry_delivery(
+                    other_company_courier.id,
+                    "Unauthorized candidate",
+                ),
+            ),
+        )
+
+        for operation_name, operation in operations:
+            with self.subTest(operation=operation_name):
+                with (
+                    patch.object(
+                        type(self.company),
+                        "_lock_package_limits",
+                        side_effect=AssertionError(
+                            "candidate was checked after company row locking"
+                        ),
+                    ) as lock_package_limits,
+                    patch.object(
+                        type(draft),
+                        "_lock_shipments",
+                        side_effect=AssertionError(
+                            "candidate was checked after shipment row locking"
+                        ),
+                    ) as lock_shipments,
+                    patch.object(
+                        type(draft),
+                        "_lock_couriers",
+                        side_effect=AssertionError(
+                            "candidate was checked after courier row locking"
+                        ),
+                    ) as lock_couriers,
+                ):
+                    with self.assertRaises(AccessError):
+                        operation()
+                    lock_package_limits.assert_not_called()
+                    lock_shipments.assert_not_called()
+                    lock_couriers.assert_not_called()
+
+    def test_live_reassignment_requires_manager_before_locking(self):
+        assigned_courier = self.create_courier(name="Live assigned courier")
+        replacement_courier = self.create_courier(name="Live replacement courier")
+        shipment = self.create_shipment()
+        self._start_transit(shipment, assigned_courier)
+        unauthorized = shipment.with_user(self.operator_user)
+
+        with patch.object(
+            type(unauthorized),
+            "_lock_shipments",
+            side_effect=AssertionError("manager check happened after row locking"),
+        ) as lock_shipments:
+            with self.assertRaises(AccessError):
+                unauthorized.action_reassign(
+                    replacement_courier.id,
+                    reason="Unauthorized active reassignment",
+                )
+            lock_shipments.assert_not_called()
+
+    def test_company_limit_write_checks_access_before_locking(self):
+        self.create_shipment()
+        unauthorized = self.company.with_user(self.courier_user)
+
+        with patch.object(
+            type(self.company),
+            "_lock_package_limits",
+            side_effect=AssertionError("company validation acquired a row lock"),
+        ) as lock_package_limits:
+            with self.assertRaises(AccessError):
+                unauthorized.write({"parcel_max_package_weight": 29.0})
+            lock_package_limits.assert_not_called()
+
+    def test_shipment_and_package_crud_reject_access_before_locking(self):
+        other_shipment = self.create_shipment(
+            company=self.other_company,
+            sender=self.other_sender,
+            recipient=self.other_recipient,
+        )
+        other_package = self.create_package(other_shipment)
+        local_draft = self.create_shipment()
+        assigned = self.create_shipment()
+        assigned_package = self.create_package(assigned)
+        assigned.action_assign(self._courier_for_courier_user().id)
+        restricted_context = {"allowed_company_ids": self.company.ids}
+        restricted_shipment = other_shipment.with_user(self.operator_user).with_context(
+            **restricted_context
+        )
+        restricted_package = other_package.with_user(self.operator_user).with_context(
+            **restricted_context
+        )
+        package_model = self.env["parcel.package"]
+        operations = (
+            (
+                "shipment_write",
+                lambda: restricted_shipment.write(
+                    {"expected_delivery_at": fields.Datetime.now() + timedelta(days=1)}
+                ),
+            ),
+            (
+                "package_create_without_acl",
+                lambda: package_model.with_user(self.courier_user).create(
+                    {"shipment_id": local_draft.id, "weight": 1.0}
+                ),
+            ),
+            (
+                "package_create_cross_company",
+                lambda: (
+                    package_model.with_user(self.operator_user)
+                    .with_context(**restricted_context)
+                    .create({"shipment_id": other_shipment.id, "weight": 1.0})
+                ),
+            ),
+            (
+                "package_write_cross_company",
+                lambda: restricted_package.write({"weight": 2.0}),
+            ),
+            (
+                "package_unlink_cross_company",
+                lambda: restricted_package.unlink(),
+            ),
+            (
+                "package_unlink_without_acl",
+                lambda: assigned_package.with_user(self.courier_user).unlink(),
+            ),
+        )
+
+        for operation_name, operation in operations:
+            with self.subTest(operation=operation_name):
+                with (
+                    patch.object(
+                        type(self.company),
+                        "_lock_package_limits",
+                        side_effect=AssertionError(
+                            "unauthorized CRUD call acquired a company row lock"
+                        ),
+                    ) as lock_package_limits,
+                    patch.object(
+                        type(other_shipment),
+                        "_lock_shipments",
+                        side_effect=AssertionError(
+                            "unauthorized CRUD call acquired a shipment row lock"
+                        ),
+                    ) as lock_shipments,
+                ):
+                    with self.assertRaises(AccessError):
+                        operation()
+                    lock_package_limits.assert_not_called()
+                    lock_shipments.assert_not_called()
+
+    def test_inline_package_create_checks_access_before_locking(self):
+        shipment = self.create_shipment()
+        shipment.action_assign(self._courier_for_courier_user().id)
+        unauthorized = shipment.with_user(self.courier_user)
+
+        with patch.object(
+            type(self.company),
+            "_lock_package_limits",
+            side_effect=AssertionError(
+                "unauthorized inline package create acquired a company row lock"
+            ),
+        ) as lock_package_limits:
+            with self.assertRaises(AccessError):
+                unauthorized.write(
+                    {
+                        "package_ids": [
+                            Command.create(
+                                {
+                                    "weight": 1.0,
+                                    "weight_uom_id": self.kg_uom.id,
+                                }
+                            )
+                        ]
+                    }
+                )
+            lock_package_limits.assert_not_called()
+
+    def test_assigned_package_weight_write_rejects_state_before_locking(self):
+        shipment = self.create_shipment()
+        shipment.action_assign(self._courier_for_courier_user().id)
+        package = shipment.package_ids.with_user(self.courier_user)
+
+        with patch.object(
+            type(self.company),
+            "_lock_package_limits",
+            side_effect=AssertionError(
+                "invalid package write acquired a company row lock"
+            ),
+        ) as lock_package_limits:
+            with self.assertRaises(UserError):
+                package.write({"weight": 2.0})
+            lock_package_limits.assert_not_called()
+
     def test_company_rules_hide_shipments_outside_allowed_companies(self):
         other_company_shipment = self.create_shipment(
             company=self.other_company,

@@ -30,6 +30,9 @@
             "parcel_transport_management/static/src/js/parcel_dashboard.js",
             "parcel_transport_management/static/src/xml/parcel_dashboard.xml",
         ],
+        "web.assets_unit_tests": [
+            "parcel_transport_management/static/tests/**/*",
+        ],
     },
     "application": True,
     "installable": True,

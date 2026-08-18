@@ -59,6 +59,60 @@ class TestParcelCore(ParcelTestCase):
             places=6,
         )
 
+    def test_package_default_get_uses_shipment_company(self):
+        shipment = self.create_shipment(
+            company=self.other_company,
+            sender=self.other_sender,
+            recipient=self.other_recipient,
+            packages=[],
+        )
+        defaults = (
+            self.env["parcel.package"]
+            .with_context(
+                allowed_company_ids=(self.company | self.other_company).ids,
+                default_shipment_id=shipment.id,
+            )
+            .with_company(self.company)
+            .default_get(["shipment_id", "weight_uom_id"])
+        )
+
+        self.assertEqual(defaults["shipment_id"], shipment.id)
+        self.assertEqual(defaults["weight_uom_id"], self.lb_uom.id)
+
+    def test_context_default_shipment_cannot_bypass_package_invariants(self):
+        shipment = self.create_shipment()
+        shipment.action_assign(self.courier.id)
+        package_count = len(shipment.package_ids)
+
+        with self.assertRaises(UserError):
+            self.env["parcel.package"].with_context(
+                default_shipment_id=shipment.id
+            ).create({"weight": 1.0})
+
+        self.assertEqual(len(shipment.package_ids), package_count)
+
+    def test_settings_update_package_limit_and_uom_atomically(self):
+        shipment = self.create_shipment(packages=[])
+        self.create_package(shipment, weight=20.0, uom=self.kg_uom)
+        self.company.write(
+            {
+                "parcel_max_package_weight": 70.0,
+                "parcel_max_package_weight_uom_id": self.lb_uom.id,
+            }
+        )
+        settings = self.env["res.config.settings"].create(
+            {
+                "company_id": self.company.id,
+                "parcel_max_package_weight": 30.0,
+                "parcel_max_package_weight_uom_id": self.kg_uom.id,
+            }
+        )
+
+        settings.set_values()
+
+        self.assertEqual(self.company.parcel_max_package_weight, 30.0)
+        self.assertEqual(self.company.parcel_max_package_weight_uom_id, self.kg_uom)
+
     def test_courier_company_is_allowed_on_create_and_immutable_afterward(self):
         courier_model = self.env["parcel.courier"].with_context(
             allowed_company_ids=self.company.ids
