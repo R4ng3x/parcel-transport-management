@@ -330,6 +330,19 @@ vez:
 \leq \text{max\_concurrent\_weight}
 \]
 
+Los límites de capacidad son **límites de admisión**, no restricciones
+retroactivas. Cambiar `max_concurrent_shipments`, `max_concurrent_weight` o
+`max_weight_uom_id` MUST NOT desasignar, cancelar ni invalidar reservas que ya
+fueron aceptadas. Una reducción MAY dejar temporalmente la carga reservada por
+encima del nuevo límite.
+
+Mientras la carga reservada existente no deje hueco suficiente bajo **ambos**
+límites, cualquier nueva `action_assign`, `action_reassign` o
+`action_retry_delivery` dirigida a ese repartidor MUST fallar sin modificar el
+envío ni su histórico. La admisión se reanuda automáticamente cuando las
+transiciones normales del dominio liberan suficiente capacidad; el cambio de
+configuración por sí mismo nunca expulsa trabajo ya reservado.
+
 - La conversión MUST usar `uom.uom._compute_quantity(..., round=False)`.
 - Los límites y sus unidades MUST ser estrictamente positivos y compatibles con
   peso.

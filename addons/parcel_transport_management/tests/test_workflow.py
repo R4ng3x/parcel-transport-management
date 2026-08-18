@@ -82,6 +82,72 @@ class TestParcelWorkflow(ParcelTestCase):
         self.assertEqual(assigned.courier_id, courier)
         self.assertFalse(rejected.courier_id)
 
+    def test_reduced_shipment_capacity_is_an_admission_limit(self):
+        courier = self.create_courier(
+            max_concurrent_shipments=2,
+            max_concurrent_weight=100.0,
+            max_weight_uom_id=self.kg_uom.id,
+        )
+        first = self.create_shipment()
+        second = self.create_shipment()
+        candidate = self.create_shipment()
+        first.action_assign(courier.id)
+        second.action_assign(courier.id)
+
+        courier.write({"max_concurrent_shipments": 1})
+
+        self.assertEqual(courier.current_shipment_count, 2)
+        self.assertEqual(first.courier_id, courier)
+        self.assertEqual(second.courier_id, courier)
+        self.assertEqual(first.state, "assigned")
+        self.assertEqual(second.state, "assigned")
+
+        with self.assertRaisesRegex(UserError, "no shipment capacity"):
+            candidate.action_assign(courier.id)
+
+        first.action_unassign()
+        self.assertEqual(courier.current_shipment_count, 1)
+        with self.assertRaisesRegex(UserError, "no shipment capacity"):
+            candidate.action_assign(courier.id)
+
+        second.action_unassign()
+        candidate.action_assign(courier.id)
+
+        self.assertEqual(courier.current_shipment_count, 1)
+        self.assertEqual(candidate.courier_id, courier)
+        self.assertEqual(candidate.state, "assigned")
+
+    def test_reduced_weight_capacity_is_an_admission_limit(self):
+        courier = self.create_courier(
+            max_concurrent_shipments=10,
+            max_concurrent_weight=10.0,
+            max_weight_uom_id=self.kg_uom.id,
+        )
+        heavy = self._shipment_with_weights(6.0)
+        light = self._shipment_with_weights(3.0)
+        candidate = self._shipment_with_weights(1.0)
+        heavy.action_assign(courier.id)
+        light.action_assign(courier.id)
+
+        courier.write({"max_concurrent_weight": 5.0})
+
+        self.assertAlmostEqual(courier.current_weight, 9.0, places=6)
+        self.assertEqual(heavy.courier_id, courier)
+        self.assertEqual(light.courier_id, courier)
+        self.assertEqual(heavy.state, "assigned")
+        self.assertEqual(light.state, "assigned")
+
+        with self.assertRaisesRegex(UserError, "no weight capacity"):
+            candidate.action_assign(courier.id)
+
+        heavy.action_unassign()
+        candidate.action_assign(courier.id)
+
+        self.assertAlmostEqual(courier.current_weight, 4.0, places=6)
+        self.assertEqual(light.courier_id, courier)
+        self.assertEqual(candidate.courier_id, courier)
+        self.assertEqual(candidate.state, "assigned")
+
     def test_assignment_converts_weight_before_checking_capacity(self):
         courier = self.create_courier(
             max_concurrent_shipments=10,
