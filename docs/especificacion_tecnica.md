@@ -484,12 +484,20 @@ elegir al repartidor anterior y llama a `action_retry_delivery`.
 
 ### 10.1 Primitivas
 
+[`ResCompany`](../addons/parcel_transport_management/models/res_company.py)
+define:
+
+1. `_lock_package_limits()`: `SELECT ... FROM res_company ... ORDER BY id FOR UPDATE`
+   seguido de `UPDATE res_company SET write_date = write_date`. Esta primitiva
+   serializa la reconfiguración del límite máximo por paquete con las
+   operaciones que crean, modifican o vuelven a validar paquetes.
+
 [`ParcelShipment`](../addons/parcel_transport_management/models/shipment.py)
 define:
 
-1. `_lock_shipments()`: `SELECT ... FROM parcel_shipment ... ORDER BY id FOR UPDATE`;
-2. `_lock_packages()`: `SELECT ... FROM parcel_package ... ORDER BY id FOR UPDATE`;
-3. `_lock_couriers()`: `SELECT ... FROM parcel_courier ... ORDER BY id FOR UPDATE`
+2. `_lock_shipments()`: `SELECT ... FROM parcel_shipment ... ORDER BY id FOR UPDATE`;
+3. `_lock_packages()`: `SELECT ... FROM parcel_package ... ORDER BY id FOR UPDATE`;
+4. `_lock_couriers()`: `SELECT ... FROM parcel_courier ... ORDER BY id FOR UPDATE`
    seguido de `UPDATE parcel_courier SET write_date = write_date`.
 
 Cada conjunto MUST ordenarse por ID ascendente. Después del bloqueo, el ORM MUST
@@ -498,16 +506,31 @@ invalidar los campos relevantes para no decidir con caché obsoleta.
 ### 10.2 Orden global
 
 Toda operación que necesite varias clases de filas MUST adquirirlas en este
-orden total:
+orden total ampliado:
 
 ```text
-shipment(s) por id -> package(s) por id -> courier(s) por id
+company/package-limit por id -> shipment(s) por id -> package(s) por id -> courier(s) por id
 ```
 
-La operación MUST NOT invertir esta jerarquía. En una reasignación se bloquean
-juntos el repartidor anterior y el nuevo; en un fallo se bloquea el repartidor
-actual antes de liberarlo; en un reintento se bloquea el candidato. Los IDs de
-cada conjunto se ordenan y `_lock_couriers()` conserva su `UPDATE` neutro.
+El nivel `company/package-limit` se aplica únicamente a operaciones que
+participan en la serialización del límite máximo empresarial por paquete. Una
+operación MAY comenzar en el primer nivel que necesite y omitir niveles que no
+utilice, pero MUST NOT adquirir posteriormente un nivel anterior ni invertir la
+jerarquía.
+
+Ejemplos normativos del orden:
+
+- `action_assign`: empresa/límite -> envío -> paquete -> repartidor;
+- creación de paquete: empresa/límite -> envío;
+- cambio de peso o UoM de paquete: empresa/límite -> envío -> paquete;
+- una reasignación que no modifica ni revalida el límite empresarial MAY
+  comenzar en envío y continuar con paquete -> repartidor.
+
+En una reasignación se bloquean juntos el repartidor anterior y el nuevo; en un
+fallo se bloquea el repartidor actual antes de liberarlo; en un reintento se
+bloquea el candidato. Los IDs de cada conjunto se ordenan,
+`_lock_package_limits()` conserva su `UPDATE` neutro sobre la empresa y
+`_lock_couriers()` conserva el suyo sobre el repartidor.
 
 ### 10.3 Semántica transaccional
 
@@ -515,6 +538,10 @@ cada conjunto se ordenan y `_lock_couriers()` conserva su `UPDATE` neutro.
   pertenecer a la misma transacción PostgreSQL.
 - Una excepción MUST revertir la operación completa; no debe quedar evento sin
   estado, estado sin evento ni reserva parcial.
+- El `UPDATE` neutro de la empresa MUST convertir cambios concurrentes del
+  máximo por paquete y mutaciones de paquetes bajo el snapshot repeatable-read
+  de Odoo en serialización o revalidación, en vez de permitir que ambas
+  operaciones confirmen dejando un paquete no terminal fuera del límite vigente.
 - El `UPDATE` neutro del repartidor MUST convertir lecturas de capacidad
   concurrentes bajo el snapshot repeatable-read de Odoo en conflicto de
   serialización, en vez de permitir dos reservas basadas en carga obsoleta.

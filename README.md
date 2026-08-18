@@ -28,7 +28,9 @@ Contratos principales:
 - el peso es finito y positivo, usa unidades compatibles y respeta el máximo por paquete; cambiar el límite no puede invalidar envíos no terminales y la asignación vuelve a validarlo tras bloquear los paquetes;
 - la capacidad del repartidor se limita simultáneamente por número de envíos y peso; `delivery_failed` no reserva capacidad y el reintento valida de nuevo ambos límites;
 - recogida, inicio de tránsito, entrega y fallo comprueban ACL, reglas y autorización antes de bloquear, y repiten después la autorización ligada al repartidor mutable;
-- asignación, reasignación, recogida, entrega, fallo, reintento y cancelación bloquean filas en PostgreSQL en el orden envío → paquete → repartidor;
+- las operaciones concurrentes respetan un orden global de bloqueo
+  empresa/límite de paquete → envío → paquete → repartidor, comenzando en el
+  primer nivel aplicable y sin invertir nunca la jerarquía;
 - las direcciones y zonas se congelan en el envío para conservar su historial;
 - los cambios de SLA, ruta y repartidor activo, además de cada intento fallido y su único reintento, quedan auditados con actor, fecha y motivo;
 - los hechos `parcel.delivery.attempt` y `parcel.delivery.retry` son append-only, se crean solo desde acciones de dominio y no aceptan edición ni borrado;
