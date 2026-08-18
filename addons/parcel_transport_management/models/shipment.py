@@ -196,6 +196,11 @@ class ParcelShipment(models.Model):
         readonly=True,
         copy=False,
     )
+    is_overdue = fields.Boolean(
+        string="Delayed",
+        compute="_compute_is_overdue",
+        search="_search_is_overdue",
+    )
     cancellation_reason = fields.Text(readonly=True, copy=False, tracking=True)
     cancelled_at = fields.Datetime(readonly=True, copy=False)
     total_weight_kg = fields.Float(
@@ -247,6 +252,37 @@ class ParcelShipment(models.Model):
                     ).total_seconds()
                     / 3600.0,
                 )
+
+    @api.depends("expected_delivery_at", "state")
+    def _compute_is_overdue(self):
+        now = fields.Datetime.now()
+        for shipment in self:
+            shipment.is_overdue = bool(
+                shipment.expected_delivery_at
+                and shipment.expected_delivery_at < now
+                and shipment.state not in ("delivered", "cancelled")
+            )
+
+    @api.model
+    def _search_is_overdue(self, operator, value):
+        if operator not in ("=", "!=") or not isinstance(value, bool):
+            raise NotImplementedError(
+                "The delayed flag only supports boolean equality searches."
+            )
+        now = fields.Datetime.now()
+        overdue_domain = [
+            ("expected_delivery_at", "<", now),
+            ("state", "not in", ("delivered", "cancelled")),
+        ]
+        if (operator == "=" and value) or (operator == "!=" and not value):
+            return overdue_domain
+        return [
+            "|",
+            ("state", "in", ("delivered", "cancelled")),
+            "|",
+            ("expected_delivery_at", "=", False),
+            ("expected_delivery_at", ">=", now),
+        ]
 
     @api.model
     def _new_reference(self):
@@ -515,6 +551,7 @@ class ParcelShipment(models.Model):
             )
 
     def _require_operational_access(self):
+        self.check_access("write")
         if self._is_operator_or_manager():
             return
         self.ensure_one()
@@ -624,6 +661,7 @@ class ParcelShipment(models.Model):
             raise UserError(
                 _("The courier and shipment must belong to the same company.")
             )
+        packages._check_weight_configuration()
         self._check_courier_capacity(courier, shipments)
 
         now = fields.Datetime.now()
@@ -835,6 +873,7 @@ class ParcelShipment(models.Model):
 
     def action_record_pickup(self, package_ids, note=None):
         self.ensure_one()
+        self._require_operational_access()
         shipment = self._lock_shipments()
         packages = shipment._lock_packages()
         courier = shipment.courier_id
@@ -874,6 +913,7 @@ class ParcelShipment(models.Model):
 
     def action_start_transit(self):
         self.ensure_one()
+        self._require_operational_access()
         shipment = self._lock_shipments()
         packages = shipment._lock_packages()
         courier = shipment.courier_id
@@ -897,6 +937,7 @@ class ParcelShipment(models.Model):
 
     def action_record_delivery(self, package_ids, recipient_name=None, note=None):
         self.ensure_one()
+        self._require_operational_access()
         shipment = self._lock_shipments()
         packages = shipment._lock_packages()
         courier = shipment.courier_id
@@ -942,6 +983,7 @@ class ParcelShipment(models.Model):
 
     def action_record_delivery_failure(self, reason):
         self.ensure_one()
+        self._require_operational_access()
         shipment = self._lock_shipments()
         packages = shipment._lock_packages()
         courier = shipment.courier_id

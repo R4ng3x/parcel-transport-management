@@ -29,6 +29,36 @@ class TestParcelCore(ParcelTestCase):
         self.assertEqual(courier.max_concurrent_weight, 300.0)
         self.assertEqual(courier.max_weight_uom_id, self.lb_uom)
 
+    def test_package_default_uom_uses_shipment_company(self):
+        shipment = self.create_shipment(
+            company=self.other_company,
+            sender=self.other_sender,
+            recipient=self.other_recipient,
+            packages=[],
+        )
+        package_model = (
+            self.env["parcel.package"]
+            .with_context(
+                allowed_company_ids=(self.company | self.other_company).ids,
+            )
+            .with_company(self.company)
+        )
+
+        package = package_model.create(
+            {
+                "shipment_id": shipment.id,
+                "weight": 10.0,
+            }
+        )
+
+        self.assertEqual(package.company_id, self.other_company)
+        self.assertEqual(package.weight_uom_id, self.lb_uom)
+        self.assertAlmostEqual(
+            package.weight_kg,
+            self.lb_uom._compute_quantity(10.0, self.kg_uom, round=False),
+            places=6,
+        )
+
     def test_courier_company_is_allowed_on_create_and_immutable_afterward(self):
         courier_model = self.env["parcel.courier"].with_context(
             allowed_company_ids=self.company.ids
@@ -243,6 +273,63 @@ class TestParcelCore(ParcelTestCase):
             self.create_package(shipment, weight=10.01, uom=self.lb_uom)
         with self.assertRaises(ValidationError):
             self.create_package(shipment, weight=5.0, uom=self.kg_uom)
+
+    def test_company_package_limit_change_rejects_invalidating_open_shipments(self):
+        shipment = self.create_shipment(
+            packages=[{"weight": 20.0, "weight_uom_id": self.kg_uom.id}]
+        )
+        original_limit = self.company.parcel_max_package_weight
+        original_uom = self.company.parcel_max_package_weight_uom_id
+
+        with self.assertRaises(ValidationError):
+            self.company.write({"parcel_max_package_weight": 10.0})
+        self.company.invalidate_recordset(
+            [
+                "parcel_max_package_weight",
+                "parcel_max_package_weight_uom_id",
+            ]
+        )
+        self.assertEqual(self.company.parcel_max_package_weight, original_limit)
+        self.assertEqual(
+            self.company.parcel_max_package_weight_uom_id,
+            original_uom,
+        )
+        self.assertEqual(shipment.state, "draft")
+
+        shipment.action_assign(self.courier.id)
+
+        with self.assertRaises(ValidationError):
+            self.company.write({"parcel_max_package_weight_uom_id": self.lb_uom.id})
+        self.company.invalidate_recordset(
+            [
+                "parcel_max_package_weight",
+                "parcel_max_package_weight_uom_id",
+            ]
+        )
+        self.assertEqual(self.company.parcel_max_package_weight, original_limit)
+        self.assertEqual(
+            self.company.parcel_max_package_weight_uom_id,
+            original_uom,
+        )
+        self.assertEqual(shipment.state, "assigned")
+
+    def test_assignment_revalidates_package_weight_after_limit_change(self):
+        shipment = self.create_shipment(
+            packages=[{"weight": 20.0, "weight_uom_id": self.kg_uom.id}]
+        )
+        # Simulate a stale configuration state so the transition remains a
+        # defense-in-depth boundary independent of the settings write guard.
+        self.env.cr.execute(
+            "UPDATE res_company SET parcel_max_package_weight = %s WHERE id = %s",
+            [10.0, self.company.id],
+        )
+        self.company.invalidate_recordset(["parcel_max_package_weight"])
+
+        with self.assertRaises(ValidationError):
+            shipment.action_assign(self.courier.id)
+
+        self.assertEqual(shipment.state, "draft")
+        self.assertFalse(shipment.courier_id)
 
     def test_packages_are_mutable_only_before_operations_start(self):
         shipment = self.create_shipment()

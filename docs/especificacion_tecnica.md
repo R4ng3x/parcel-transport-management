@@ -200,7 +200,7 @@ erDiagram
 | `parcel.shipment`             | `reference`, `company_id`, `sender_id`, `recipient_id`, `courier_id`, `package_ids`, `state`                                        | Referencia única de servidor; empresa inmutable; agregado operativo        |
 | `parcel.shipment`             | `pickup_*`, `delivery_*`, `origin_zone_id`, `destination_zone_id`, `coverage_warning`                                               | Snapshot de ruta y cobertura                                               |
 | `parcel.shipment`             | `expected_delivery_at`, `original_expected_delivery_at`, `first_picked_up_at`, `transit_started_at`, `delivered_at`, `cancelled_at` | SLA y marcas temporales controladas                                        |
-| `parcel.shipment`             | `delay_hours`, `original_delay_hours`, `total_weight_kg`                                                                            | Valores calculados                                                         |
+| `parcel.shipment`             | `delay_hours`, `original_delay_hours`, `is_overdue`, `total_weight_kg`                                                              | Valores calculados                                                         |
 | `parcel.package`              | `shipment_id`, `company_id`, `tracking_code`, `weight`, `weight_uom_id`, `weight_kg`                                                | Código global único; peso positivo y convertible                           |
 | `parcel.package`              | `pickup_event_id`, `delivery_event_id`, `delivery_attempt_ids`                                                                      | Eventos únicos de recogida/entrega; relación de intentos protegida         |
 | `parcel.courier`              | `company_id`, `user_id`, `availability`, `active`, `zone_ids`                                                                       | Perfil y disponibilidad; usuario único por empresa                         |
@@ -292,8 +292,8 @@ y
    en `draft`.
 3. `weight` MUST ser finito en la práctica de conversión, estrictamente positivo
    y usar una unidad de la categoría peso.
-4. El peso convertido sin redondeo MUST ser menor o igual al máximo configurado
-   en la empresa.
+4. Al crear o modificar un paquete y al asignar su envío, el peso convertido sin
+   redondeo MUST ser menor o igual al máximo vigente de la empresa.
 5. `tracking_code` MUST ser globalmente único, generado por servidor y no
    aceptado desde el cliente.
 6. El formato canónico MUST ser `PTM-XXXX-XXXX-XXXX-XXXX`, con 16 símbolos del
@@ -302,6 +302,11 @@ y
    `delivery_attempt_ids` MUST NOT modificarse por escritura directa.
 8. Cada paquete MUST vincular como máximo un evento de recogida y uno de entrega.
 9. Un paquete MUST NOT entregarse antes de haber sido recogido.
+10. `action_assign` MUST volver a validar peso, unidad y máximo empresarial
+    vigentes después de bloquear los paquetes.
+11. Cambiar el máximo o su unidad MUST NOT invalidar paquetes de envíos no
+    terminales, incluidos los borradores. Los envíos terminales conservan su
+    interpretación histórica.
 
 Implementación: `ParcelPackage` en
 [`models/package.py`](../addons/parcel_transport_management/models/package.py).
@@ -363,6 +368,9 @@ Implementación: `_check_courier_capacity` y `_shipment_weight_in_uom` en
    motivo no vacío; MUST NOT aplicarse en `delivered` o `cancelled`.
 10. El contrato actual NO exige que el SLA inicial o revisado esté en el futuro;
     los SLA ya vencidos son válidos y alimentan la detección de retraso.
+11. `is_overdue` MUST calcularse dinámicamente como SLA vigente anterior a
+    `now` en un estado no terminal; la lista y el filtro nativos MUST usar esa
+    misma semántica.
 
 ### 7.4 Direcciones, zonas y cobertura
 
@@ -441,6 +449,11 @@ Las operaciones MUST usar:
 - `action_cancel`, `action_revise_sla`, `action_correct_route`.
 
 Un flag de contexto como `ptm_internal_write=True` MUST NOT eludir las guardas.
+`action_record_pickup`, `action_start_transit`, `action_record_delivery` y
+`action_record_delivery_failure` MUST comprobar ACL, reglas de registro y
+autorización contextual antes de ejecutar SQL de bloqueo. Después de adquirir
+los locks MUST repetir la autorización ligada a la asignación mutable, para
+evitar una carrera entre la comprobación y la operación.
 Las llamadas internas controladas usan `super().write()` tras autorización,
 bloqueos y validaciones. Los asistentes
 [`assignment.py`](../addons/parcel_transport_management/wizards/assignment.py),
@@ -587,6 +600,9 @@ paquetes hermanos. `current_status` se calcula para el paquete consultado, no
 copia ciegamente el estado agregado del envío. El fallo se representa solo por
 el hito genérico `delivery_failed`; el despacho posterior añade otro hito
 genérico `in_transit`, sin exponer ninguno de los dos motivos internos.
+La cronología solo MAY incluir hitos respaldados por una marca temporal de
+dominio fiable. `assigned` MAY ser el `current_status`, pero no se crea como
+hito mientras no exista una fecha propia; `write_date` MUST NOT sustituirla.
 
 ### 12.4 Privacidad y localización HTTP
 

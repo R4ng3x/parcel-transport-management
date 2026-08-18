@@ -397,6 +397,18 @@ class TestPublicTracking(HttpCase):
             self.assertNotIn(marker, serialized)
         self.assertNotIn(self.package_b.tracking_code, serialized)
 
+    def test_public_timeline_omits_unverified_assignment_timestamp(self):
+        shipment = self.package_b.shipment_id
+        shipment.action_assign(self.courier.id)
+
+        data = self.package_b.get_public_tracking_data()
+
+        self.assertEqual(data["current_status"], "assigned")
+        self.assertNotIn(
+            "assigned",
+            [item["status"] for item in data["timeline"]],
+        )
+
     def test_failure_and_retry_are_publicly_generic_without_internal_reason(self):
         shipment = self.package_b.shipment_id
         courier_name = "PII-RETRY-COURIER-1H7N"

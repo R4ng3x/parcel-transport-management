@@ -77,6 +77,46 @@ class ResCompany(models.Model):
                 )
         return super().create(vals_list)
 
+    def _validate_operational_package_limits(self, values):
+        limit_fields = {
+            "parcel_max_package_weight",
+            "parcel_max_package_weight_uom_id",
+        }
+        if not limit_fields.intersection(values):
+            return
+
+        shipments = (
+            self.env["parcel.shipment"]
+            .sudo()
+            .search(
+                [
+                    ("company_id", "in", self.ids),
+                    ("state", "not in", ("delivered", "cancelled")),
+                ],
+                order="id",
+            )
+        )
+        shipments = shipments._lock_shipments().filtered(
+            lambda shipment: shipment.state not in ("delivered", "cancelled")
+        )
+        packages = shipments._lock_packages()
+        for company in self:
+            company_packages = packages.filtered(
+                lambda package, company=company: package.company_id.id == company.id
+            )
+            if not company_packages:
+                continue
+            maximum = values.get(
+                "parcel_max_package_weight",
+                company.parcel_max_package_weight,
+            )
+            maximum_uom_id = values.get(
+                "parcel_max_package_weight_uom_id",
+                company.parcel_max_package_weight_uom_id.id,
+            )
+            maximum_uom = self.env["uom.uom"].sudo().browse(maximum_uom_id).exists()
+            company_packages._validate_weight_limit(maximum, maximum_uom)
+
     def write(self, values):
         if "parcel_max_package_weight" in values:
             self._validate_max_package_weight(values["parcel_max_package_weight"])
@@ -84,6 +124,7 @@ class ResCompany(models.Model):
             self._validate_default_courier_max_weight(
                 values["parcel_default_courier_max_weight"]
             )
+        self._validate_operational_package_limits(values)
         return super().write(values)
 
     @api.constrains(

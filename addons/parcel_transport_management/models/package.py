@@ -56,7 +56,6 @@ class ParcelPackage(models.Model):
         string="Weight Unit",
         required=True,
         ondelete="restrict",
-        default=lambda self: self.env.company.parcel_max_package_weight_uom_id,
     )
     weight_kg = fields.Float(
         compute="_compute_weight_kg",
@@ -122,9 +121,12 @@ class ParcelPackage(models.Model):
             if not self.search_count([("tracking_code", "=", code)], limit=1):
                 return code
 
-    @api.constrains("weight", "weight_uom_id", "company_id")
-    def _check_weight_configuration(self):
+    def _validate_weight_limit(self, maximum, maximum_uom):
         kg_uom = self.env.ref("uom.product_uom_kgm")
+        if not maximum_uom or not maximum_uom._has_common_reference(kg_uom):
+            raise ValidationError(
+                _("The company maximum package weight unit is not configured.")
+            )
         for package in self:
             if not _is_strictly_positive_finite(package.weight):
                 raise ValidationError(_("Package weight must be strictly positive."))
@@ -132,12 +134,6 @@ class ParcelPackage(models.Model):
                 package.weight_uom_id._has_common_reference(kg_uom)
             ):
                 raise ValidationError(_("Package weight must use a weight unit."))
-            maximum = package.company_id.parcel_max_package_weight
-            maximum_uom = package.company_id.parcel_max_package_weight_uom_id
-            if not maximum_uom:
-                raise ValidationError(
-                    _("The company maximum package weight unit is not configured.")
-                )
             converted = package.weight_uom_id._compute_quantity(
                 package.weight, maximum_uom, round=False
             )
@@ -152,6 +148,14 @@ class ParcelPackage(models.Model):
                     }
                 )
 
+    @api.constrains("weight", "weight_uom_id", "company_id")
+    def _check_weight_configuration(self):
+        for package in self:
+            package._validate_weight_limit(
+                package.company_id.parcel_max_package_weight,
+                package.company_id.parcel_max_package_weight_uom_id,
+            )
+
     @api.model_create_multi
     def create(self, vals_list):
         shipment_ids = {
@@ -165,6 +169,7 @@ class ParcelPackage(models.Model):
             raise ValidationError(_("A valid shipment is required."))
         if any(shipment.state != "draft" for shipment in shipments):
             raise UserError(_("Packages can only be added to draft shipments."))
+        shipments_by_id = {shipment.id: shipment for shipment in shipments}
 
         prepared = []
         for incoming in vals_list:
@@ -179,6 +184,11 @@ class ParcelPackage(models.Model):
                 "delivery_attempt_ids",
             }.intersection(values):
                 raise AccessError(_("Package events cannot be set directly."))
+            shipment = shipments_by_id.get(values.get("shipment_id"))
+            if shipment and "weight_uom_id" not in values:
+                values["weight_uom_id"] = (
+                    shipment.company_id.parcel_max_package_weight_uom_id.id
+                )
             values["tracking_code"] = self._new_tracking_code()
             prepared.append(values)
         return super().create(prepared)
@@ -264,8 +274,6 @@ class ParcelPackage(models.Model):
                 )
 
         add_timeline_item("draft", self.create_date)
-        if shipment.state == "assigned":
-            add_timeline_item("assigned", shipment.write_date)
         add_timeline_item("picked_up", pickup.occurred_at if pickup else False)
         if pickup and shipment.transit_started_at:
             add_timeline_item("in_transit", shipment.transit_started_at)

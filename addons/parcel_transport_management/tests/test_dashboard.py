@@ -299,6 +299,32 @@ class TestParcelDashboard(ParcelTestCase):
             warning_item["coverage_warning_reason"], uncovered.coverage_warning
         )
 
+    def test_overdue_search_matches_dynamic_open_shipment_semantics(self):
+        overdue = self.create_shipment(
+            expected_delivery_at=self.NOW - timedelta(hours=1)
+        )
+        upcoming = self.create_shipment(
+            expected_delivery_at=self.NOW + timedelta(hours=1)
+        )
+        cancelled = self.create_shipment(
+            expected_delivery_at=self.NOW - timedelta(hours=1)
+        )
+        cancelled.action_cancel("Cancelled overdue test shipment")
+        candidates = overdue | upcoming | cancelled
+
+        with patch.object(fields.Datetime, "now", return_value=self.NOW):
+            self.assertTrue(overdue.is_overdue)
+            self.assertFalse(upcoming.is_overdue)
+            self.assertFalse(cancelled.is_overdue)
+            matches = self.env["parcel.shipment"].search(
+                [
+                    ("id", "in", candidates.ids),
+                    ("is_overdue", "=", True),
+                ]
+            )
+
+        self.assertEqual(matches, overdue)
+
     def test_lanes_zone_pressure_and_courier_capacity_are_aggregated(self):
         origin_zone = self.env["parcel.delivery.zone"].create(
             {

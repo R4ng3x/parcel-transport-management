@@ -8,7 +8,7 @@
                 class="o_ptm_native_view o_ptm_shipment_view"
                 string="Shipments"
                 default_order="id desc"
-                decoration-danger="state == 'delivery_failed' or (delay_hours &gt; 0 and state not in ['delivered', 'cancelled'])"
+                decoration-danger="state == 'delivery_failed' or is_overdue"
                 decoration-warning="state in ['partially_picked_up', 'partially_delivered']"
                 decoration-info="state == 'in_transit'"
                 decoration-success="state == 'delivered'"
@@ -23,6 +23,7 @@
                 <field name="total_weight_kg" optional="show" />
                 <field name="expected_delivery_at" optional="show" />
                 <field name="delay_hours" string="Delay (h)" optional="hide" />
+                <field name="is_overdue" column_invisible="True" />
                 <field
                     name="state"
                     widget="badge"
@@ -566,7 +567,7 @@
                     string="Coverage Review"
                     domain="[('coverage_warning', '!=', False)]"
                 />
-                <filter name="delayed" string="Delayed" domain="[('delay_hours', '&gt;', 0)]" />
+                <filter name="delayed" string="Delayed" domain="[('is_overdue', '=', True)]" />
                 <filter
                     name="expected_delivery_at"
                     string="Delivery Date"

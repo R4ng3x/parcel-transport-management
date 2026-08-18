@@ -1281,6 +1281,7 @@ msgid "Delay Hours"
 msgstr "Horas de retraso"
 
 #. module: parcel_transport_management
+#: model:ir.model.fields,field_description:parcel_transport_management.field_parcel_shipment__is_overdue
 #: model_terms:ir.ui.view,arch_db:parcel_transport_management.view_ptm_shipment_search
 msgid "Delayed"
 msgstr "Con retraso"

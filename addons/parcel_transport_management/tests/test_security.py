@@ -1,4 +1,5 @@
 from datetime import timedelta
+from unittest.mock import patch
 
 from odoo import Command, fields
 from odoo.exceptions import AccessError, UserError, ValidationError
@@ -205,6 +206,64 @@ class TestParcelSecurity(ParcelTestCase):
             )
         self.assertEqual(other_shipment.state, "assigned")
         self.assertFalse(other_shipment.package_ids.pickup_event_id)
+
+    def test_unauthorized_operational_calls_are_rejected_before_locking(self):
+        self._courier_for_courier_user()
+        shipment = self.create_shipment()
+        shipment.action_assign(self.create_courier().id)
+        package_ids = shipment.package_ids.ids
+        unauthorized = shipment.with_user(self.courier_user)
+        operations = (
+            (
+                "pickup",
+                lambda: unauthorized.action_record_pickup(package_ids),
+            ),
+            ("transit", unauthorized.action_start_transit),
+            (
+                "delivery",
+                lambda: unauthorized.action_record_delivery(
+                    package_ids,
+                    recipient_name="Receiving Clerk",
+                ),
+            ),
+            (
+                "delivery_failure",
+                lambda: unauthorized.action_record_delivery_failure(
+                    "Unauthorized attempt"
+                ),
+            ),
+        )
+
+        for operation_name, operation in operations:
+            with self.subTest(operation=operation_name):
+                with patch.object(
+                    type(unauthorized),
+                    "_lock_shipments",
+                    side_effect=AssertionError("unauthorized call acquired a row lock"),
+                ) as lock_shipments:
+                    with self.assertRaises(AccessError):
+                        operation()
+                    lock_shipments.assert_not_called()
+
+    def test_cross_company_operator_is_rejected_before_locking(self):
+        shipment = self.create_shipment(
+            company=self.other_company,
+            sender=self.other_sender,
+            recipient=self.other_recipient,
+        )
+        shipment.action_assign(self.create_courier(company=self.other_company).id)
+        unauthorized = shipment.with_user(self.operator_user).with_context(
+            allowed_company_ids=self.company.ids,
+        )
+
+        with patch.object(
+            type(unauthorized),
+            "_lock_shipments",
+            side_effect=AssertionError("unauthorized call acquired a row lock"),
+        ) as lock_shipments:
+            with self.assertRaises(AccessError):
+                unauthorized.action_start_transit()
+            lock_shipments.assert_not_called()
 
     def test_company_rules_hide_shipments_outside_allowed_companies(self):
         other_company_shipment = self.create_shipment(

@@ -25,14 +25,15 @@ Contratos principales:
 - no se puede iniciar el transporte sin repartidor asignado;
 - todos los paquetes deben estar recogidos antes de pasar a tránsito;
 - un paquete solo puede recogerse y entregarse una vez;
-- el peso es positivo, usa unidades de peso compatibles y respeta el máximo por paquete;
+- el peso es finito y positivo, usa unidades compatibles y respeta el máximo por paquete; cambiar el límite no puede invalidar envíos no terminales y la asignación vuelve a validarlo tras bloquear los paquetes;
 - la capacidad del repartidor se limita simultáneamente por número de envíos y peso; `delivery_failed` no reserva capacidad y el reintento valida de nuevo ambos límites;
+- recogida, inicio de tránsito, entrega y fallo comprueban ACL, reglas y autorización antes de bloquear, y repiten después la autorización ligada al repartidor mutable;
 - asignación, reasignación, recogida, entrega, fallo, reintento y cancelación bloquean filas en PostgreSQL en el orden envío → paquete → repartidor;
 - las direcciones y zonas se congelan en el envío para conservar su historial;
 - los cambios de SLA, ruta y repartidor activo, además de cada intento fallido y su único reintento, quedan auditados con actor, fecha y motivo;
 - los hechos `parcel.delivery.attempt` y `parcel.delivery.retry` son append-only, se crean solo desde acciones de dominio y no aceptan edición ni borrado;
 - las escrituras directas de estado, repartidor, eventos y marcas temporales están bloqueadas;
-- el tracking público mantiene las mismas claves y solo añade hitos genéricos de fallo y vuelta a tránsito: nunca devuelve motivos, notas, identidades, IDs, direcciones ni paquetes hermanos.
+- el tracking público mantiene las mismas claves y una cronología respaldada solo por marcas temporales de dominio: no sustituye una asignación sin fecha por `write_date` y nunca devuelve motivos, notas, identidades, IDs, direcciones ni paquetes hermanos.
 
 ## Arquitectura
 
@@ -52,7 +53,7 @@ parcel.courier <-> parcel.delivery.zone <- parcel.zone.postcode.rule
 
 La lógica reside en modelos Python. Las vistas, asistentes y el Command Center OWL llaman a métodos de dominio; no escriben campos operativos directamente.
 
-- **Interfaz nativa:** listas, formularios, kanban no arrastrable, configuración y asistentes de operación.
+- **Interfaz nativa:** listas, formularios, kanban no arrastrable, configuración, filtro dinámico de SLA vencido y asistentes de operación.
 - **Command Center OWL:** red/panel operativo abstracto con cola de hasta 50 envíos, hasta 8 carriles origen-destino, hasta 8 zonas de presión destino, 50 repartidores y 8 actividades; refresco secuencial cada 60 segundos y conservación de la última instantánea válida ante errores.
 - **Tracking público:** búsqueda por código globalmente único, controlador sin ACL ORM pública, DTO explícito, respuesta genérica para códigos inválidos y cabeceras `no-store`/`noindex`.
 - **Documentos operativos:** manifiesto A4 del envío y etiqueta térmica de 100 × 150 mm por paquete con código de barras Code128; ambos respetan ACL y reglas multiempresa antes de renderizar.
@@ -65,7 +66,7 @@ Se escribieron primero contratos observables para la lógica con riesgo real:
 - máquina de estados y transiciones inválidas;
 - requisito de repartidor y disponibilidad;
 - generación, formato y unicidad de referencias y tracking;
-- peso, unidades, fechas, direcciones y resolución de zonas;
+- peso, UoM resuelta por empresa del envío, reconfiguración de límites, fechas, direcciones y resolución de zonas;
 - capacidad dual y carreras por el último hueco o kilogramo;
 - recogidas y entregas parciales, duplicadas o concurrentes;
 - fallo total o tras entrega parcial, liberación de capacidad y restauración derivada al reintentar;
@@ -73,8 +74,8 @@ Se escribieron primero contratos observables para la lógica con riesgo real:
 - dos envíos fallidos que compiten por el último hueco de reintento;
 - cancelación frente a entrega concurrente;
 - revisiones de SLA, correcciones de ruta y reasignación activa;
-- permisos, aislamiento multiempresa, históricos append-only y contextos RPC falsificados;
-- contrato exacto e inalterado del dashboard y privacidad HTTP del tracking, incluidos los hitos genéricos de fallo/reintento.
+- permisos antes de los locks, aislamiento multiempresa, históricos append-only y contextos RPC falsificados;
+- contrato exacto del dashboard, búsqueda dinámica de retrasos y privacidad HTTP del tracking, incluida la ausencia de hitos sin fecha fiable.
 
 No se duplican con tests de bajo valor las garantías declarativas de Odoo: posición exacta de campos, colores, iconos, XML puramente visual ni CRUD básico. Esos aspectos se verifican instalando el módulo y recorriendo los escenarios de escritorio y móvil en navegador.
 
